@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: plans
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: plans
+  template:
+    metadata:
+      labels:
+        app: plans
+    spec:
+      containers:
+        - name: plans-contenedor
+          image: Por definir
+          envFrom:
+            - secretRef:
+                name: db-secrets
+          ports:
+            - containerPort: 3000
+
+---
+# healthcheck
+
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: plans-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3003
+    type: HTTP
+    requestPath: /plans/ping
+
+---
+#Service
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: plans
+  annotations:
+    cloud.google.com/backend-config: '{"default": "plans-config"}'
+spec:
+  selector:
+    app: plans
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3003
+      nodePort: 32334
+  type: NodePort
