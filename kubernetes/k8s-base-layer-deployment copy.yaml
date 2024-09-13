@@ -1,63 +1,3 @@
-# Deploy plans
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  name: plans-deployment
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: plans
-  template:
-    metadata:
-      labels:
-        app: plans
-    spec:
-      containers:
-        - name: plans-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:1.0
-          envFrom:
-            - secretRef:
-                name: db-secrets
-          ports:
-            - containerPort: 3003
-
----
-# healthcheck
-
-apiVersion: cloud.google.com/v1
-kind: BackendConfig
-metadata:
-  name: plans-config
-spec:
-  healthCheck:
-    checkIntervalSec: 60
-    port: 3003
-    type: HTTP
-    requestPath: /plans/ping
-
----
-#Service
-
-apiVersion: v1
-kind: Service
-metadata:
-  name: plans-service
-  annotations:
-    cloud.google.com/backend-config: '{"default": "plans-config"}'
-spec:
-  selector:
-    app: plans
-  ports:
-    - protocol: TCP
-      port: 80
-      targetPort: 3003
-      nodePort: 32334
-  type: NodePort
-
-# Deploy invoices
-
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -93,7 +33,7 @@ spec:
     checkIntervalSec: 60
     port: 3002
     type: HTTP
-    requestPath: /invoices/ping
+    requestPath: /invoice/ping
 
 ---
 #Service
@@ -168,5 +108,3 @@ spec:
       targetPort: 3001
       nodePort: 32336
   type: NodePort
-
-  
