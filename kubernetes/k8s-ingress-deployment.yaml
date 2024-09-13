@@ -22,3 +22,10 @@ spec:
                 name: payments-service
                 port:
                   number: 80
+          - pathType: Prefix
+            path: /plan
+            backend:
+              service:
+                name: plans-service 
+                port:
+                  number: 80
