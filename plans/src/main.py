@@ -45,7 +45,7 @@ def handle_exception(err):
     }
     return jsonify(response), err.code
 
-app.register_blueprint(operations_blueprint)
+app.register_blueprint(operations_blueprint,url_prefix='/plan')
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=3003, debug=True)

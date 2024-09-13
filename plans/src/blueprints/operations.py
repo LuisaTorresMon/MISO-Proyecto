@@ -6,13 +6,13 @@ from src.commands.create import Create
 operations_blueprint = Blueprint('operations', __name__)
 
 # Consultar todos los planes
-@operations_blueprint.route('/plans', methods = ['GET'])
+@operations_blueprint.route('/list', methods = ['GET'])
 def list():
     result = List().execute()
     return make_response(result, 200)
 
 # Consultar un plan especifico
-@operations_blueprint.route('/plans/<string:planId>', methods = ['GET'])
+@operations_blueprint.route('/get/<string:planId>', methods = ['GET'])
 def get(planId):
     result = Get(planId).execute()
     return make_response(result, 200)
@@ -25,6 +25,6 @@ def create():
     return make_response(result, 201)
 
 # Consultar la salud del microservicio
-@operations_blueprint.route('/plans/ping', methods = ['GET'])
+@operations_blueprint.route('/ping', methods = ['GET'])
 def health():
     return 'pong', 200
