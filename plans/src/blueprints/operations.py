@@ -1,6 +1,7 @@
 from flask import Flask, jsonify, make_response, request, Blueprint
 from src.commands.get import Get
 from src.commands.list import List
+from src.commands.create import Create
 
 operations_blueprint = Blueprint('operations', __name__)
 
@@ -15,6 +16,13 @@ def list():
 def get(planId):
     result = Get(planId).execute()
     return make_response(result, 200)
+
+# Crear contrato del plan escogido
+@operations_blueprint.route('/contract', methods = ['POST'])
+def create():
+    data = request.get_json()
+    result = Create(data).execute()
+    return make_response(result, 201)
 
 # Consultar la salud del microservicio
 @operations_blueprint.route('/plans/ping', methods = ['GET'])
