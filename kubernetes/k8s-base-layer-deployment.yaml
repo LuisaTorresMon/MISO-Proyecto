@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: invoices-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/invoices:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/invoices:2.0
           envFrom:
             - secretRef:
                 name: db-secrets

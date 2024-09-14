@@ -14,6 +14,8 @@ class Payment(db.Model):
     facturacion_id = db.Column(db.Integer, nullable=False)
     medio_pago_id = db.Column(db.Integer, nullable=False)
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    intentos = db.Column(db.Integer, nullable=False, default=1) 
+
     
 class PaymentSchema(SQLAlchemyAutoSchema):
     class Meta:

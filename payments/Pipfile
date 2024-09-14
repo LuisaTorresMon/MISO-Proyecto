@@ -22,3 +22,5 @@ pytest-mock = "*"
 pytest-env = "*"
 pytest-flask = "*"
 Flask-Migrate = "*"
+google-cloud-pubsub = "*"
+
