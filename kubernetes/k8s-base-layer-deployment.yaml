@@ -14,16 +14,14 @@ spec:
     spec:
       containers:
         - name: plans-contenedor
-          image: Por definir
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:2.0
           envFrom:
             - secretRef:
                 name: db-secrets
           ports:
-            - containerPort: 3000
+            - containerPort: 3003
 
 ---
-# healthcheck
-
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
@@ -33,11 +31,9 @@ spec:
     checkIntervalSec: 60
     port: 3003
     type: HTTP
-    requestPath: /plans/ping
+    requestPath: /plan/ping
 
 ---
-#Service
-
 apiVersion: v1
 kind: Service
 metadata:
@@ -51,7 +47,7 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 3003
-      nodePort: 32334
+      nodePort: 32337
   type: NodePort
 
 ---
@@ -70,13 +66,13 @@ eason":"ValidMetricFound","message":"the
     autoscaling.alpha.kubernetes.io/current-metrics: '[{"type":"Resource","resource":{"name":"cpu","currentAverageUtilization":1,"currentAverageValue":"2m"}}]'
   name: plans-hpa
 spec:
-  maxReplicas: 3
+  maxReplicas: 2
   minReplicas: 1
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: rnccrcsicovclientms-deployment
-  targetCPUUtilizationPercentage: 50
+    name: plans-deployment
+  targetCPUUtilizationPercentage: 10
 status:
   currentCPUUtilizationPercentage: 1
   currentReplicas: 1
