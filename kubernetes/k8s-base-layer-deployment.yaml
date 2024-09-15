@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: invoices-deployment
+ # namespace: k8s-proyecto-final-namespace
 spec:
   replicas: 1
   selector:
@@ -12,9 +13,10 @@ spec:
       labels:
         app: invoices
     spec:
+      serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: invoices-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/invoices:2.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/invoices:9.0
           envFrom:
             - secretRef:
                 name: db-secrets
@@ -65,15 +67,16 @@ spec:
       labels:
         app: payments
     spec:
+      serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: payments-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/payments:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/payments:10.2
           envFrom:
             - secretRef:
                 name: db-secrets
           ports:
             - containerPort: 3001
-
+            
 ---
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
@@ -102,6 +105,7 @@ spec:
       targetPort: 3001
       nodePort: 32336
   type: NodePort
+
 ---
 apiVersion: apps/v1
 kind: Deployment

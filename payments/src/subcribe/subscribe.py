@@ -13,17 +13,21 @@ project_id = os.environ.get('PROJECT_ID', '')
 subscription_id = os.environ.get('SUBSCRIPTION_ID', '')
 
 payment_service = PaymentService()
+app = None
 
 def callback(message):
-    logging.debug('creando contexto') 
-    Config.init() 
-       
-    logging.debug(f"Recibido mensaje: {message.data}")
-    message.ack()  
+    global app
     
-    payment_data = message.data.decode('utf-8')
+    if app is None:
+        logging.debug('creando contexto')
+        app = Config.init() 
+    
+    with app.app_context():
+        logging.debug(f"Recibido mensaje: {message.data}")    
+        payment_data = message.data.decode('utf-8')
+        payment_service.procesar_cola(json.loads(payment_data))    
+        message.ack()  
 
-    payment_service.procesar_cola(json.loads(payment_data))
 
 def subscribe():
 

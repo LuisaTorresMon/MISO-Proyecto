@@ -15,8 +15,7 @@ logging.basicConfig(level=logging.DEBUG)
 app.register_blueprint(payment_blueprint, url_prefix='/payment')
 
 def start_subscription():
-    with app.app_context():
-        subscribe()
+    subscribe()
 
 threading.Thread(target=start_subscription).start()
 logging.debug('La descripcion ha comenzado')

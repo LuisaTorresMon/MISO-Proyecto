@@ -23,16 +23,19 @@ class PaymentService():
     def procesar_cola(self, invoice):
         
         self.es_excepcion = invoice.get('es_excepcion')
+        self.facturacion_id = invoice.get('facturacion_id')
         
         if self.es_excepcion is True:
             payment = db.session.query(Payment).filter_by(facturacion_id=self.facturacion_id).first()
             if payment:
-                if payment.intentos <= 4:
+                if payment.intentos <= 5:
                     payment.intentos += 1
                     db.session.commit()                
                     raise Exception("Este es un mensaje de excepcion de procesamiento de cola")
-                else:
-                    self.create_payment(invoice)
+            else:
+                self.create_payment(invoice)
+                raise Exception("Este es un mensaje de excepcion de procesamiento de cola")
+
         else:
             self.create_payment(invoice)
             

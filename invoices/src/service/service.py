@@ -1,5 +1,6 @@
 from ..models.models import Invoice, InvoiceSchema, db
 from google.cloud import pubsub_v1
+import google.auth
 from dotenv import load_dotenv
 import logging
 import json
@@ -45,6 +46,10 @@ class InvoiceService():
       return invoices_schema
 
     def encolar(self, invoice):
+        
+        credentials, project = google.auth.default()
+        logging.debug(f"Current account: {credentials.service_account_email}")
+        
         logging.debug('Entrando a encolar')
         topic_path = publisher.topic_path(projec_id, tema_publicacion)
 
