@@ -1,5 +1,5 @@
 from flask import Flask
-from ..models.models import db
+#from ..models.models import db
 from dotenv import load_dotenv
 from os import environ
 
@@ -13,17 +13,15 @@ class Config:
       
       
         db_url = environ.get('SQLALCHEMY_DATABASE_URI')
-        user_path = environ.get('USER_PATH')
 
         app.config['SQLALCHEMY_DATABASE_URI'] = f"{db_url}"
         
         app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-        app.config['USERS_PATH'] = user_path
       
         app_context = app.app_context()
         app_context.push()
         
-        db.init_app(app)
-        db.create_all()
+     #   db.init_app(app)
+     #   db.create_all()
 
         return app

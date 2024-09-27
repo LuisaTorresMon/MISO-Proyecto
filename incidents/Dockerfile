@@ -16,4 +16,4 @@ ENV FLASK_APP=src/main.py
 
 EXPOSE 3002
 
-CMD ["pipenv", "run","python", "-m", "flask", "run", "--host=0.0.0.0", "--port=3002"]
+CMD ["pipenv", "run","python", "-m", "flask", "run", "--host=0.0.0.0", "--port=3004"]
