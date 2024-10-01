@@ -51,7 +51,7 @@ jobs:
         K8S_FILE="kubernetes/k8s-base-layer-deployment.yaml"
         echo "Before:"
         cat $K8S_FILE
-        sed -i "s|image: us-central1-docker.pkg.dev/${GOOGLE_PROJECT}/uniandes-misw-proyecto-grado-19/plans:.*|image: us-central1-docker.pkg.dev/${GOOGLE_PROJECT}/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}|g" $K8S_FILE
+        sed -i "s|image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:.*|image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}|g" $K8S_FILE
         echo "After:"
         cat $K8S_FILE
                 
