@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 name: Deploy ABCall
+=======
+name: Deploy Nginx
+>>>>>>> 53d40def8ae4bac95703cd2f860a98ab678fabdc
 
 on:
   push:
