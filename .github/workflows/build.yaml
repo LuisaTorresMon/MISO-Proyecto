@@ -36,3 +36,13 @@ jobs:
         gcloud auth configure-docker us-central1-docker.pkg.dev
         docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG} ./plans
         docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}
+        
+    - name: Update Kubernetes manifest with latest image version
+      run: |
+        K8S_FILE="kubernetes/k8s-base-layer-deployment.yaml"
+        sed -i "s|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:[0-9]*|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}|g" $K8S_FILE
+        cat $K8S_FILE
+        
+    - name: Apply changes to Kubernetes
+      run: |
+        kubectl apply -f kubernetes/k8s-base-layer-deployment.yaml
