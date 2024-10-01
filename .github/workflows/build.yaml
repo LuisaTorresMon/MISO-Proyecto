@@ -36,6 +36,10 @@ jobs:
         gcloud auth configure-docker us-central1-docker.pkg.dev
         docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG} ./plans
         docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}
+
+    - name: Authenticate to GKE
+      run: |
+        gcloud container clusters get-credentials autopilot-cluster-1 --zone us-central1 --project ${{ secrets.GOOGLE_PROJECT }}
         
     - name: Update Kubernetes manifest with latest image version
       run: |
