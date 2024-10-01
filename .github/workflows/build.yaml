@@ -12,6 +12,14 @@ jobs:
 
     - name: code checkout
       uses: actions/checkout@v2
+    
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Export gcloud related env variable
+      run: export CLOUDSDK_PYTHON="/usr/bin/python3"
 
     - name: install the gcloud cli
       uses: google-github-actions/setup-gcloud@v0
@@ -23,7 +31,18 @@ jobs:
     - name: build and push the docker image
       env:
         GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+        IMAGE_TAG: ${{ github.run_number }}
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
-        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:3.0 .
-        docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/demo/uniandes-misw-proyecto-grado-19/plans:3.0
+        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG} ./plans
+        docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}
+        
+    - name: Update Kubernetes manifest with latest image version
+      run: |
+        K8S_FILE="kubernetes/k8s-base-layer-deployment.yaml"
+        sed -i "s|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:[0-9]*|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}|g" $K8S_FILE
+        cat $K8S_FILE
+        
+    - name: Apply changes to Kubernetes
+      run: |
+        kubectl apply -f kubernetes/k8s-base-layer-deployment.yaml
