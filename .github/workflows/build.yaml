@@ -32,11 +32,6 @@ jobs:
       id: get-version
       run: | 
         IMAGE_TAG: ${{ github.run_number }}
-        echo "Latest version: $IMAGE_TAG"
-
-    #    TAGS=$(gcloud container images list-tags us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans --format='get(tags)') 
-    #    LATEST_VERSION=$(echo "$TAGS" | grep -Eo '([0-9]+\.[0-9]+)' | sort -V | tail -n 1)
-    #    echo "Latest version: $LATEST_VERSION"
 
     - name: build and push the docker image
       env:
