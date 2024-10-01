@@ -11,3 +11,7 @@ class BadRequestError(ApiError):
 class CamposFaltantes(ApiError):
     code = 400
     description = ("Campos faltantes en la solicitud")
+    
+class ServerSystemException(ApiError):
+    code = 500
+    description = "Error en el sistema porfavor contacte con el administrador"

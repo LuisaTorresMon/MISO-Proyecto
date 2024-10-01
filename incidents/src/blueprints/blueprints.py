@@ -1,9 +1,14 @@
 from flask import Blueprint, request, jsonify
 from ..validations.validations import ValidatorIncidents
-import logging
+from ..service.incident_service import IncidentService
+from ..service.calls_service import CallsService
+from ..errors.errors import ServerSystemException
+import logging, os
 
 incident_blueprint = Blueprint('incident', __name__)
 validator_incident = ValidatorIncidents()
+incident_service = IncidentService()
+call_service = CallsService()
 
 @incident_blueprint.route('/ping', methods=['GET'])
 def healthcheck():
@@ -53,5 +58,33 @@ def create_incidence():
                                               asunto_incidencia,
                                               detalle_incidencia)
     
+    
+    incident = incident_service.create_incident(nombre_cliente,
+                                              apellido_cliente, 
+                                              correo_electronico_cliente,
+                                              tipo_documento_cliente,
+                                              numero_documento_cliente,
+                                              celular_cliente,
+                                              tipo_incidencia,
+                                              canal_incidencia,
+                                              asunto_incidencia,
+                                              detalle_incidencia,
+                                              uploaded_files)
 
-    return 'pong', 200
+    return incident, 201
+
+@incident_blueprint.route('/calls/<int:id>', methods=['GET'])
+def find_calls_by_person(id):
+    try:
+        return call_service.find_calls_by_person(id)
+    except Exception as err:
+        raise ServerSystemException(f"Error a la hora de conultar las llamadas del usuario {err}, porfavor contacte con su administrador")
+    
+@incident_blueprint.route('/person/<int:id>', methods=['GET'])
+def find_incidents_by_person(id):
+    try:
+        return incident_service.find_incidents_by_person(id)
+    except Exception as err:
+        raise ServerSystemException(f"Error a la hora de conultar las llamadas del usuario {err}, porfavor contacte con su administrador")
+    
+    
