@@ -49,7 +49,7 @@ jobs:
     - name: Update Kubernetes manifest with latest image version
       run: |
         K8S_FILE="kubernetes/k8s-base-layer-deployment.yaml"
-        sed -i "s|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:[0-9]*|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}|g" $K8S_FILE
+        sed -i "s|image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:*|image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}|g" $K8S_FILE
         cat $K8S_FILE
         
     - name: Apply changes to Kubernetes
