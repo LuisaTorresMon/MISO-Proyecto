@@ -2,8 +2,8 @@ name: workflow develop and pull request
 
 on:
   push:
-    branches:
-      - '*' 
+    branches: [ "feature**", "bugfix**" ]
+ 
 permissions:
   contents: write
   pull-requests: write
