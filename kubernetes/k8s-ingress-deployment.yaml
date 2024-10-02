@@ -9,20 +9,6 @@ spec:
     - http:
         paths:
           - pathType: Prefix
-            path: /invoice
-            backend:
-              service:
-                name: invoices-service
-                port:
-                  number: 80
-          - pathType: Prefix
-            path: /payment
-            backend:
-              service:
-                name: payments-service
-                port:
-                  number: 80
-          - pathType: Prefix
             path: /plan
             backend:
               service:
