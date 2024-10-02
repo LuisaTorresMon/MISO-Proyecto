@@ -34,27 +34,5 @@ jobs:
     - name: build and push the docker image
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
-        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG} ./plans
-        docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}
-
-    - name: Install gke-gcloud-auth-plugin
-      run: |
-        gcloud components install gke-gcloud-auth-plugin
-        export USE_GKE_GCLOUD_AUTH_PLUGIN=True
-        
-    - name: Authenticate to GKE
-      run: |
-        gcloud container clusters get-credentials autopilot-cluster-1 --zone us-central1 --project ${{ secrets.GOOGLE_PROJECT }}
-        
-    - name: Update Kubernetes manifest with latest image version
-      run: |
-        K8S_FILE="kubernetes/k8s-base-layer-deployment.yaml"
-        echo "Before:"
-        cat $K8S_FILE
-        sed -i "s|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:.*|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}|g" $K8S_FILE
-        echo "After:"
-        cat $K8S_FILE
-                
-    - name: Apply changes to Kubernetes
-      run: |
-        kubectl apply -f kubernetes/k8s-base-layer-deployment.yaml
+        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:3.0 .
+        docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/demo/uniandes-misw-proyecto-grado-19/plans:3.0
