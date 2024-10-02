@@ -1,0 +1,60 @@
+name: Deploy ABCall
+
+on:
+  push:
+    branches:
+    - 'github-actions'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      GOOGLE_PROJECT: ${{ secrets.GOOGLE_PROJECT }}
+      IMAGE_TAG: ${{ github.run_number }}
+    steps:
+
+    - name: code checkout
+      uses: actions/checkout@v2
+    
+    - name: Setup python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.9'
+
+    - name: Export gcloud related env variable
+      run: export CLOUDSDK_PYTHON="/usr/bin/python3"
+
+    - name: install the gcloud cli
+      uses: google-github-actions/setup-gcloud@v0
+      with:
+        project_id: ${{ secrets.GOOGLE_PROJECT }}
+        service_account_key: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        export_default_credentials: true
+
+    - name: build and push the docker image
+      run: |
+        gcloud auth configure-docker us-central1-docker.pkg.dev
+        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG} ./plans
+        docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}
+
+    - name: Install gke-gcloud-auth-plugin
+      run: |
+        gcloud components install gke-gcloud-auth-plugin
+        export USE_GKE_GCLOUD_AUTH_PLUGIN=True
+        
+    - name: Authenticate to GKE
+      run: |
+        gcloud container clusters get-credentials autopilot-cluster-1 --zone us-central1 --project ${{ secrets.GOOGLE_PROJECT }}
+        
+    - name: Update Kubernetes manifest with latest image version
+      run: |
+        K8S_FILE="kubernetes/k8s-base-layer-deployment.yaml"
+        echo "Before:"
+        cat $K8S_FILE
+        sed -i "s|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:.*|image: us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/plans:${IMAGE_TAG}|g" $K8S_FILE
+        echo "After:"
+        cat $K8S_FILE
+                
+    - name: Apply changes to Kubernetes
+      run: |
+        kubectl apply -f kubernetes/k8s-base-layer-deployment.yaml
