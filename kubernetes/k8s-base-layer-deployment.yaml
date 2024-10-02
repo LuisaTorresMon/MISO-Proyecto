@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: invoices-deployment
- # namespace: k8s-proyecto-final-namespace
+  # namespace: k8s-proyecto-final-namespace
 spec:
   replicas: 1
   selector:
@@ -157,4 +157,59 @@ spec:
       port: 80
       targetPort: 3003
       nodePort: 32337
+  type: NodePort
+
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: incidents-deployment
+  # namespace: k8s-proyecto-final-namespace
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: incidents
+  template:
+    metadata:
+      labels:
+        app: incidents
+    spec:
+      serviceAccountName: k8s-proyecto-final-serviceaccount
+      containers:
+        - name: incidents-contenedor
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/incident:1.0
+          envFrom:
+            - secretRef:
+                name: db-secrets
+          ports:
+            - containerPort: 3004
+
+---
+apiVersion: cloud.google.com/v1
+kind: BackendConfig
+metadata:
+  name: incident-config
+spec:
+  healthCheck:
+    checkIntervalSec: 60
+    port: 3004
+    type: HTTP
+    requestPath: /incident/ping
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: incident-service
+  annotations:
+    cloud.google.com/backend-config: '{"default": "incident-config"}'
+spec:
+  selector:
+    app: incidents
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3004
+      nodePort: 32338
   type: NodePort
