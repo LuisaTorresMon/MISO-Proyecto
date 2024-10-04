@@ -23,6 +23,19 @@ class User(db.Model):
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     es_activo = db.Column(db.Boolean, server_default="true", nullable=False)
 
+class Empresa(db.Model):
+    __tablename__ = 'empresa'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_empresa = db.Column(db.String(200))
+    tipo_identificacion = db.Column(db.Integer)
+    numero_identificacion = db.Column(db.String(100))
+    sector = db.Column(db.String(100))
+    telefono = db.Column(db.Integer)
+    pais = db.Column(db.String(100))
+    fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = User
@@ -31,6 +44,15 @@ class UserSchema(SQLAlchemyAutoSchema):
         include_fk = True
         exclude = ("contrasena", )
     id = fields.Integer()
+
+class EmpresaSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Empresa
+        include_relationships = True
+        load_instance = True
+        include_fk = True
+
+    id = fields.String()
 
 def cargar_datos_iniciales():
     if User.query.count() == 0:
