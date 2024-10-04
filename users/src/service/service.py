@@ -1,10 +1,11 @@
-from ..models.model import User, UserSchema, db
+from ..models.model import User, UserSchema, Empresa, EmpresaSchema, db
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
 from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException
 user_schema = UserSchema()
+empresa_schema = EmpresaSchema()
 
 class UserService():
 
