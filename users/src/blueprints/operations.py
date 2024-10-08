@@ -11,6 +11,12 @@ def create():
     result = user_service.create_user(data)
     return make_response(result, 201)
 
+@users_blueprint.route('/register/client', methods = ['POST'])
+def register():
+    data = request.get_json()
+    result = user_service.register_client(data)
+    return result
+
 @users_blueprint.route("/auth/signin", methods = ["POST"])
 def signIn():
     data = request.get_json()

@@ -59,3 +59,37 @@ class UserService():
             "id": user.id,
             "username": user.nombre_usuario  # Corrige esto si el atributo es 'nombre_usuario'
         }
+    
+    def register_client(self, user):
+        nombre_usuario = user.get('usuario')
+        contrasena = user.get('contrasena')
+        nombre_empresa = user.get('nombre_completo')
+        tipo_identificacion = user.get('tipo_documento')
+        numero_identificacion = user.get('numero_documento')
+        sector = user.get('sector')
+        telefono = user.get('telefono')
+        pais = user.get('pais')
+
+        nueva_empresa = Empresa(
+            nombre_empresa = nombre_empresa,
+            tipo_identificacion = tipo_identificacion,
+            numero_identificacion = numero_identificacion,
+            sector = sector,
+            telefono = telefono,
+            pais = pais
+        )
+
+        db.session.add(nueva_empresa)
+        db.session.commit()
+
+        user_data = {
+            "username": nombre_usuario,
+            "password": contrasena
+        }
+        new_user = self.create_user(user_data)
+
+        return jsonify({
+            "message": "Cliente registrado exitosamente.",
+            "usuario": new_user['nombre_usuario'],
+            "empresa": nombre_empresa
+        })
