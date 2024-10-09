@@ -93,3 +93,19 @@ class UserService():
             "usuario": new_user['nombre_usuario'],
             "empresa": nombre_empresa
         })
+
+    def register_user(self, user):
+        nombre_usuario = user.get('usuario')
+        contrasena = user.get('contrasena')
+
+        user_data = {
+            "username": nombre_usuario,
+            "password": contrasena
+        }
+
+        new_user = self.create_user(user_data)
+
+        return jsonify({
+            "message": "Cliente registrado exitosamente.",
+            "usuario": new_user['nombre_usuario']
+        })
