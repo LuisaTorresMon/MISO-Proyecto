@@ -18,19 +18,19 @@ def healthcheck():
 def create_incidence():
 
     # Datos cliente
-    nombre_cliente = request.form.get('nombre_cliente')     
-    apellido_cliente = request.form.get('apellido_cliente')     
-    correo_electronico_cliente = request.form.get('correo_electronico_cliente') 
-    tipo_documento_cliente = request.form.get('tipo_documento_cliente')     
-    numero_documento_cliente = request.form.get('numero_documento_cliente')  
-    celular_cliente = request.form.get('celular_cliente')  
+    nombre_cliente = request.form.get('name')     
+    apellido_cliente = request.form.get('lastName')     
+    correo_electronico_cliente = request.form.get('emailClient') 
+    tipo_documento_cliente = request.form.get('identityType')     
+    numero_documento_cliente = request.form.get('identityNumber')  
+    celular_cliente = request.form.get('cellPhone')  
     
     # Datos incidencia
     
-    tipo_incidencia = request.form.get('tipo_incidencia')     
-    canal_incidencia = request.form.get('canal_incidencia')     
-    asunto_incidencia = request.form.get('asunto_incidencia') 
-    detalle_incidencia = request.form.get('detalle_incidencia') 
+    tipo_incidencia = request.form.get('incidentType')     
+    canal_incidencia = request.form.get('incidentChannel')     
+    asunto_incidencia = request.form.get('incidentSubject') 
+    detalle_incidencia = request.form.get('incidentDetail') 
     
     # Files    
     uploaded_files = request.files.getlist('files')    
