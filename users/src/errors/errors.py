@@ -37,3 +37,4 @@ class PassNoCoincide(ApiError):
 class PassNoValido(ApiError):
     code = 400
     description = "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula y un número"
+    
