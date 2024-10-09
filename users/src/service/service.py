@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
 from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException
+from ..validators.validator import UserValidator
 user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
 
@@ -15,7 +16,7 @@ class UserService():
     def create_user(self, user):
         self.username = user.get('username')
         self.password = user.get('password').encode('utf-8')
-
+        
         user = User.query.filter_by(nombre_usuario=self.username).first()
 
         if user:
@@ -61,6 +62,8 @@ class UserService():
         }
     
     def register_client(self, user):
+        UserValidator.validate_registration_data(user)
+
         nombre_usuario = user.get('usuario')
         contrasena = user.get('contrasena')
         nombre_empresa = user.get('nombre_completo')
