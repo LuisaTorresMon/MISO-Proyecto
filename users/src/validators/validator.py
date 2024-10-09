@@ -52,9 +52,11 @@ class UserValidator():
         if not telefono.isdigit():
             raise TelefonoNoNumerico
         
+        # Validación de coincidencia en la contraseña
         if user.get('contrasena') != user.get('confirmar_contrasena'):
             raise PassNoCoincide
         
+        # Validación de formato de contraseña
         contrasena = user.get('contrasena')
         if not UserValidator.is_valid_password(contrasena):
             raise PassNoValido
