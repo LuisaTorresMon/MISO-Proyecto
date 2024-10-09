@@ -1,6 +1,6 @@
 from flask import Flask, jsonify, make_response, request, Blueprint
 from ..service.service import UserService
-from flask_jwt_extended import jwt_required
+from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
 users_blueprint = Blueprint('users', __name__)
 user_service = UserService()
@@ -21,7 +21,8 @@ def signIn():
 @users_blueprint.route("/auth/validate-token", methods=["POST"])
 @jwt_required()
 def validate_token():
-    return make_response({"msg": "OK"}), 200
+    current_jwt = get_jwt()
+    return make_response(current_jwt), 200
 
 
 # Consultar la salud del microservicio
