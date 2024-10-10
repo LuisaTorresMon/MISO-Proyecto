@@ -1,0 +1,28 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+faker = "*"
+flask = "*"
+flask-restful = "*"
+flask-sqlalchemy = "*"
+marshmallow = "*"
+marshmallow-sqlalchemy = "*"
+sqlalchemy = "*"
+python-dotenv = "*"
+pytest = "*"
+flask-cors = "*"
+requests = "*"
+python-abc = "*"
+psycopg2 = "*"
+pytest-cov = "*"
+pytest-mock = "*"
+pytest-env = "*"
+pytest-flask = "*"
+Flask-Migrate = "*"
+google-cloud-pubsub = "*"
+email-validator = "*"
+tinytag = "*"
+google-cloud-storage="*"
