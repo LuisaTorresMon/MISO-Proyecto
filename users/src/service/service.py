@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
 from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException
+from ..validators.validator import UserValidator
 user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
 
@@ -80,3 +81,40 @@ class UserService():
         return {
             "token": token_de_acceso
         }
+
+    def register_client(self, user):
+        UserValidator.validate_registration_data(user)
+
+        nombre_usuario = user.get('usuario')
+        contrasena = user.get('contrasena')
+        nombre_empresa = user.get('nombre_completo')
+        tipo_identificacion = user.get('tipo_documento')
+        numero_identificacion = user.get('numero_documento')
+        sector = user.get('sector')
+        telefono = user.get('telefono')
+        pais = user.get('pais')
+
+        nueva_empresa = Empresa(
+            nombre_empresa = nombre_empresa,
+            tipo_identificacion = tipo_identificacion,
+            numero_identificacion = numero_identificacion,
+            sector = sector,
+            telefono = telefono,
+            pais = pais
+        )
+
+        db.session.add(nueva_empresa)
+        db.session.commit()
+
+        user_data = {
+            "username": nombre_usuario,
+            "password": contrasena,
+            "id_company": nueva_empresa.id
+        }
+        new_user = self.create_user(user_data)
+
+        return jsonify({
+            "message": "Cliente registrado exitosamente.",
+            "usuario": new_user['nombre_usuario'],
+            "empresa": nombre_empresa
+        })

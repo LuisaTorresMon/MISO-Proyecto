@@ -42,19 +42,24 @@ class UserValidator():
         ]
         for field in required_fields:
             if not user.get(field):
+                print(f"El campo {field} está faltando o es inválido.")
                 raise BadRequestException(f"El campo {field} es obligatorio.")
+        print(f"El tipo de documento {user.get('tipo_documento')}")
         
         email = user.get('email')
-        if not UserValidator.is_valid_email(email):
-            raise EmailInvalido
+        if email is None or not UserValidator.is_valid_email(email):
+            print(f"El correo {email}")
+            raise EmailInvalido("El formato del email no es válido")
         
-        telefono = user.get('telefono')
+        telefono = str(user.get('telefono'))
         if not telefono.isdigit():
-            raise TelefonoNoNumerico
+            print(f"El telefono {telefono}")
+            raise TelefonoNoNumerico("El campo de teléfono debe contener solo números")
         
         # Validación de coincidencia en la contraseña
         if user.get('contrasena') != user.get('confirmar_contrasena'):
-            raise PassNoCoincide
+            print(f"la constrseña {user.get('contrasena')} y la confirmacion {user.get('confirmar_contrasena')}")
+            raise PassNoCoincide("Las contraseñas no coinciden")
         
         # Validación de formato de contraseña
         contrasena = user.get('contrasena')
