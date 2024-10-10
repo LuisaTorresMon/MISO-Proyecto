@@ -16,6 +16,9 @@ def healthcheck():
 
 @incident_blueprint.route('/create', methods=['POST'])
 def create_incidence():
+    headers = request.headers
+    token_encabezado = headers.get('Authorization')
+    logging.debug(token_encabezado)
 
     # Datos cliente
     nombre_cliente = request.form.get('name')     
@@ -56,7 +59,8 @@ def create_incidence():
                                               tipo_incidencia,
                                               canal_incidencia,
                                               asunto_incidencia,
-                                              detalle_incidencia)
+                                              detalle_incidencia,
+                                              token_encabezado)
     
     
     incident = incident_service.create_incident(nombre_cliente,

@@ -1,6 +1,7 @@
 import logging
-from ..errors.errors import CamposFaltantes, BadRequestError
+from ..errors.errors import CamposFaltantes, BadRequestError, InvalidToken, ErrorService, TokenEmpty
 from email_validator import validate_email, EmailNotValidError
+import requests
 
 class ValidatorIncidents():
     def validate_incident_data(self, nombre_cliente, 
@@ -12,7 +13,8 @@ class ValidatorIncidents():
                          tipo_incidencia,
                          canal_incidencia,
                          asunto_incidencia,
-                         detalle_incidencia):
+                         detalle_incidencia,
+                         token):
         
         self.nombre_cliente = nombre_cliente
         self.apellido_cliente = apellido_cliente
@@ -25,6 +27,8 @@ class ValidatorIncidents():
         self.asunto_incidencia = asunto_incidencia
         self.detalle_incidencia = detalle_incidencia
         
+        self.validar_token_enviado(token)
+        self.validar_token_valido(token)
         self.validar_campos_requeridos()
         self.validar_formato_tamano_campos()
         
@@ -80,4 +84,26 @@ class ValidatorIncidents():
         if self.tipo_documento_cliente == 'Cedula de extrangeria':
             if (len(self.numero_documento_cliente) != 12 or (not self.numero_documento_cliente.isdigit())):
                 raise BadRequestError('El numero de documento cuando es de tipo Cedula de extrangeria, debe ser numerico y debe tener una longitud de 12 caracteres')
-        
+    
+    def validar_token_valido(self, token):
+            token_sin_bearer = token[len('Bearer '):]
+            logging.debug(f"token sin bearer {token_sin_bearer}")
+
+            url = 'http://users:3000/user/auth/validate-token'
+
+            headers = {
+                "Authorization": f"Bearer {token_sin_bearer}",
+                      }
+
+            response = requests.post(url, headers=headers)
+            logging.debug(f"codigo de respuesta {response.text}")
+            if response.status_code == 200:
+                return response
+            elif response.status_code == 401:
+                raise InvalidToken('')
+            else:
+                raise ErrorService('')   
+            
+    def validar_token_enviado(self, token):
+        if token is None:
+            raise TokenEmpty('')

@@ -32,3 +32,4 @@ class Create(BaseCommannd):
         contract_data = schema.dump(new_contract)
 
         return contract_data
+

@@ -15,3 +15,15 @@ class CamposFaltantes(ApiError):
 class ServerSystemException(ApiError):
     code = 500
     description = "Error en el sistema porfavor contacte con el administrador"
+    
+class InvalidToken(ApiError):
+    code = 401
+    description = "El token no es válido o está vencido."
+    
+class ErrorService(ApiError):
+    code = 500
+    description = "Error a la hora de consumir el servicio."
+    
+class TokenEmpty(ApiError):
+    code = 403
+    description = "No hay token en la solicitud"
