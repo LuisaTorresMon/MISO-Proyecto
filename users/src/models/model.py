@@ -17,8 +17,10 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre_usuario = db.Column(db.String(100))
-    contrasena = db.Column(db.String(255))
+    id_persona = db.Column(db.Integer)
+    id_empresa = db.Column(db.Integer)
+    nombre_usuario = db.Column(db.String(100), unique=True, nullable=False)
+    contrasena = db.Column(db.String(255), nullable=False)
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     es_activo = db.Column(db.Boolean, server_default="true", nullable=False)
@@ -56,7 +58,7 @@ def cargar_datos_iniciales():
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
 
         users = [
-            User(nombre_usuario="sa", contrasena=hashed_password.decode("utf-8"))  # Almacena como bytes
+            User(id_persona=1, id_empresa=None, nombre_usuario="sa", contrasena=hashed_password.decode("utf-8"))  # Almacena como bytes
         ]
 
         db.session.bulk_save_objects(users)

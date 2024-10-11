@@ -3,8 +3,7 @@ import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
-from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException
-
+from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException
 user_schema = UserSchema()
 person_schema = PersonSchema()
 
@@ -14,8 +13,31 @@ class UserService():
         pass
 
     def create_user(self, user):
+        self.id_persona = user.get('id_person')
+        self.id_empresa = user.get('id_company')
         self.username = user.get('username')
         self.password = user.get('password').encode('utf-8')
+
+        if self.id_persona is None and self.id_empresa is None:
+            raise BadRequestException
+        elif self.id_persona is not None and self.id_empresa is not None:
+            raise BadRequestException
+        else:
+            if self.id_persona is not None:
+                if str(self.id_persona).strip() != "":
+                    try:
+                        int( self.id_persona)
+                    except ValueError:
+                        raise BadRequestException
+
+                if self.id_empresa is not None:
+                    if str(self.id_empresa).strip() != "":
+                        try:
+                            int( self.id_empresa)
+                        except ValueError:
+                            raise BadRequestException
+
+
 
         user = User.query.filter_by(nombre_usuario=self.username).first()
 
@@ -26,6 +48,8 @@ class UserService():
         hashed_password = bcrypt.hashpw(self.password, salt)
 
         new_user = User(
+            id_persona=self.id_persona,
+            id_empresa=self.id_empresa,
             nombre_usuario=self.username,
             contrasena=hashed_password.decode('utf-8')
         )
@@ -45,23 +69,16 @@ class UserService():
         if user is None:
             raise IncorrectUserOrPasswordException
 
-        # Verificar la contraseña
-        # No es necesario codificar user.contrasena nuevamente
         if not bcrypt.checkpw(password.encode('utf-8'), user.contrasena.encode('utf-8')):
             raise IncorrectUserOrPasswordException
 
-        # Generar el token JWT
-        additional_claims = {"usuario": "usuario"}
+        additional_claims = {
+            "id": user.id,
+            "id_person": user.id_persona,
+            "id_company": user.id_empresa
+        }
         token_de_acceso = create_access_token(identity=user.id, additional_claims=additional_claims)
 
         return {
-            "mensaje": "Inicio de sesión exitoso",
-            "token": token_de_acceso,
-            "id": user.id,
-            "username": user.nombre_usuario  # Corrige esto si el atributo es 'nombre_usuario'
+            "token": token_de_acceso
         }
-        
-    def get_person_by_identity(self, identity_type, identity_number):
-        
-        person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
-        return person_schema.dump(person)
