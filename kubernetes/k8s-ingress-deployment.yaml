@@ -15,3 +15,11 @@ spec:
                 name: plans-service 
                 port:
                   number: 80
+          - pathType: Prefix
+            path: /incident
+            backend:
+              service:
+                name: incident-service 
+                port:
+                  number: 80
+                  
