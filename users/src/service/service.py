@@ -82,3 +82,7 @@ class UserService():
         return {
             "token": token_de_acceso
         }
+        
+    def get_person_by_identity(self, identity_type, identity_number):        
+        person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
+        return person_schema.dump(person)
