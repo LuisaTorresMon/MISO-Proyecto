@@ -22,6 +22,18 @@ class User(db.Model):
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     es_activo = db.Column(db.Boolean, server_default="true", nullable=False)
+    
+class Person(db.Model):
+    __tablename__ = 'persona'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_completo = db.Column(db.String(255), nullable=False)
+    tipo_identificacion = db.Column(db.String(50), nullable=False)
+    numero_identificacion = db.Column(db.String(50), nullable=False)
+    telefono = db.Column(db.String(20))
+    correo_electronico = db.Column(db.String(100))
+    fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
 
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -31,6 +43,11 @@ class UserSchema(SQLAlchemyAutoSchema):
         include_fk = True
         exclude = ("contrasena", )
     id = fields.Integer()
+    
+class PersonSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Person
+        load_instance = True  
 
 def cargar_datos_iniciales():
     if User.query.count() == 0:

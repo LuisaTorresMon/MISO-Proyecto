@@ -9,6 +9,7 @@ from dotenv import load_dotenv
 from flask_migrate import Migrate
 from flask_jwt_extended import JWTManager
 from datetime import datetime, timedelta
+import logging
 
 app = Flask(__name__)
 load_dotenv('.env.template')
@@ -53,6 +54,8 @@ def handle_exception(err):
 jwt = JWTManager(app)
 
 app.register_blueprint(users_blueprint,url_prefix='/user')
+
+logging.basicConfig(level=logging.DEBUG) 
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0', port=3000, debug=True)

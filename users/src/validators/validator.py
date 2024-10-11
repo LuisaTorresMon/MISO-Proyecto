@@ -1,8 +1,8 @@
-from src.errors.errors import TokenNoEnviado, TokenVencido, BadRequestException, SizeInvalido, OfferInvalida, ErrorUUID
-from src.commands.create import Create
+from src.errors.errors import TokenNoEnviado, TokenVencido, RequiredFields
 import uuid
 
 campos_requeridos = ['username', 'password']
+person_required_files = ['identityType','identityNumber']
 
 class UserValidator():
 
@@ -12,10 +12,12 @@ class UserValidator():
         self.validar_token_enviado(token_encabezado)
         self.validar_token_vencido(token_encabezado)
         self.validar_campos_requeridos(data)
-        self.validar_size_enviado(data.get('size'))
-        self.validar_offer_enviada(data.get('offer'))
         
         return True
+
+    def validate_query_person(self, identity_type, identity_number):
+        if not identity_type or not identity_number:
+            raise RequiredFields
 
     def validar_listado(self, headers):
         
@@ -42,24 +44,11 @@ class UserValidator():
         parts_token = token.split()
         if "fake" in parts_token[1]:
             raise TokenVencido
+
     
     def validar_campos_requeridos(self, data):
         for campo in campos_requeridos:
             if campo not in data:
-                raise CamposFaltantes
+                raise RequiredFields
     
-    def validar_size_enviado(self, data):
-        valid_values = ["LARGE", "MEDIUM", "SMALL"]
-        if data not in valid_values:
-            raise SizeInvalido
     
-    def validar_offer_enviada(self, data):
-        if data < 0:
-            raise OfferInvalida
-    
-    def validar_uuid(self, field):
-        try:
-            uuid.UUID(field)
-            return
-        except ValueError:
-            raise ErrorUUID

@@ -21,3 +21,11 @@ class UserAlreadyExistException(ApiError):
 class IncorrectUserOrPasswordException(ApiError):
     code = 401
     description = "Usuario o contraseña incorrectos"
+    
+class RequiredFields(ApiError):
+    code = 400
+    description = "Campos faltantes en la solicitud"
+    
+class ServerSystemException(ApiError):
+    code = 500
+    description = "Error en el sistema porfavor contacte con el administrador"

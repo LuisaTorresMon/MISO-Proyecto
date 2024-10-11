@@ -1,10 +1,12 @@
-from ..models.model import User, UserSchema, db
+from ..models.model import Person, PersonSchema, User, UserSchema, db
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
 from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException
+
 user_schema = UserSchema()
+person_schema = PersonSchema()
 
 class UserService():
 
@@ -58,3 +60,8 @@ class UserService():
             "id": user.id,
             "username": user.nombre_usuario  # Corrige esto si el atributo es 'nombre_usuario'
         }
+        
+    def get_person_by_identity(self, identity_type, identity_number):
+        
+        person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
+        return person_schema.dump(person)

@@ -1,5 +1,5 @@
 import logging
-from ..errors.errors import CamposFaltantes, BadRequestError, InvalidToken, ErrorService, TokenEmpty
+from ..errors.errors import RequiredFields, BadRequestError, InvalidToken, ErrorService, TokenEmpty
 from email_validator import validate_email, EmailNotValidError
 import requests
 
@@ -27,32 +27,32 @@ class ValidatorIncidents():
         self.asunto_incidencia = asunto_incidencia
         self.detalle_incidencia = detalle_incidencia
         
-        self.validar_token_enviado(token)
+        self.validate_token_sent(token)
         self.validar_token_valido(token)
         self.validar_campos_requeridos()
         self.validar_formato_tamano_campos()
         
     def validar_campos_requeridos(self):
         if not self.nombre_cliente:
-            raise CamposFaltantes("El campo nombre esta vacio, recuerda que es obligatorio")
+            raise RequiredFields("El campo nombre esta vacio, recuerda que es obligatorio")
         if not self.apellido_cliente:
-            raise CamposFaltantes("El campo apellido esta vacio, recuerda que es obligatorio")   
+            raise RequiredFields("El campo apellido esta vacio, recuerda que es obligatorio")   
         if not self.correo_electronico_cliente:
-            raise CamposFaltantes("El campo correo electronico esta vacio, recuerda que es obligatorio")   
+            raise RequiredFields("El campo correo electronico esta vacio, recuerda que es obligatorio")   
         if not self.tipo_documento_cliente:
-            raise CamposFaltantes("El campo tipo de documento esta vacio, recuerda que es obligatorio")   
+            raise RequiredFields("El campo tipo de documento esta vacio, recuerda que es obligatorio")   
         if not self.numero_documento_cliente:
-            raise CamposFaltantes("El campo numero de documento esta vacio, recuerda que es obligatorio")   
+            raise RequiredFields("El campo numero de documento esta vacio, recuerda que es obligatorio")   
         if not self.celular_cliente:
-            raise CamposFaltantes("El campo celular esta vacio, recuerda que es obligatorio")   
+            raise RequiredFields("El campo celular esta vacio, recuerda que es obligatorio")   
         if not self.tipo_incidencia:
-            raise CamposFaltantes("El campo tipo de incidente esta vacio, recuerda que es obligatorio")    
+            raise RequiredFields("El campo tipo de incidente esta vacio, recuerda que es obligatorio")    
         if not self.canal_incidencia:
-            raise CamposFaltantes("El campo canal de incidente esta vacio, recuerda que es obligatorio")  
+            raise RequiredFields("El campo canal de incidente esta vacio, recuerda que es obligatorio")  
         if not self.asunto_incidencia:
-            raise CamposFaltantes("El campo asunto de incidente esta vacio, recuerda que es obligatorio") 
+            raise RequiredFields("El campo asunto de incidente esta vacio, recuerda que es obligatorio") 
         if not self.detalle_incidencia:
-            raise CamposFaltantes("El campo detalle de incidente esta vacio, recuerda que es obligatorio")  
+            raise RequiredFields("El campo detalle de incidente esta vacio, recuerda que es obligatorio")  
         
     def validar_formato_tamano_campos(self):
         self.validar_numero_de_documento()
@@ -104,6 +104,6 @@ class ValidatorIncidents():
             else:
                 raise ErrorService('')   
             
-    def validar_token_enviado(self, token):
+    def validate_token_sent(self, token):
         if token is None:
             raise TokenEmpty('')
