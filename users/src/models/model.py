@@ -38,6 +38,18 @@ class Empresa(db.Model):
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
 
+class Persona(db.Model):
+    __tablename__ = 'persona'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_completo = db.Column(db.String(200))
+    tipo_identificacion = db.Column(db.Integer)
+    numero_identificacion = db.Column(db.String(100))
+    telefono = db.Column(db.Integer)
+    correo_electronico = db.Column(db.String(100))
+    fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = User
@@ -48,6 +60,15 @@ class UserSchema(SQLAlchemyAutoSchema):
     id = fields.Integer()
 
 class EmpresaSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Empresa
+        include_relationships = True
+        load_instance = True
+        include_fk = True
+
+    id = fields.String()
+
+class PersonaSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Empresa
         include_relationships = True
