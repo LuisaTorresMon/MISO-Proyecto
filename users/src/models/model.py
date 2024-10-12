@@ -71,3 +71,4 @@ def cargar_datos_iniciales():
         print("Datos iniciales cargados en la tabla users")
     else:
         print("La tabla users ya tiene datos")
+        
