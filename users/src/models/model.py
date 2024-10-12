@@ -17,11 +17,26 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre_usuario = db.Column(db.String(100))
-    contrasena = db.Column(db.String(255))
+    id_persona = db.Column(db.Integer)
+    id_empresa = db.Column(db.Integer)
+    nombre_usuario = db.Column(db.String(100), unique=True, nullable=False)
+    contrasena = db.Column(db.String(255), nullable=False)
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     es_activo = db.Column(db.Boolean, server_default="true", nullable=False)
+
+class Empresa(db.Model):
+    __tablename__ = 'empresa'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_empresa = db.Column(db.String(200))
+    tipo_identificacion = db.Column(db.Integer)
+    numero_identificacion = db.Column(db.String(100))
+    sector = db.Column(db.String(100))
+    telefono = db.Column(db.Integer)
+    pais = db.Column(db.String(100))
+    fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
 
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -32,6 +47,15 @@ class UserSchema(SQLAlchemyAutoSchema):
         exclude = ("contrasena", )
     id = fields.Integer()
 
+class EmpresaSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Empresa
+        include_relationships = True
+        load_instance = True
+        include_fk = True
+
+    id = fields.String()
+
 def cargar_datos_iniciales():
     if User.query.count() == 0:
         password = "123456"
@@ -39,7 +63,7 @@ def cargar_datos_iniciales():
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
 
         users = [
-            User(nombre_usuario="sa", contrasena=hashed_password.decode("utf-8"))  # Almacena como bytes
+            User(id_persona=1, id_empresa=None, nombre_usuario="sa", contrasena=hashed_password.decode("utf-8"))  # Almacena como bytes
         ]
 
         db.session.bulk_save_objects(users)
@@ -47,3 +71,4 @@ def cargar_datos_iniciales():
         print("Datos iniciales cargados en la tabla users")
     else:
         print("La tabla users ya tiene datos")
+        
