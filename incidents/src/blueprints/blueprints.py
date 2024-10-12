@@ -21,65 +21,80 @@ def create_incidence():
     logging.debug(token_encabezado)
 
     # Datos cliente
-    nombre_cliente = request.form.get('name')     
-    apellido_cliente = request.form.get('lastName')     
-    correo_electronico_cliente = request.form.get('emailClient') 
-    tipo_documento_cliente = request.form.get('identityType')     
-    numero_documento_cliente = request.form.get('identityNumber')  
-    celular_cliente = request.form.get('cellPhone')  
+    person_id = request.form.get('person_id') 
+    name_person = request.form.get('name')     
+    lastname_person = request.form.get('lastName')     
+    email_person = request.form.get('emailClient') 
+    identity_type_person = request.form.get('identityType')     
+    identity_number_person = request.form.get('identityNumber')  
+    cellphone_person = request.form.get('cellPhone')  
     
-    # Datos incidencia
-    
-    tipo_incidencia = request.form.get('incidentType')     
-    canal_incidencia = request.form.get('incidentChannel')     
-    asunto_incidencia = request.form.get('incidentSubject') 
-    detalle_incidencia = request.form.get('incidentDetail') 
+    # Datos incidencia  
+    user_id = request.form.get('user_id')
+    incident_type = request.form.get('incidentType')     
+    channel_incident = request.form.get('incidentChannel')     
+    subject_incident = request.form.get('incidentSubject') 
+    detail_incident = request.form.get('incidentDetail') 
     
     # Files    
     uploaded_files = request.files.getlist('files')    
     
-    logging.debug(f"nombre_cliente {nombre_cliente}")
-    logging.debug(f"apellido_cliente {apellido_cliente}")
-    logging.debug(f"correo_electronico_cliente {correo_electronico_cliente}")
-    logging.debug(f"tipo_documento_cliente {tipo_documento_cliente}")
-    logging.debug(f"numero_documento_cliente {numero_documento_cliente}")
-    logging.debug(f"celular_cliente {celular_cliente}")
-    logging.debug(f"tipo_incidencia {tipo_incidencia}")
-    logging.debug(f"canal_incidencia {canal_incidencia}")
-    logging.debug(f"asunto_incidencia {asunto_incidencia}")
-    logging.debug(f"detalle_incidencia {detalle_incidencia}")
+    logging.debug(f"name_person {name_person}")
+    logging.debug(f"lastname_person {lastname_person}")
+    logging.debug(f"email_person {email_person}")
+    logging.debug(f"identity_type_person {identity_type_person}")
+    logging.debug(f"identity_number_person {identity_number_person}")
+    logging.debug(f"cellphone_person {cellphone_person}")
+    logging.debug(f"incident_type {incident_type}")
+    logging.debug(f"channel_incident {channel_incident}")
+    logging.debug(f"subject_incident {subject_incident}")
+    logging.debug(f"detail_incident {detail_incident}")
     logging.debug(f"uploaded_files {uploaded_files}")
+    
+    logging.debug(f"user_id {user_id}")
+    logging.debug(f"person_id {person_id}")
 
-    validator_incident.validate_incident_data(nombre_cliente,
-                                              apellido_cliente, 
-                                              correo_electronico_cliente,
-                                              tipo_documento_cliente,
-                                              numero_documento_cliente,
-                                              celular_cliente,
-                                              tipo_incidencia,
-                                              canal_incidencia,
-                                              asunto_incidencia,
-                                              detalle_incidencia,
+
+    validator_incident.validate_incident_data(name_person,
+                                              lastname_person, 
+                                              email_person,
+                                              identity_type_person,
+                                              identity_number_person,
+                                              cellphone_person,
+                                              incident_type,
+                                              channel_incident,
+                                              subject_incident,
+                                              detail_incident,
                                               token_encabezado)
     
     
-    incident = incident_service.create_incident(nombre_cliente,
-                                              apellido_cliente, 
-                                              correo_electronico_cliente,
-                                              tipo_documento_cliente,
-                                              numero_documento_cliente,
-                                              celular_cliente,
-                                              tipo_incidencia,
-                                              canal_incidencia,
-                                              asunto_incidencia,
-                                              detalle_incidencia,
-                                              uploaded_files)
+    incident = incident_service.create_incident(name_person,
+                                              lastname_person, 
+                                              email_person,
+                                              identity_type_person,
+                                              identity_number_person,
+                                              cellphone_person,
+                                              incident_type,
+                                              channel_incident,
+                                              subject_incident,
+                                              detail_incident,
+                                              uploaded_files,
+                                              user_id,
+                                              person_id,
+                                              token_encabezado)
 
     return incident, 201
 
 @incident_blueprint.route('/calls/<int:id>', methods=['GET'])
 def find_calls_by_person(id):
     try:
+        headers = request.headers
+        token_encabezado = headers.get('Authorization')
+        logging.debug(token_encabezado)
+         
+        validator_incident.validate_token_sent(token_encabezado)
+        validator_incident.valid_token(token_encabezado)
+         
         return call_service.find_calls_by_person(id)
     except Exception as err:
         raise ServerSystemException(f"Error a la hora de conultar las llamadas del usuario {err}, porfavor contacte con su administrador")
@@ -87,8 +102,16 @@ def find_calls_by_person(id):
 @incident_blueprint.route('/person/<int:id>', methods=['GET'])
 def find_incidents_by_person(id):
     try:
+        headers = request.headers
+        token_encabezado = headers.get('Authorization')
+        logging.debug(token_encabezado)
+         
+        validator_incident.validate_token_sent(token_encabezado)
+        validator_incident.valid_token(token_encabezado)
+        
         return incident_service.find_incidents_by_person(id)
     except Exception as err:
+        logging.debug(err)
         raise ServerSystemException(f"Error a la hora de conultar las llamadas del usuario {err}, porfavor contacte con su administrador")
     
     

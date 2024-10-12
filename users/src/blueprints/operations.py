@@ -1,4 +1,5 @@
 from flask import Flask, jsonify, make_response, request, Blueprint
+from ..models.model import PersonSchema
 from ..service.service import UserService
 from ..validators.validator import UserValidator
 import logging
@@ -7,6 +8,8 @@ from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 users_blueprint = Blueprint('users', __name__)
 user_service = UserService()
 user_validator = UserValidator()
+person_schema = PersonSchema()
+
 
 # Crear usuario
 @users_blueprint.route('/create', methods = ['POST'])
@@ -17,14 +20,36 @@ def create():
 
 # Crear usuario
 @users_blueprint.route('/person', methods = ['GET'])
+@jwt_required()
 def find_person_by_identity():
     
     identity_type = request.args.get('identityType')
     identity_number = request.args.get('identityNumber')
     
     user_validator.validate_query_person(identity_type, identity_number)
-    result = user_service.get_person_by_identity(identity_type, identity_number)
+    person = user_service.get_person_by_identity(identity_type, identity_number)
+    return make_response(person_schema.dump(person), 200)
+
+@users_blueprint.route('/person/<int:id>/products', methods = ['GET'])
+@jwt_required()
+def get_products_by_person(id):
+    products = user_service.get_products_by_person(id)
+    return make_response(products, 200)
+
+
+@users_blueprint.route('/person/create', methods = ['POST'])
+@jwt_required()
+def create_person():
+    data = request.get_json()
+    result = user_service.create_person(data)
     return make_response(result, 201)
+
+@users_blueprint.route('/person/update', methods = ['PUT'])
+@jwt_required()
+def update_person():
+    data = request.get_json()
+    result = user_service.update_person(data)
+    return make_response(result, 200)
 
 @users_blueprint.route("/auth/login", methods = ["POST"])
 def signIn():

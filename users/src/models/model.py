@@ -29,13 +29,32 @@ class Person(db.Model):
     __tablename__ = 'persona'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre_completo = db.Column(db.String(255), nullable=False)
+    nombres = db.Column(db.String(255), nullable=False)
+    apellidos = db.Column(db.String(255), nullable=False)
     tipo_identificacion = db.Column(db.String(50), nullable=False)
     numero_identificacion = db.Column(db.String(50), nullable=False)
     telefono = db.Column(db.String(20))
     correo_electronico = db.Column(db.String(100))
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    
+class Product(db.Model):
+    __tablename__ = 'producto'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_producto = db.Column(db.String(255), nullable=False)
+    tipo = db.Column(db.String(50), nullable=False)
+    descripcion = db.Column(db.Text)
+    fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+
+class ProductPerson(db.Model):
+    __tablename__ = 'persona_producto'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    fecha_adquisicion = db.Column(db.Date, nullable=False)
+    id_persona = db.Column(db.Integer, nullable=False)
+    id_producto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
 
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -49,6 +68,11 @@ class UserSchema(SQLAlchemyAutoSchema):
 class PersonSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Person
+        load_instance = True  
+        
+class ProductSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Product
         load_instance = True  
 
 def cargar_datos_iniciales():
