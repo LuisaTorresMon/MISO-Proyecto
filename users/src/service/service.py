@@ -83,7 +83,9 @@ class UserService():
         }
 
     def register_client(self, user):
-        UserValidator.validate_registration_data(user)
+        user_type = 'client'
+
+        UserValidator.validate_registration_data(user, user_type)
 
         nombre_usuario = user.get('usuario')
         contrasena = user.get('contrasena')
@@ -122,6 +124,10 @@ class UserService():
         })
 
     def register_agent(self, user):
+        user_type = 'agent'
+
+        UserValidator.validate_registration_data(user, user_type)
+
         nombre_usuario = user.get('usuario')
         contrasena = user.get('contrasena')
         nombre_completo = user.get('nombre_completo')
