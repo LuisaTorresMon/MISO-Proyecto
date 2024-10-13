@@ -29,6 +29,10 @@ def mock_empresa(mocker):
     return mocker.patch('src.models.model.Empresa')
 
 @pytest.fixture
+def mock_persona(mocker):
+    return mocker.patch('src.models.model.Persona')
+
+@pytest.fixture
 def mock_validate(mocker):
     return mocker.patch('src.validator.validator.validate_registration_data')
 
@@ -46,10 +50,10 @@ class TestUsers():
             password = fake.password()
 
             user_data = {
-                "nombre_completo": fake.company(),
+                "nombre_empresa": fake.company(),
                 "email": fake.email(),
-                "tipo_documento": fake.random_number(digits=1),
-                "numero_documento": fake.random_number(digits=10),
+                "tipo_identificacion": fake.random_number(digits=1),
+                "numero_identificacion": fake.random_number(digits=10),
                 "sector": fake.company(),
                 "telefono": fake.random_number(digits=10),
                 "pais": fake.country(),
@@ -77,11 +81,13 @@ class TestUsers():
 
             password = fake.password()
 
+            user_type = 'client'
+
             user_data = {
-                "nombre_completo": fake.company(),
+                "nombre_empresa": fake.company(),
                 "email": None,
-                "tipo_documento": fake.random_number(digits=1),
-                "numero_documento": fake.random_number(digits=10),
+                "tipo_identificacion": fake.random_number(digits=1),
+                "numero_identificacion": fake.random_number(digits=10),
                 "sector": fake.company(),
                 "telefono": fake.random_number(digits=10),
                 "pais": fake.country(),
@@ -94,19 +100,20 @@ class TestUsers():
                 "nombre_usuario": user_data['usuario']
             }
 
-            with pytest.raises(EmailInvalido, match="El formato del email no es válido"):
-                UserValidator.validate_registration_data(user_data)
+            with pytest.raises(BadRequestException, match="El campo email es obligatorio."):
+                UserValidator.validate_registration_data(user_data, user_type)
 
     def test_validate_registration_data_missing_telefone(self, mock_create_user):
         with app.test_client() as test_client:
 
             password = fake.password()
+            user_type = 'client'
 
             user_data = {
-                "nombre_completo": fake.company(),
+                "nombre_empresa": fake.company(),
                 "email": fake.email(),
-                "tipo_documento": fake.random_number(digits=1),
-                "numero_documento": fake.random_number(digits=10),
+                "tipo_identificacion": fake.random_number(digits=1),
+                "numero_identificacion": fake.random_number(digits=10),
                 "sector": fake.company(),
                 "telefono": "Prueba",
                 "pais": fake.country(),
@@ -120,18 +127,19 @@ class TestUsers():
             }
 
             with pytest.raises(TelefonoNoNumerico, match="El campo de teléfono debe contener solo números"):
-                UserValidator.validate_registration_data(user_data)
+                UserValidator.validate_registration_data(user_data, user_type)
 
     def test_validate_registration_data_missing_password(self, mock_create_user):
         with app.test_client() as test_client:
 
             password = fake.password()
+            user_type = 'client'
 
             user_data = {
-                "nombre_completo": fake.company(),
+                "nombre_empresa": fake.company(),
                 "email": fake.email(),
-                "tipo_documento": fake.random_number(digits=1),
-                "numero_documento": fake.random_number(digits=10),
+                "tipo_identificacion": fake.random_number(digits=1),
+                "numero_identificacion": fake.random_number(digits=10),
                 "sector": fake.company(),
                 "telefono": fake.random_number(digits=10),
                 "pais": fake.country(),
@@ -145,18 +153,19 @@ class TestUsers():
             }
 
             with pytest.raises(PassNoCoincide, match="Las contraseñas no coinciden"):
-                UserValidator.validate_registration_data(user_data)
+                UserValidator.validate_registration_data(user_data, user_type)
     
     def test_validate_registration_data_missing_field(self, mock_create_user):
         with app.test_client() as test_client:
 
             password = fake.password()
+            user_type = 'client'
 
             user_data = {
-                "nombre_completo": fake.company(),
+                "nombre_empresa": fake.company(),
                 "email": fake.email(),
-                "tipo_documento": fake.random_number(digits=1),
-                "numero_documento": fake.random_number(digits=10),
+                "tipo_identificacion": fake.random_number(digits=1),
+                "numero_identificacion": fake.random_number(digits=10),
                 "sector": fake.company(),
                 "telefono": fake.random_number(digits=10),
                 "pais": fake.country(),
@@ -170,7 +179,7 @@ class TestUsers():
             }
 
             with pytest.raises(BadRequestException, match="El campo usuario es obligatorio."):
-                UserValidator.validate_registration_data(user_data)
+                UserValidator.validate_registration_data(user_data, user_type)
 
     def test_is_valid_password(self):
         password = fake.password()
@@ -178,3 +187,59 @@ class TestUsers():
         result = UserValidator.is_valid_password(password)
         print(f"el resultado {result}")
         assert result == True
+
+    def test_register_agent(self, client, mock_create_user, mock_persona):
+        with app.test_client() as test_client:
+
+            password = fake.password()
+
+            user_data = {
+                "nombre_completo": fake.company(),
+                "correo_electronico": fake.email(),
+                "tipo_identificacion": fake.random_number(digits=1),
+                "numero_identificacion": fake.random_number(digits=10),
+                "telefono": fake.random_number(digits=10),
+                "usuario": fake.user_name(),
+                "contrasena": password,
+                "confirmar_contrasena": password
+            }
+
+            mock_create_user.return_value = {
+                "nombre_usuario": user_data['usuario']
+            }
+
+            mock_persona.return_value.id = 1
+
+            response = client.post(
+                '/user/register/agent',  
+                data=json.dumps(user_data),
+                content_type='application/json'
+            )
+
+            assert response.status_code == 200 
+
+    def test_validate_registration_data_missing_correo_electronico(self, mock_create_user):
+        with app.test_client() as test_client:
+
+            password = fake.password()
+
+            user_type = 'agent'
+
+            user_data = {
+                "nombre_completo": fake.company(),
+                "correo_electronico": None,
+                "tipo_identificacion": fake.random_number(digits=1),
+                "numero_identificacion": fake.random_number(digits=10),
+                "telefono": fake.random_number(digits=10),
+                "usuario": fake.user_name(),
+                "contrasena": password,
+                "confirmar_contrasena": password
+            }
+
+            mock_create_user.return_value = {
+                "nombre_usuario": user_data['usuario']
+            }
+
+            with pytest.raises(BadRequestException, match="El campo correo_electronico es obligatorio."):
+                UserValidator.validate_registration_data(user_data, user_type)
+                

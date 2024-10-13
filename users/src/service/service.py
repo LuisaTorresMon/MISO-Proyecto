@@ -1,4 +1,4 @@
-from ..models.model import User, UserSchema, Empresa, EmpresaSchema, db
+from ..models.model import User, UserSchema, Empresa, EmpresaSchema, Persona, PersonaSchema, db
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
@@ -83,16 +83,19 @@ class UserService():
         }
 
     def register_client(self, user):
-        UserValidator.validate_registration_data(user)
+        user_type = 'client'
+
+        UserValidator.validate_registration_data(user, user_type)
 
         nombre_usuario = user.get('usuario')
         contrasena = user.get('contrasena')
-        nombre_empresa = user.get('nombre_completo')
-        tipo_identificacion = user.get('tipo_documento')
-        numero_identificacion = user.get('numero_documento')
+        nombre_empresa = user.get('nombre_empresa')
+        tipo_identificacion = user.get('tipo_identificacion')
+        numero_identificacion = user.get('numero_identificacion')
         sector = user.get('sector')
         telefono = user.get('telefono')
         pais = user.get('pais')
+        email = user.get('email')
 
         nueva_empresa = Empresa(
             nombre_empresa = nombre_empresa,
@@ -100,7 +103,8 @@ class UserService():
             numero_identificacion = numero_identificacion,
             sector = sector,
             telefono = telefono,
-            pais = pais
+            pais = pais,
+            email = email
         )
 
         db.session.add(nueva_empresa)
@@ -116,5 +120,43 @@ class UserService():
         return jsonify({
             "message": "Cliente registrado exitosamente.",
             "usuario": new_user['nombre_usuario'],
-            "empresa": nombre_empresa
+            "empresa": nueva_empresa.nombre_empresa
         })
+
+    def register_agent(self, user):
+        user_type = 'agent'
+
+        UserValidator.validate_registration_data(user, user_type)
+
+        nombre_usuario = user.get('usuario')
+        contrasena = user.get('contrasena')
+        nombre_completo = user.get('nombre_completo')
+        tipo_identificacion = user.get('tipo_identificacion')
+        numero_identificacion = user.get('numero_identificacion')
+        telefono = user.get('telefono')
+        correo_electronico = user.get('correo_electronico')
+
+        nuevo_agente = Persona(
+            nombre_completo = nombre_completo,
+            tipo_identificacion = tipo_identificacion,
+            numero_identificacion = numero_identificacion,
+            telefono = telefono,
+            correo_electronico = correo_electronico
+        )
+
+        db.session.add(nuevo_agente)
+        db.session.commit()
+
+        user_data = {
+            "username": nombre_usuario,
+            "password": contrasena,
+            "id_company": nuevo_agente.id
+        }
+        new_user = self.create_user(user_data)
+
+        return jsonify({
+            "message": "Cliente registrado exitosamente.",
+            "usuario": new_user['nombre_usuario'],
+            "empresa": nuevo_agente.nombre_completo
+        })
+    

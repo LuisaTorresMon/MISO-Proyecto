@@ -35,30 +35,38 @@ class UserValidator():
             raise TokenVencido
     
     @staticmethod
-    def validate_registration_data(user):
-        required_fields = [
-            'usuario', 'contrasena', 'nombre_completo', 'tipo_documento',
-            'numero_documento', 'sector', 'telefono', 'pais', 'confirmar_contrasena'
-        ]
+    def validate_registration_data(user, user_type):   
+        required_fields_client = ['usuario', 'contrasena', 'nombre_empresa', 'tipo_identificacion', 'numero_identificacion', 'sector', 'telefono', 'pais', 
+                                  'confirmar_contrasena', 'email']
+        required_fields_agent = ['usuario', 'contrasena', 'nombre_completo', 'tipo_identificacion', 'numero_identificacion', 'telefono', 'confirmar_contrasena', 
+                                 'correo_electronico']
+        
+        if user_type == 'client':
+            required_fields = required_fields_client
+        elif user_type == 'agent':
+            required_fields = required_fields_agent
+
         for field in required_fields:
             if not user.get(field):
                 print(f"El campo {field} está faltando o es inválido.")
                 raise BadRequestException(f"El campo {field} es obligatorio.")
-        print(f"El tipo de documento {user.get('tipo_documento')}")
         
-        email = user.get('email')
-        if email is None or not UserValidator.is_valid_email(email):
-            print(f"El correo {email}")
-            raise EmailInvalido("El formato del email no es válido")
+        if user.get('email'):
+            email = user.get('email')
+            if email is None or not UserValidator.is_valid_email(email):
+                raise EmailInvalido("El formato del email no es válido")
+        
+        if user.get('correo_electronico'):
+            correo_electronico = user.get('correo_electronico')
+            if correo_electronico is None or not UserValidator.is_valid_email(correo_electronico):
+                raise EmailInvalido("El formato del email no es válido")
         
         telefono = str(user.get('telefono'))
         if not telefono.isdigit():
-            print(f"El telefono {telefono}")
             raise TelefonoNoNumerico("El campo de teléfono debe contener solo números")
         
         # Validación de coincidencia en la contraseña
         if user.get('contrasena') != user.get('confirmar_contrasena'):
-            print(f"la constrseña {user.get('contrasena')} y la confirmacion {user.get('confirmar_contrasena')}")
             raise PassNoCoincide("Las contraseñas no coinciden")
         
         # Validación de formato de contraseña
@@ -81,4 +89,5 @@ class UserValidator():
             return False
         if not re.search(r'[0-9]', password):
             return False
-        return True
+        return True 
+    
