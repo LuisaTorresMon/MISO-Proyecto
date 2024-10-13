@@ -30,6 +30,7 @@ class Empresa(db.Model):
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     nombre_empresa = db.Column(db.String(200))
+    email = db.Column(db.String(200))
     tipo_identificacion = db.Column(db.Integer)
     numero_identificacion = db.Column(db.String(100))
     sector = db.Column(db.String(100))
@@ -70,7 +71,7 @@ class EmpresaSchema(SQLAlchemyAutoSchema):
 
 class PersonaSchema(SQLAlchemyAutoSchema):
     class Meta:
-        model = Empresa
+        model = Persona
         include_relationships = True
         load_instance = True
         include_fk = True

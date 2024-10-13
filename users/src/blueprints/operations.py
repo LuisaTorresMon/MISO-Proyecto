@@ -13,9 +13,15 @@ def create():
     return make_response(result, 201)
 
 @users_blueprint.route('/register/client', methods = ['POST'])
-def register():
+def register_client():
     data = request.get_json()
     result = user_service.register_client(data)
+    return result
+
+@users_blueprint.route('/register/agent', methods = ['POST'])
+def register_agent():
+    data = request.get_json()
+    result = user_service.register_agent(data)
     return result
 
 @users_blueprint.route("/auth/login", methods = ["POST"])

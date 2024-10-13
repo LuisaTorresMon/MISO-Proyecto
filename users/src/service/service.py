@@ -1,4 +1,4 @@
-from ..models.model import User, UserSchema, Empresa, EmpresaSchema, db
+from ..models.model import User, UserSchema, Empresa, EmpresaSchema, Persona, PersonaSchema, db
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
@@ -7,6 +7,7 @@ from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistEx
 from ..validators.validator import UserValidator
 user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
+persona_schema = PersonaSchema()
 
 class UserService():
 
@@ -88,6 +89,7 @@ class UserService():
         nombre_usuario = user.get('usuario')
         contrasena = user.get('contrasena')
         nombre_empresa = user.get('nombre_completo')
+        email = user.get('email')
         tipo_identificacion = user.get('tipo_documento')
         numero_identificacion = user.get('numero_documento')
         sector = user.get('sector')
@@ -96,6 +98,7 @@ class UserService():
 
         nueva_empresa = Empresa(
             nombre_empresa = nombre_empresa,
+            email = email,
             tipo_identificacion = tipo_identificacion,
             numero_identificacion = numero_identificacion,
             sector = sector,
@@ -118,3 +121,38 @@ class UserService():
             "usuario": new_user['nombre_usuario'],
             "empresa": nombre_empresa
         })
+    
+    def register_agent(self, user):
+
+        nombre_usuario = user.get('usuario')
+        contrasena = user.get('contrasena')
+        nombre_agente = user.get('nombre_completo')
+        tipo_identificacion = user.get('tipo_identificacion')
+        numero_identificacion = user.get('numero_identificacion')
+        telefono = user.get('telefono')
+        email = user.get('correo_electronico')
+
+        nuevo_agente = Persona(
+            nombre_completo = nombre_agente,
+            tipo_identificacion = tipo_identificacion,
+            numero_identificacion = numero_identificacion,
+            telefono = telefono,
+            correo_electronico = email
+        )
+
+        db.session.add(nuevo_agente)
+        db.session.commit()
+
+        user_data = {
+            "username": nombre_usuario,
+            "password": contrasena,
+            "id_company": nuevo_agente.id
+        }
+        new_user = self.create_user(user_data)
+
+        return jsonify({
+            "message": "Agente registrado exitosamente.",
+            "usuario": new_user['nombre_usuario'],
+            "agente": nuevo_agente.nombre_completo
+        })
+    
