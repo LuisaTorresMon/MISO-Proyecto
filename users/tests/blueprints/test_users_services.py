@@ -216,7 +216,7 @@ class TestUsers():
                 content_type='application/json'
             )
 
-            assert response.status_code == 200
+            assert response.status_code == 200 
 
     def test_validate_registration_data_missing_correo_electronico(self, mock_create_user):
         with app.test_client() as test_client:
@@ -242,3 +242,4 @@ class TestUsers():
 
             with pytest.raises(BadRequestException, match="El campo correo_electronico es obligatorio."):
                 UserValidator.validate_registration_data(user_data, user_type)
+                
