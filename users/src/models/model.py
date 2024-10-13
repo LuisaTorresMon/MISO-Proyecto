@@ -47,7 +47,7 @@ class Persona(db.Model):
     tipo_identificacion = db.Column(db.Integer)
     numero_identificacion = db.Column(db.String(100))
     telefono = db.Column(db.Integer)
-    correo_electronico = db.Column(db.String(100))
+    correo_electronico = db.Column(db.String(200))
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
 
