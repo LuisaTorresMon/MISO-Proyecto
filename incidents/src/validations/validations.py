@@ -72,18 +72,13 @@ class ValidatorIncidents():
                 raise BadRequestError('El celular debe ser un campo numerico')
 
     def validar_numero_de_documento(self):
-        if self.identity_type_person == 'Cedula de cuidadania':
+        if self.identity_type_person == 'Cédula_Cuidadania':
             if (not self.identity_number_person.isdigit()) or (len(self.identity_number_person) != 8 and len(self.identity_number_person) != 10) :
                 raise BadRequestError('El numero de documento cuando es de tipo Cedula de cuidadania, debe ser numerico y debe tener una longitud de 8 0 10 caracteres')
             
-        if self.identity_type_person == 'NIT':
-            if (len(self.identity_number_person) != 12):
-                raise BadRequestError('El numero de documento cuando es de tipo NIT, debe tener una longitud de 12 caracteres')
-            elif(self.identity_number_person[10] != '-'):
-                raise BadRequestError('El numero de documento cuando es de tipo NIT, debe tener un guion (-) antes del ultimo digito')
-        if self.identity_type_person == 'Cedula de extrangeria':
+        if self.identity_type_person == 'Cédula_Extrangeria':
             if (len(self.identity_number_person) != 12 or (not self.identity_number_person.isdigit())):
-                raise BadRequestError('El numero de documento cuando es de tipo Cedula de extrangeria, debe ser numerico y debe tener una longitud de 12 caracteres')
+                raise BadRequestError('El numero de documento cuando es de tipo Cedula de extranjeria, debe ser numerico y debe tener una longitud de 12 caracteres')
     
     def valid_token(self, token):
             token_sin_bearer = token[len('Bearer '):]

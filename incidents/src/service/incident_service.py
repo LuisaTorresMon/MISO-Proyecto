@@ -127,6 +127,7 @@ class IncidentService():
 
             response = requests.post(url, headers=headers, json=person)
             logging.debug(f"codigo de respuesta {response.text}")
+            print(f"codigo de respuesta {response.status_code}")
 
             if response.status_code == 201:
                 
