@@ -2,7 +2,6 @@ import json
 import pytest
 from faker import Faker
 from src.main import app
-from src.models.model import db, Product, ProductPerson
 
 fake = Faker()    
 
