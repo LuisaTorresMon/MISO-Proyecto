@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, make_response, request, Blueprint
-from ..models.model import PersonSchema
 from ..service.service import UserService
 from ..validators.validator import UserValidator
+from ..models.model import PersonSchema
 import logging
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
