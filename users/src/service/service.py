@@ -1,10 +1,9 @@
-from ..models.model import User, UserSchema, Empresa, EmpresaSchema, Persona, PersonaSchema, db
+from ..models.model import User, UserSchema, Empresa, EmpresaSchema, db
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
-from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException
-from ..validators.validator import UserValidator
+from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException
 user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
 
@@ -68,6 +67,8 @@ class UserService():
         if user is None:
             raise IncorrectUserOrPasswordException
 
+        # Verificar la contraseña
+        # No es necesario codificar user.contrasena nuevamente
         if not bcrypt.checkpw(password.encode('utf-8'), user.contrasena.encode('utf-8')):
             raise IncorrectUserOrPasswordException
 
@@ -159,4 +160,20 @@ class UserService():
             "usuario": new_user['nombre_usuario'],
             "empresa": nuevo_agente.nombre_completo
         })
-    
+
+
+    def register_user(self, user):
+        nombre_usuario = user.get('usuario')
+        contrasena = user.get('contrasena')
+
+        user_data = {
+            "username": nombre_usuario,
+            "password": contrasena
+        }
+
+        new_user = self.create_user(user_data)
+
+        return jsonify({
+            "message": "Cliente registrado exitosamente.",
+            "usuario": new_user['nombre_usuario']
+        })
