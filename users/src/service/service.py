@@ -123,11 +123,11 @@ class UserService():
         
         existing_person = self.get_person_by_identity(identity_type, identity_number)
 
-        existing_person.nombres = name,
-        existing_person.apellidos = lastname,
-        existing_person.tipo_identificacion = identity_type,
-        existing_person.numero_identificacion = identity_number,
-        existing_person.telefono = cellphone,
+        existing_person.nombres = name
+        existing_person.apellidos = lastname
+        existing_person.tipo_identificacion = identity_type
+        existing_person.numero_identificacion = identity_number
+        existing_person.telefono = cellphone
         existing_person.correo_electronico = email
         
         db.session.commit()        
