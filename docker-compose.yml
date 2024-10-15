@@ -70,6 +70,24 @@ services:
       - app_net
       - plan_net
 
+  incident:
+    build: ./incidents/
+    ports:
+      - "3004:3004"
+    environment:
+      DB_NAME: monitor_incident
+      DB_HOST: incident_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      USERS_PATH: "http://users:3000"
+    depends_on:
+      incident_db:
+        condition: service_healthy
+    networks:
+      - app_net
+      - incident_net
+
   user_db:
     image: postgres
     environment:
@@ -128,9 +146,24 @@ services:
     networks:
       - plan_net
 
+  incident_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: monitor_incident
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - incident_net
+
 networks:
   invoice_net:
   payment_net:
   app_net:
   plan_net:
+  incident_net:
   user_net:
