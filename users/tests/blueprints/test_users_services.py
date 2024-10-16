@@ -243,3 +243,4 @@ class TestUsers():
             with pytest.raises(BadRequestException, match="El campo correo_electronico es obligatorio."):
                 UserValidator.validate_registration_data(user_data, user_type)
                 
+                
