@@ -19,6 +19,7 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_persona = db.Column(db.Integer)
     id_empresa = db.Column(db.Integer)
+    id_tipousuario = db.Column(db.Integer)
     nombre_usuario = db.Column(db.String(100), unique=True, nullable=False)
     contrasena = db.Column(db.String(255), nullable=False)
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
@@ -51,6 +52,12 @@ class Persona(db.Model):
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
 
+class TipoUsuario(db.Model):
+    __tablename__ = 'tipousuario'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    tipo = db.Column(db.String(200))
+
 class UserSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = User
@@ -78,6 +85,15 @@ class PersonaSchema(SQLAlchemyAutoSchema):
 
     id = fields.String()
 
+class TipoUsuarioSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = TipoUsuario
+        include_relationships = True
+        load_instance = True
+        include_fk = True
+
+    id = fields.String()
+
 def cargar_datos_iniciales():
     if User.query.count() == 0:
         password = "123456"
@@ -93,4 +109,17 @@ def cargar_datos_iniciales():
         print("Datos iniciales cargados en la tabla users")
     else:
         print("La tabla users ya tiene datos")
+    
+    if TipoUsuario.query.count() == 0:
+        type_users = [
+            TipoUsuario(tipo="cliente"),
+            TipoUsuario(tipo="agente"),
+            TipoUsuario(tipo="usuario")
+        ]
+
+        db.session.bulk_save_objects(type_users)
+        db.session.commit()
+        print("Datos iniciales cargados en la tabla TipoUsuario")
+    else:
+        print("La tabla TipoUsuario ya tiene datos")
         
