@@ -7,6 +7,7 @@ from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistEx
 from ..validators.validator import UserValidator
 user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
+persona_schema = PersonaSchema()
 
 class UserService():
 
