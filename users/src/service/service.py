@@ -1,9 +1,10 @@
-from ..models.model import User, UserSchema, Empresa, EmpresaSchema, db
+from ..models.model import User, UserSchema, Empresa, EmpresaSchema, Persona, PersonaSchema, db
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
-from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException
+from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException
+from ..validators.validator import UserValidator
 user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
 persona_schema = PersonaSchema()
@@ -178,3 +179,4 @@ class UserService():
             "message": "Cliente registrado exitosamente.",
             "usuario": new_user['nombre_usuario']
         })
+    

@@ -30,7 +30,7 @@ def register_agent():
     result = user_service.register_agent(data)
     return result
 
-@users_blueprint.route("/auth/signin", methods = ["POST"])
+@users_blueprint.route("/auth/login", methods = ["POST"])
 def signIn():
     data = request.get_json()
     result = user_service.signIn(data)
