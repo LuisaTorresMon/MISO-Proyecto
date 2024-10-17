@@ -29,3 +29,20 @@ class RequiredFields(ApiError):
 class ServerSystemException(ApiError):
     code = 500
     description = "Error en el sistema porfavor contacte con el administrador"
+
+class EmailInvalido(ApiError):
+    code = 400
+    description = "El formato del email no es válido"
+
+class TelefonoNoNumerico(ApiError):
+    code = 400
+    description = "El campo de teléfono debe contener solo números"
+
+class PassNoCoincide(ApiError):
+    code = 400
+    description = "Las contraseñas no coinciden"
+
+class PassNoValido(ApiError):
+    code = 400
+    description = "La contraseña debe tener al menos 8 caracteres, incluyendo una letra mayúscula, una letra minúscula y un número" 
+    

@@ -50,6 +50,23 @@ def update_person():
     data = request.get_json()
     result = user_service.update_person(data)
     return make_response(result, 200)
+@users_blueprint.route('/register/client', methods = ['POST'])
+def register_client():
+    data = request.get_json()
+    result = user_service.register_client(data)
+    return result
+
+@users_blueprint.route('/register/user', methods = ['POST'])
+def register_user():
+    data = request.get_json()
+    result = user_service.register_user(data)
+    return result
+
+@users_blueprint.route('/register/agent', methods = ['POST'])
+def register_agent():
+    data = request.get_json()
+    result = user_service.register_agent(data)
+    return result
 
 @users_blueprint.route("/auth/login", methods = ["POST"])
 def signIn():
