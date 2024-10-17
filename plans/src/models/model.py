@@ -54,7 +54,7 @@ class Contract(db.Model):
     fecha_fin_plan = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(days=365))
     es_activo = db.Column(db.Boolean)
     plan_id = db.Column(db.Integer)
-    empresa_id = db.Column(db.String(100))
+    empresa_id = db.Column(db.Integer)
 
 class ContractSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -71,4 +71,4 @@ class ContractGetJsonSchema(SQLAlchemyAutoSchema):
     fecha_fin_plan = fields.DateTime()
     es_activo = fields.Boolean()
     plan_id = fields.String()
-    empresa_id = fields.String()
+    empresa_id = fields.Integer()
