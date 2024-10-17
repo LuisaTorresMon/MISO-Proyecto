@@ -6,6 +6,7 @@ from flask_jwt_extended import jwt_required, create_access_token, get_current_us
 from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException
 user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
+persona_schema = PersonaSchema()
 
 class UserService():
 
