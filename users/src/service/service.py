@@ -36,19 +36,19 @@ class UserService():
                     except ValueError:
                         raise BadRequestException
 
-                if self.id_empresa is not None:
-                    if str(self.id_empresa).strip() != "":
-                        try:
-                            int( self.id_empresa)
-                        except ValueError:
-                            raise BadRequestException
+            if self.id_empresa is not None:
+                if str(self.id_empresa).strip() != "":
+                    try:
+                        int( self.id_empresa)
+                    except ValueError:
+                        raise BadRequestException
                 
-                if self.id_tipousuario is not None:
-                    if str(self.id_tipousuario).strip() != "":
-                        try:
-                            int( self.id_tipousuario)
-                        except ValueError:
-                            raise BadRequestException
+            if self.id_tipousuario is not None:
+                if str(self.id_tipousuario).strip() != "":
+                    try:
+                        int( self.id_tipousuario)
+                    except ValueError:
+                        raise BadRequestException
 
         user = User.query.filter_by(nombre_usuario=self.username).first()
 
@@ -75,21 +75,21 @@ class UserService():
         username = user.get('username')
         password = user.get('password')
 
-        user = User.query.filter_by(nombre_usuario=username).first()
+        stored_user = User.query.filter_by(nombre_usuario=username).first()
 
-        if user is None:
+        if stored_user is None:
             raise IncorrectUserOrPasswordException
 
-        if not bcrypt.checkpw(password.encode('utf-8'), user.contrasena.encode('utf-8')):
+        if not bcrypt.checkpw(password.encode('utf-8'), stored_user.contrasena.encode('utf-8')):
             raise IncorrectUserOrPasswordException
 
         additional_claims = {
-            "id": user.id,
-            "id_person": user.id_persona,
-            "id_company": user.id_empresa,
-            "id_typeuser": user.id_tipousuario
+            "id": stored_user.id,
+            "id_person": stored_user.id_persona,
+            "id_company": stored_user.id_empresa,
+            "id_typeuser": stored_user.id_tipousuario
         }
-        token_de_acceso = create_access_token(identity=user.id, additional_claims=additional_claims)
+        token_de_acceso = create_access_token(identity=stored_user.id, additional_claims=additional_claims)
 
         return {
             "token": token_de_acceso
@@ -235,22 +235,5 @@ class UserService():
             "message": "Cliente registrado exitosamente.",
             "usuario": new_user['nombre_usuario'],
             "empresa": nuevo_agente.nombres
-        })
-
-
-    def register_user(self, user):
-        nombre_usuario = user.get('usuario')
-        contrasena = user.get('contrasena')
-
-        user_data = {
-            "username": nombre_usuario,
-            "password": contrasena
-        }
-
-        new_user = self.create_user(user_data)
-
-        return jsonify({
-            "message": "Cliente registrado exitosamente.",
-            "usuario": new_user['nombre_usuario']
         })
     
