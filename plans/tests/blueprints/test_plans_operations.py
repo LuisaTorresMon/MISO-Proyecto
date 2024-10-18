@@ -156,3 +156,4 @@ class TestPlans():
 
             assert response.status_code == 200
             assert response.data == b'pong'
+            
