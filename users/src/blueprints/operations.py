@@ -57,12 +57,6 @@ def register_client():
     result = user_service.register_client(data)
     return result
 
-@users_blueprint.route('/register/user', methods = ['POST'])
-def register_user():
-    data = request.get_json()
-    result = user_service.register_user(data)
-    return result
-
 @users_blueprint.route('/register/agent', methods = ['POST'])
 def register_agent():
     data = request.get_json()
