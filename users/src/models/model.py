@@ -19,12 +19,15 @@ class User(db.Model):
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     id_persona = db.Column(db.Integer)
     id_empresa = db.Column(db.Integer)
-    id_tipousuario = db.Column(db.Integer)
+    id_tipousuario = db.Column(db.Integer, db.ForeignKey('tipousuario.id'), nullable=False)
     nombre_usuario = db.Column(db.String(100), unique=True, nullable=False)
     contrasena = db.Column(db.String(255), nullable=False)
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     es_activo = db.Column(db.Boolean, server_default="true", nullable=False)
+    
+    tipo_usuario = db.relationship('TipoUsuario', backref='incidentes')
+
     
 class Person(db.Model):
     __tablename__ = 'persona'
@@ -115,20 +118,6 @@ class TipoUsuarioSchema(SQLAlchemyAutoSchema):
     id = fields.String()
 
 def cargar_datos_iniciales():
-    if User.query.count() == 0:
-        password = "123456"
-        salt = bcrypt.gensalt()
-        hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
-
-        users = [
-            User(id_persona=1, id_empresa=None, nombre_usuario="sa", contrasena=hashed_password.decode("utf-8"))  # Almacena como bytes
-        ]
-
-        db.session.bulk_save_objects(users)
-        db.session.commit()
-        print("Datos iniciales cargados en la tabla users")
-    else:
-        print("La tabla users ya tiene datos")
     
     if TipoUsuario.query.count() == 0:
         type_users = [
@@ -142,4 +131,21 @@ def cargar_datos_iniciales():
         print("Datos iniciales cargados en la tabla TipoUsuario")
     else:
         print("La tabla TipoUsuario ya tiene datos")
+    
+    if User.query.count() == 0:
+        password = "123456"
+        salt = bcrypt.gensalt()
+        hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
+
+        users = [
+            User(id_empresa=None, id_tipousuario = 1, nombre_usuario="sa", contrasena=hashed_password.decode("utf-8")),  
+            User(id_empresa=None, id_tipousuario = 2, nombre_usuario="test_agent", contrasena=hashed_password.decode("utf-8")) 
+
+        ]
+
+        db.session.bulk_save_objects(users)
+        db.session.commit()
+        print("Datos iniciales cargados en la tabla users")
+    else:
+        print("La tabla users ya tiene datos")
         

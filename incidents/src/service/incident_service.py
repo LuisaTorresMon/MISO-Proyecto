@@ -265,8 +265,8 @@ class IncidentService():
            incidents_schema = []
 
            for incident in incidents:
-               incident_data = incident_schema.dump(incident)  # Serializar los datos del incidente
-               incident_data['estado_nombre'] = incident.estado.estado  # Agregar el nombre del estado
+               incident_data = incident_schema.dump(incident)  
+               incident_data['estado_nombre'] = incident.estado.estado  
                incidents_schema.append(incident_data)
                           
            return incidents_schema

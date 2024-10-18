@@ -87,7 +87,7 @@ class UserService():
             "id": user.id,
             "id_person": user.id_persona,
             "id_company": user.id_empresa,
-            "id_typeuser": user.id_tipousuario
+            "user_type": user.tipo_usuario.tipo
         }
         token_de_acceso = create_access_token(identity=user.id, additional_claims=additional_claims)
 
