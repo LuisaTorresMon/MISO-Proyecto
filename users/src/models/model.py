@@ -132,7 +132,7 @@ def cargar_datos_iniciales():
     else:
         print("La tabla TipoUsuario ya tiene datos")
     
-    if User.query.count() == 0:
+    if User.query.count() == 0: 
         password = "123456"
         salt = bcrypt.gensalt()
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
