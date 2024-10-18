@@ -69,7 +69,7 @@ class Empresa(db.Model):
     tipo_identificacion = db.Column(db.Integer)
     numero_identificacion = db.Column(db.String(100))
     sector = db.Column(db.String(100))
-    telefono = db.Column(db.Integer)
+    telefono = db.Column(db.String(20))
     pais = db.Column(db.String(100))
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)

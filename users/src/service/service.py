@@ -205,15 +205,17 @@ class UserService():
 
         nombre_usuario = user.get('usuario')
         contrasena = user.get('contrasena')
-        nombre_completo = user.get('nombre_completo')
+        nombres = user.get('nombres')
+        apellidos = user.get('apellidos')
         tipo_identificacion = user.get('tipo_identificacion')
         numero_identificacion = user.get('numero_identificacion')
         telefono = user.get('telefono')
         correo_electronico = user.get('correo_electronico')
+        empresa_id = user.get('empresa_id')
 
         nuevo_agente = Person(
-            nombres =nombre_completo,
-            apellidos = '',
+            nombres =nombres,
+            apellidos = apellidos,
             tipo_identificacion = tipo_identificacion,
             numero_identificacion = numero_identificacion,
             telefono = telefono,
@@ -226,7 +228,7 @@ class UserService():
         user_data = {
             "username": nombre_usuario,
             "password": contrasena,
-            "id_company": nuevo_agente.id,
+            "id_company": empresa_id,
             "id_typeuser": id_user_type
         }
         new_user = self.create_user(user_data)
