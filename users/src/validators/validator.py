@@ -1,7 +1,8 @@
-from src.errors.errors import TokenNoEnviado, TokenVencido, BadRequestException, EmailInvalido, TelefonoNoNumerico, PassNoCoincide, PassNoValido
+from src.errors.errors import TokenNoEnviado, RequiredFields, TokenVencido, BadRequestException, EmailInvalido, TelefonoNoNumerico, PassNoCoincide, PassNoValido
 import re
 
 campos_requeridos = ['username', 'password']
+person_required_files = ['identityType','identityNumber']
 
 class UserValidator():
 
@@ -9,7 +10,13 @@ class UserValidator():
         token_encabezado = headers.get('Authorization')
         self.validar_token_enviado(token_encabezado)
         self.validar_token_vencido(token_encabezado)
+        self.validar_campos_requeridos(data)
+        
         return True
+
+    def validate_query_person(self, identity_type, identity_number):
+        if not identity_type or not identity_number:
+            raise RequiredFields
 
     def validar_listado(self, headers):
         
@@ -33,6 +40,13 @@ class UserValidator():
         parts_token = token.split()
         if "fake" in parts_token[1]:
             raise TokenVencido
+
+    
+    def validar_campos_requeridos(self, data):
+        for campo in campos_requeridos:
+            if campo not in data:
+                raise RequiredFields
+    
     
     @staticmethod
     def validate_registration_data(user, user_type):   

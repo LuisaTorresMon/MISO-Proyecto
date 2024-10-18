@@ -25,6 +25,37 @@ class User(db.Model):
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     es_activo = db.Column(db.Boolean, server_default="true", nullable=False)
+    
+class Person(db.Model):
+    __tablename__ = 'persona'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombres = db.Column(db.String(255), nullable=False)
+    apellidos = db.Column(db.String(255), nullable=False)
+    tipo_identificacion = db.Column(db.String(50), nullable=False)
+    numero_identificacion = db.Column(db.String(50), nullable=False)
+    telefono = db.Column(db.String(20))
+    correo_electronico = db.Column(db.String(100))
+    fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    
+class Product(db.Model):
+    __tablename__ = 'producto'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    nombre_producto = db.Column(db.String(255), nullable=False)
+    tipo = db.Column(db.String(50), nullable=False)
+    descripcion = db.Column(db.Text)
+    fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+    fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
+
+class ProductPerson(db.Model):
+    __tablename__ = 'persona_producto'
+
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    fecha_adquisicion = db.Column(db.Date, nullable=False)
+    id_persona = db.Column(db.Integer, nullable=False)
+    id_producto = db.Column(db.Integer, db.ForeignKey('producto.id'), nullable=False)
 
 class Empresa(db.Model):
     __tablename__ = 'empresa'
@@ -37,18 +68,6 @@ class Empresa(db.Model):
     sector = db.Column(db.String(100))
     telefono = db.Column(db.Integer)
     pais = db.Column(db.String(100))
-    fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
-    fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
-
-class Persona(db.Model):
-    __tablename__ = 'persona'
-
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    nombre_completo = db.Column(db.String(200))
-    tipo_identificacion = db.Column(db.Integer)
-    numero_identificacion = db.Column(db.String(100))
-    telefono = db.Column(db.Integer)
-    correo_electronico = db.Column(db.String(200))
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
 
@@ -66,19 +85,20 @@ class UserSchema(SQLAlchemyAutoSchema):
         include_fk = True
         exclude = ("contrasena", )
     id = fields.Integer()
+    
+class PersonSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Person
+        load_instance = True  
+        
+class ProductSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = Product
+        load_instance = True  
 
 class EmpresaSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Empresa
-        include_relationships = True
-        load_instance = True
-        include_fk = True
-
-    id = fields.String()
-
-class PersonaSchema(SQLAlchemyAutoSchema):
-    class Meta:
-        model = Persona
         include_relationships = True
         load_instance = True
         include_fk = True

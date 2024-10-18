@@ -22,6 +22,9 @@ class Incidente(db.Model):
     estado_id = db.Column(db.Integer, db.ForeignKey('estado.id'), nullable=False)
     tipo_id = db.Column(db.Integer, db.ForeignKey('tipo.id'), nullable=False)
     
+    estado = db.relationship('Estado', backref='incidentes')
+
+    
 class Canal(db.Model):
     __tablename__ = 'canal'
 

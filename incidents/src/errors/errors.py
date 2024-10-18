@@ -8,7 +8,7 @@ class BadRequestError(ApiError):
     code = 400
     description = "En el caso que alguno de los campos no esté presente en la solicitud, o no tengan el formato esperado."
 
-class CamposFaltantes(ApiError):
+class RequiredFields(ApiError):
     code = 400
     description = ("Campos faltantes en la solicitud")
     
