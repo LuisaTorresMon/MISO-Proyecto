@@ -9,7 +9,7 @@ common_utils = CommonUtils()
 
 class CallsService():
 
-        def save_call_incidence(self, incident):
+        def save_call_incidence(self, incident, user_id, person_id):
             
             logging.debug("Iniciando el guardado de la llamada")
 
@@ -30,8 +30,8 @@ class CallsService():
                 nombre_grabacion = f"{audio_name}_{incident.codigo}_{current_date}",
                 duracion = f"{audio.duration:.2f}",
                 incidencia_id = incident.id,
-                usuario_id = 1,
-                persona_id = 1
+                usuario_id = user_id,
+                persona_id = person_id
             )
         
             db.session.add(incident_call)

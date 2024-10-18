@@ -1,13 +1,16 @@
-from ..models.model import User, UserSchema, Empresa, EmpresaSchema, Persona, PersonaSchema, db
+from ..models.model import User, Empresa, ProductPerson, Product, Person, PersonSchema, ProductSchema, UserSchema, EmpresaSchema, db
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
 from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException
 from ..validators.validator import UserValidator
+
+user_schema = UserSchema()
+product_schema = ProductSchema()
 user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
-persona_schema = PersonaSchema()
+persona_schema = PersonSchema()
 
 class UserService():
 
@@ -72,14 +75,11 @@ class UserService():
         username = user.get('username')
         password = user.get('password')
 
-        # Buscar el usuario en la base de datos
         user = User.query.filter_by(nombre_usuario=username).first()
 
         if user is None:
             raise IncorrectUserOrPasswordException
 
-        # Verificar la contraseña
-        # No es necesario codificar user.contrasena nuevamente
         if not bcrypt.checkpw(password.encode('utf-8'), user.contrasena.encode('utf-8')):
             raise IncorrectUserOrPasswordException
 
@@ -94,6 +94,65 @@ class UserService():
         return {
             "token": token_de_acceso
         }
+        
+    def create_person(self, person):
+                
+        name = person.get('name') 
+        lastname = person.get('lastname')
+        email = person.get('email')
+        identity_type = person.get('identity_type')
+        identity_number = person.get('identity_number')
+        cellphone = person.get('cellphone')
+        
+        new_person = self.get_person_by_identity(identity_type, identity_number)
+
+        if not new_person:
+            new_person = Person(
+                nombres = name,
+                apellidos = lastname,
+                tipo_identificacion = identity_type,
+                numero_identificacion = identity_number,
+                telefono = cellphone,
+                correo_electronico = email
+            )
+        
+            db.session.add(new_person)
+            db.session.commit()
+        
+        return persona_schema.dump(new_person) 
+    
+    def update_person(self, person):
+                
+        name = person.get('name') 
+        lastname = person.get('lastname')
+        email = person.get('email')
+        identity_type = person.get('identity_type')
+        identity_number = person.get('identity_number')
+        cellphone = person.get('cellphone')
+        
+        existing_person = self.get_person_by_identity(identity_type, identity_number)
+
+        existing_person.nombres = name
+        existing_person.apellidos = lastname
+        existing_person.tipo_identificacion = identity_type
+        existing_person.numero_identificacion = identity_number
+        existing_person.telefono = cellphone
+        existing_person.correo_electronico = email
+        
+        db.session.commit()        
+        return persona_schema.dump(existing_person) 
+        
+    def get_person_by_identity(self, identity_type, identity_number):        
+        person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
+        return person
+    
+    def get_products_by_person(self, person_id):
+        products = db.session.query(Product).join(ProductPerson).filter(ProductPerson.id_persona == person_id).all()
+        products_schema = [product_schema.dump(product) for product in products]
+        
+        return products_schema
+
+
 
     def register_client(self, user):
         user_type = 'client'
@@ -152,8 +211,9 @@ class UserService():
         telefono = user.get('telefono')
         correo_electronico = user.get('correo_electronico')
 
-        nuevo_agente = Persona(
-            nombre_completo = nombre_completo,
+        nuevo_agente = Person(
+            nombres =nombre_completo,
+            apellidos = '',
             tipo_identificacion = tipo_identificacion,
             numero_identificacion = numero_identificacion,
             telefono = telefono,
@@ -174,7 +234,7 @@ class UserService():
         return jsonify({
             "message": "Cliente registrado exitosamente.",
             "usuario": new_user['nombre_usuario'],
-            "empresa": nuevo_agente.nombre_completo
+            "empresa": nuevo_agente.nombres
         })
 
 
