@@ -60,7 +60,7 @@ class TestServices():
 
         products_schema = user_service.get_products_by_person(new_person['id'])
         
-        self.assertGreater(len(products_schema), 0)
+        assert len(products_schema) > 0
 
     def create_product(self):
         with app.test_client() as test_client:

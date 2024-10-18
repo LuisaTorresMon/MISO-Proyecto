@@ -50,6 +50,7 @@ def update_person():
     data = request.get_json()
     result = user_service.update_person(data)
     return make_response(result, 200)
+
 @users_blueprint.route('/register/client', methods = ['POST'])
 def register_client():
     data = request.get_json()

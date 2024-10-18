@@ -75,14 +75,11 @@ class UserService():
         username = user.get('username')
         password = user.get('password')
 
-        # Buscar el usuario en la base de datos
         user = User.query.filter_by(nombre_usuario=username).first()
 
         if user is None:
             raise IncorrectUserOrPasswordException
 
-        # Verificar la contraseña
-        # No es necesario codificar user.contrasena nuevamente
         if not bcrypt.checkpw(password.encode('utf-8'), user.contrasena.encode('utf-8')):
             raise IncorrectUserOrPasswordException
 
@@ -237,7 +234,7 @@ class UserService():
         return jsonify({
             "message": "Cliente registrado exitosamente.",
             "usuario": new_user['nombre_usuario'],
-            "empresa": nuevo_agente.nombre_completo
+            "empresa": nuevo_agente.nombres
         })
 
 
