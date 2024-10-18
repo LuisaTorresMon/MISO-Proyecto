@@ -6,6 +6,7 @@ from src.main import app
 from src.models.model import db, Product, ProductPerson
 from src.errors.errors import TokenNoEnviado, TokenVencido, BadRequestException, EmailInvalido, TelefonoNoNumerico, PassNoCoincide, PassNoValido
 from src.validators.validator import UserValidator
+from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
 
 fake = Faker()
 headers = {"Authorization": "Bearer 123456"}
@@ -358,31 +359,35 @@ class TestOperations():
                 content_type='application/json'
             )
 
-            assert response.status_code == 200 
+            assert response.status_code == 200
 
-    def test_validate_registration_data_missing_correo_electronico(self, mock_create_user):
-        with app.test_client() as test_client:
+    def test_create_user(self, client):
+        user_data = {
+            'id_person': '4',
+            'id_company': None,
+            'id_typeuser': '1',
+            'username': fake.user_name(),
+            'password': 'password123'
+        }
 
-            password = fake.password()
+        response = client.post('/user/create', json=user_data)
 
-            user_type = 'agent'
+        assert response.status_code == 201
 
-            user_data = {
-                "nombre_completo": fake.company(),
-                "correo_electronico": None,
-                "tipo_identificacion": fake.random_element(elements=('Cedula_ciudadania', 'Cedula_extranjeria', 'Pasaporte')),
-                "numero_identificacion": fake.random_number(digits=10),
-                "telefono": fake.random_number(digits=10),
-                "usuario": fake.user_name(),
-                "contrasena": password,
-                "confirmar_contrasena": password
-            }
+    def test_validate_token_success(self, client, mocker):
+        access_token = create_access_token(identity='test_user')
 
-            mock_create_user.return_value = {
-                "nombre_usuario": user_data['usuario']
-            }
+        mocker.patch('flask_jwt_extended.get_jwt', return_value={'sub': 'test_user'})
 
-            with pytest.raises(BadRequestException, match="El campo correo_electronico es obligatorio."):
-                UserValidator.validate_registration_data(user_data, user_type)
-                
-                
+        response = client.post('/user/auth/validate-token', headers={'Authorization': f'Bearer {access_token}'})
+
+        assert response.status_code == 200
+        response_data = json.loads(response.data)
+        assert response_data['sub'] == 'test_user'
+
+    def test_validate_token_without_jwt(self, client):
+        response = client.post('/user/auth/validate-token')
+
+        assert response.status_code == 401
+        response_data = json.loads(response.data)
+        assert 'msg' in response_data

@@ -35,9 +35,9 @@ class PlanGetJsonSchema(SQLAlchemyAutoSchema):
 def cargar_datos_iniciales():
     if Plan.query.count() == 0:
         planes = [
-            Plan(id=1, nombre_plan="Plan Emprendedor", precio=100),
-            Plan(id=2, nombre_plan="Plan Empresario", precio=200),
-            Plan(id=3, nombre_plan="Plan Empresario Plus", precio=300)
+            Plan(id=1, nombre_plan="Plan Emprendedor", precio=200),
+            Plan(id=2, nombre_plan="Plan Empresario", precio=300),
+            Plan(id=3, nombre_plan="Plan Empresario Plus", precio=500)
         ]
         # Agregar los planes a la sesión
         db.session.bulk_save_objects(planes)
@@ -49,12 +49,12 @@ def cargar_datos_iniciales():
 class Contract(db.Model):
     __tablename__ = 'contract'
 
-    id = db.Column(db.String, primary_key=True, default=lambda: str(uuid.uuid4()))
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     fecha_inicio_plan = db.Column(db.DateTime, default=datetime.utcnow)
     fecha_fin_plan = db.Column(db.DateTime, default=lambda: datetime.utcnow() + timedelta(days=365))
     es_activo = db.Column(db.Boolean)
     plan_id = db.Column(db.Integer)
-    empresa_id = db.Column(db.String(100))
+    empresa_id = db.Column(db.Integer)
 
 class ContractSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -63,12 +63,12 @@ class ContractSchema(SQLAlchemyAutoSchema):
         load_instance = True
         include_fk = True
 
-    id = fields.String()
+    id = fields.Integer()
 
 class ContractGetJsonSchema(SQLAlchemyAutoSchema):
-    id = fields.String()
+    id = fields.Integer()
     fecha_inicio_plan = fields.DateTime()
     fecha_fin_plan = fields.DateTime()
     es_activo = fields.Boolean()
     plan_id = fields.String()
-    empresa_id = fields.String()
+    empresa_id = fields.Integer()
