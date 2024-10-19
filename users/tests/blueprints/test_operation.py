@@ -332,10 +332,15 @@ class TestOperations():
     def test_register_agent(self, client, mock_create_user, mock_persona):
         with app.test_client() as test_client:
 
+            token = self.generate_token()
+
+            headers = {'Authorization': f"Bearer {token}"}
+
             password = fake.password()
 
             user_data = {
-                "nombre_completo": fake.company(),
+                "nombres": fake.company(),
+                "apellidos": fake.company(),
                 "correo_electronico": fake.email(),
                 "tipo_identificacion": fake.random_element(elements=('Cedula_ciudadania', 'Cedula_extranjeria', 'Pasaporte')),
                 "numero_identificacion": fake.random_number(digits=10),
@@ -356,7 +361,8 @@ class TestOperations():
             response = client.post(
                 '/user/register/agent',  
                 data=json.dumps(user_data),
-                content_type='application/json'
+                content_type='application/json',
+                headers=headers
             )
 
             assert response.status_code == 200

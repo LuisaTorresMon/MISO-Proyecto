@@ -9,7 +9,7 @@ permissions:
   pull-requests: write
   
 jobs:
-  test-plans-microservices:
+   test-users-microservices:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -17,14 +17,14 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install pipenv
-        working-directory: ./plans
+        working-directory: ./users
         run: pip install pipenv
       - name: Install dependencies
-        working-directory: ./plans
+        working-directory: ./users
         run: pipenv install --dev
       - name: Run unit tests
-        working-directory: ./plans
-        run: pipenv run pytest
+        working-directory: ./users
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
   test-incidents-microservices:
     runs-on: ubuntu-latest
     strategy:

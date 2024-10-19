@@ -58,10 +58,18 @@ def register_client():
     return result
 
 @users_blueprint.route('/register/agent', methods = ['POST'])
+@jwt_required()
 def register_agent():
     data = request.get_json()
     result = user_service.register_agent(data)
     return result
+
+@users_blueprint.route('/agent/<int:id_empresa>', methods = ['GET'])
+@jwt_required()
+def get_agents_by_company(id_empresa):
+    result = user_service.get_agents_by_company(id_empresa)
+    return result
+
 
 @users_blueprint.route("/auth/login", methods = ["POST"])
 def signIn():

@@ -1,61 +1,85 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: plans-deployment
+  name: users-deployment
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: plans
+      app: users
   template:
     metadata:
       labels:
-        app: plans
+        app: users
     spec:
       containers:
-        - name: plans-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:2.0
+        - name: users-contenedor
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/users:1.0
           envFrom:
             - secretRef:
                 name: db-secrets
           ports:
-            - containerPort: 3003
+            - containerPort: 3000
 
 ---
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
-  name: plans-config
+  name: users-config
 spec:
   healthCheck:
     checkIntervalSec: 60
-    port: 3003
+    port: 3000
     type: HTTP
-    requestPath: /plan/ping
+    requestPath: /user/ping
 
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: plans-service
+  name: users-service
   annotations:
-    cloud.google.com/backend-config: '{"default": "plans-config"}'
+    cloud.google.com/backend-config: '{"default": "users-config"}'
 spec:
   selector:
-    app: plans
+    app: users
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 3003
+      targetPort: 3000
       nodePort: 32337
   type: NodePort
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: users-hpa
+  annotations:
+    autoscaling.alpha.kubernetes.io/conditions: '[{"type":"AbleToScale","status":"True","lastTransitionTime":"2021-12-08T17:22:16Z","reason":"ScaleDownStabilized","message":"recent
+      recommendations were higher than current one, applying the highest recent recommendation"},{"type":"ScalingActive","status":"True","lastTransitionTime":"2021-12-08T17:22:16Z","r
+eason":"ValidMetricFound","message":"the HPA was able to successfully calculate a replica count from cpu resource utilization
+      (percentage of request)"},{"type":"ScalingLimited","status":"False","lastTransitionTime":"2021-12-08T17:22:16Z","reason":"DesiredWithinRange","message":"the
+      desired count is within the acceptable range"}]'
+    autoscaling.alpha.kubernetes.io/current-metrics: '[{"type":"Resource","resource":{"name":"cpu","currentAverageUtilization":1,"currentAverageValue":"2m"}}]'
+spec:
+  maxReplicas: 2
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: users-deployment
+  targetCPUUtilizationPercentage: 50
+status:
+  currentCPUUtilizationPercentage: 1
+  currentReplicas: 1
+  desiredReplicas: 1
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: incidents-deployment
-  # namespace: k8s-proyecto-final-namespace
 spec:
   replicas: 1
   selector:
@@ -69,7 +93,7 @@ spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: incidents-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/incident:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/incidents:1.0
           envFrom:
             - secretRef:
                 name: db-secrets
@@ -80,7 +104,7 @@ spec:
 apiVersion: cloud.google.com/v1
 kind: BackendConfig
 metadata:
-  name: incident-config
+  name: incidents-config
 spec:
   healthCheck:
     checkIntervalSec: 60
@@ -92,9 +116,9 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: incident-service
+  name: incidents-service
   annotations:
-    cloud.google.com/backend-config: '{"default": "incident-config"}'
+    cloud.google.com/backend-config: '{"default": "incidents-config"}'
 spec:
   selector:
     app: incidents
@@ -104,3 +128,28 @@ spec:
       targetPort: 3004
       nodePort: 32338
   type: NodePort
+
+---
+apiVersion: autoscaling/v1
+kind: HorizontalPodAutoscaler
+metadata:
+  name: incidents-hpa
+  annotations:
+    autoscaling.alpha.kubernetes.io/conditions: '[{"type":"AbleToScale","status":"True","lastTransitionTime":"2021-12-08T17:22:16Z","reason":"ScaleDownStabilized","message":"recent
+      recommendations were higher than current one, applying the highest recent recommendation"},{"type":"ScalingActive","status":"True","lastTransitionTime":"2021-12-08T17:22:16Z","r
+eason":"ValidMetricFound","message":"the HPA was able to successfully calculate a replica count from cpu resource utilization
+      (percentage of request)"},{"type":"ScalingLimited","status":"False","lastTransitionTime":"2021-12-08T17:22:16Z","reason":"DesiredWithinRange","message":"the
+      desired count is within the acceptable range"}]'
+    autoscaling.alpha.kubernetes.io/current-metrics: '[{"type":"Resource","resource":{"name":"cpu","currentAverageUtilization":1,"currentAverageValue":"2m"}}]'
+spec:
+  maxReplicas: 2
+  minReplicas: 1
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: incidents-deployment
+  targetCPUUtilizationPercentage: 50
+status:
+  currentCPUUtilizationPercentage: 1
+  currentReplicas: 1
+  desiredReplicas: 1

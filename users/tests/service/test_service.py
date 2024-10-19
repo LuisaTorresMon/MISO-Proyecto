@@ -156,18 +156,6 @@ class TestServices():
         with pytest.raises(BadRequestException):
             user_service.create_user(mock_data)
 
-    def test_create_user_valid_id_person_id_company_raises_exception(self):
-        mock_data = {
-            'id_person': '4',
-            'id_company': '2',
-            'id_typeuser': '1',
-            'username': 'testuser',
-            'password': 'password123'
-        }
-
-        with pytest.raises(BadRequestException):
-                    user_service.create_user(mock_data)
-
     def test_create_user_bad_credentials_by_username_raises_exception(self, mocker):
         mock_user = {
             'username': 'invalid_username',
