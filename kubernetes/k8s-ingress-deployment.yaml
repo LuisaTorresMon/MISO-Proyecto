@@ -7,7 +7,7 @@ metadata:
 spec:
   rules:
     - host: "abcall-back"
-    - http:
+      http:
         paths:
           - pathType: Prefix
             path: /user
