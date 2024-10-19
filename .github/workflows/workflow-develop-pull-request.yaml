@@ -3,13 +3,13 @@ name: workflow develop and pull request
 on:
   push:
     branches: [ "feature**", "bugfix**" ]
- 
+
 permissions:
   contents: write
   pull-requests: write
-  
+
 jobs:
-   test-users-microservices:
+  test-users-microservices:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -25,6 +25,7 @@ jobs:
       - name: Run unit tests
         working-directory: ./users
         run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
+
   test-incidents-microservices:
     runs-on: ubuntu-latest
     strategy:
@@ -44,7 +45,7 @@ jobs:
 
   merge-develop:
     needs: 
-      - test-plans-microservices
+      - test-users-microservices
       - test-incidents-microservices
     if: ${{ contains(github.event.head_commit.message, 'release') || contains(github.event.head_commit.message, 'develop') }}
     runs-on: ubuntu-latest
