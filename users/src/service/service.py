@@ -13,6 +13,7 @@ user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
 persona_schema = PersonSchema()
 
+
 class UserService():
 
     def __init__(self):
@@ -26,7 +27,8 @@ class UserService():
         self.username = user.get('username')
         self.password = user.get('password').encode('utf-8')
 
-        if self.id_persona is None and self.id_empresa is None and self.id_tipousuario is None:
+        # if self.id_persona is None and self.id_empresa is None and self.id_tipousuario is None:
+        if self.id_persona is None and self.id_tipousuario is None:
             raise BadRequestException
 
         else:
@@ -260,12 +262,16 @@ class UserService():
         })
 
     def register_user(self, user):
-        fullname = user.get('fullName')
+        first_name = user.get('firstName')
+        last_name = user.get('lastName')
         password = user.get("password")
         username = user.get("username")
 
-        new_user_person = Persona(
-            nombre_completo = fullname
+        new_user_person = Person(
+            nombres=first_name,
+            apellidos=last_name,
+            tipo_identificacion="cc",
+            numero_identificacion="1020"
         )
 
         db.session.add(new_user_person)
@@ -274,7 +280,8 @@ class UserService():
         user_data = {
             "username": username,
             "password": password,
-            "id_persona": new_user_person.id
+            "id_persona": new_user_person.id,
+            "id_typeuser": 2
         }
 
         print(user_data)
@@ -283,6 +290,4 @@ class UserService():
         return jsonify({
             "message": "Cliente registrado exitosamente.",
             "usuario": new_user['nombre_usuario']
-            "empresa": nuevo_agente.nombres
         })
-    

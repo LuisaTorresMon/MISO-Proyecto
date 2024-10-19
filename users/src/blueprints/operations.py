@@ -64,6 +64,13 @@ def register_agent():
     result = user_service.register_agent(data)
     return result
 
+@users_blueprint.route('/register/user', methods = ['POST'])
+# @jwt_required()
+def register_user():
+    data = request.get_json()
+    result = user_service.register_user(data)
+    return result
+
 @users_blueprint.route('/agent/<int:id_empresa>', methods = ['GET'])
 @jwt_required()
 def get_agents_by_company(id_empresa):
