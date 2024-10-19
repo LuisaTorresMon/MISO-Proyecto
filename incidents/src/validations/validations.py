@@ -84,7 +84,10 @@ class ValidatorIncidents():
             token_sin_bearer = token[len('Bearer '):]
             logging.debug(f"token sin bearer {token_sin_bearer}")
 
-            url = 'http://users:3000/user/auth/validate-token'
+            
+            #url = 'http://users:3000/user/auth/validate-token'
+            url = 'http://users-service/user/auth/validate-token'
+
 
             headers = {
                 "Authorization": f"Bearer {token_sin_bearer}",

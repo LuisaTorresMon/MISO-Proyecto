@@ -110,7 +110,8 @@ class IncidentService():
             token_sin_bearer = token[len('Bearer '):]
             logging.debug(f"token sin bearer {token_sin_bearer}")
 
-            url = 'http://users:3000/user/person/create'
+            #url = 'http://users:3000/user/person/create'
+            url = 'http://users-service/user/person/create'
 
             headers = {
                 "Authorization": f"Bearer {token_sin_bearer}",
@@ -148,7 +149,8 @@ class IncidentService():
             token_sin_bearer = token[len('Bearer '):]
             logging.debug(f"token sin bearer {token_sin_bearer}")
 
-            url = f"http://users:3000/user/person/update"
+            #url = f"http://users:3000/user/person/update"
+            url = f"http://users-service/user/person/update"
 
             headers = {
                 "Authorization": f"Bearer {token_sin_bearer}",
