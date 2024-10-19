@@ -9,14 +9,14 @@ spec:
     - http:
         paths:
           - pathType: Prefix
-            path: /users
+            path: /user
             backend:
               service:
                 name: users-service 
                 port:
                   number: 80
           - pathType: Prefix
-            path: /incidents
+            path: /incident
             backend:
               service:
                 name: incidents-service 
