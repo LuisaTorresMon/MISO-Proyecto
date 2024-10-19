@@ -5,6 +5,7 @@ from flask import jsonify
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
 from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException
 from ..validators.validator import UserValidator
+import logging
 
 user_schema = UserSchema()
 product_schema = ProductSchema()
@@ -26,8 +27,7 @@ class UserService():
 
         if self.id_persona is None and self.id_empresa is None and self.id_tipousuario is None:
             raise BadRequestException
-        elif self.id_persona is not None and self.id_empresa is not None and self.id_tipousuario is not None:
-            raise BadRequestException
+
         else:
             if self.id_persona is not None:
                 if str(self.id_persona).strip() != "":
@@ -141,6 +141,24 @@ class UserService():
         
         db.session.commit()        
         return persona_schema.dump(existing_person) 
+    
+    def get_agents_by_company(self, company_id):       
+        id_type_user = 2; 
+        agents = User.query.filter_by(id_empresa=company_id, id_tipousuario=id_type_user).all()    
+        agents_data = []
+        for agent in agents:
+
+            agent_data = {
+                'nombre_usuario': agent.nombre_usuario,
+                'numero_identificacion': agent.persona.numero_identificacion,
+                'nombre_completo': f"{agent.persona.nombres} {agent.persona.apellidos}",
+                'correo_electronico': agent.persona.correo_electronico,
+                'telefono': agent.persona.telefono
+            }
+            
+            agents_data.append(agent_data)
+       
+        return agents_data
         
     def get_person_by_identity(self, identity_type, identity_number):        
         person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
@@ -151,8 +169,6 @@ class UserService():
         products_schema = [product_schema.dump(product) for product in products]
         
         return products_schema
-
-
 
     def register_client(self, user):
         user_type = 'client'
@@ -205,15 +221,19 @@ class UserService():
 
         nombre_usuario = user.get('usuario')
         contrasena = user.get('contrasena')
-        nombre_completo = user.get('nombre_completo')
+        nombres = user.get('nombres')
+        apellidos = user.get('apellidos')
         tipo_identificacion = user.get('tipo_identificacion')
         numero_identificacion = user.get('numero_identificacion')
         telefono = user.get('telefono')
         correo_electronico = user.get('correo_electronico')
+        id_empresa = user.get('id_empresa')
+
+        logging.debug(id_empresa)
 
         nuevo_agente = Person(
-            nombres =nombre_completo,
-            apellidos = '',
+            nombres =nombres,
+            apellidos = apellidos,
             tipo_identificacion = tipo_identificacion,
             numero_identificacion = numero_identificacion,
             telefono = telefono,
@@ -226,8 +246,9 @@ class UserService():
         user_data = {
             "username": nombre_usuario,
             "password": contrasena,
-            "id_company": nuevo_agente.id,
-            "id_typeuser": id_user_type
+            "id_company": id_empresa,
+            "id_typeuser": id_user_type,
+            "id_person": nuevo_agente.id
         }
         new_user = self.create_user(user_data)
 

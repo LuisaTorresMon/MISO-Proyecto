@@ -52,7 +52,7 @@ class UserValidator():
     def validate_registration_data(user, user_type):   
         required_fields_client = ['usuario', 'contrasena', 'nombre_empresa', 'tipo_identificacion', 'numero_identificacion', 'sector', 'telefono', 'pais', 
                                   'confirmar_contrasena', 'email']
-        required_fields_agent = ['usuario', 'contrasena', 'nombre_completo', 'tipo_identificacion', 'numero_identificacion', 'telefono', 'confirmar_contrasena', 
+        required_fields_agent = ['usuario', 'contrasena', 'nombres', 'apellidos', 'tipo_identificacion', 'numero_identificacion', 'telefono', 'confirmar_contrasena', 
                                  'correo_electronico']
         
         if user_type == 'client':
