@@ -15,6 +15,7 @@ class UserService():
         pass
 
     def create_user(self, user):
+        print(user)
         self.id_persona = user.get('id_person')
         self.id_empresa = user.get('id_company')
         self.id_tipousuario = user.get('id_typeuser')
@@ -177,16 +178,25 @@ class UserService():
             "empresa": nuevo_agente.nombre_completo
         })
 
-
     def register_user(self, user):
-        nombre_usuario = user.get('usuario')
-        contrasena = user.get('contrasena')
+        fullname = user.get('fullName')
+        password = user.get("password")
+        username = user.get("username")
+
+        new_user_person = Persona(
+            nombre_completo = fullname
+        )
+
+        db.session.add(new_user_person)
+        db.session.commit()
 
         user_data = {
-            "username": nombre_usuario,
-            "password": contrasena
+            "username": username,
+            "password": password,
+            "id_persona": new_user_person.id
         }
 
+        print(user_data)
         new_user = self.create_user(user_data)
 
         return jsonify({
