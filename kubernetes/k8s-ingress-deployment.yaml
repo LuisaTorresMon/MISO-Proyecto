@@ -6,6 +6,7 @@ metadata:
     name: gateway-ingress
 spec:
   rules:
+    - host: "abcall-back"
     - http:
         paths:
           - pathType: Prefix
