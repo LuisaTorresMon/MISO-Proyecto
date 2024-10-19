@@ -86,7 +86,7 @@ class ValidatorIncidents():
 
             
             #url = 'http://users:3000/user/auth/validate-token'
-            url = 'http://users-service/user/auth/validate-token'
+            url = 'http://users-service/user/auth/validate-token' 
 
 
             headers = {
