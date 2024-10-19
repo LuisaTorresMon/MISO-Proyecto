@@ -1,24 +1,24 @@
 version: "3.8"
    
 services:  
-  plans:
+  users:
     build: .
     ports:
-      - "3003:3003"
+      - "3000:3000"
     environment:
-      DB_NAME: monitor_plans
-      DB_HOST: plans_db
+      DB_NAME: monitor_user
+      DB_HOST: user_db
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
     depends_on:
-      plans_db:
+      user_db:
         condition: service_healthy
 
-  plans_db:
+  user_db:
     image: postgres
     environment:
-      POSTGRES_DB: monitor_plans
+      POSTGRES_DB: monitor_user
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
     ports:

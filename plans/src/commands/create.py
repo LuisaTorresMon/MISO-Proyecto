@@ -3,7 +3,6 @@ from flask import jsonify, request
 import requests
 from .base_command import BaseCommannd
 from src.models.model import Contract, Plan, db, ContractSchema, ContractGetJsonSchema
-from src.utils.utils import FileUtils
 
 contract_schema = ContractSchema()
 
