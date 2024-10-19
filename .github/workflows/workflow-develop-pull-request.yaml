@@ -42,11 +42,29 @@ jobs:
       - name: Run unit tests
         working-directory: ./incidents
         run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
+  
+  test-plans-microservices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./plans
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./plans
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./plans
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
 
   merge-develop:
     needs: 
       - test-users-microservices
       - test-incidents-microservices
+      - test-plans-microservices
     if: ${{ contains(github.event.head_commit.message, 'release') || contains(github.event.head_commit.message, 'develop') }}
     runs-on: ubuntu-latest
     steps:
