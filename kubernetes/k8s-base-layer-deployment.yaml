@@ -205,7 +205,7 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 3003
-      nodePort: 32338
+      nodePort: 32339
   type: NodePort
 
 ---
@@ -232,4 +232,3 @@ status:
   currentCPUUtilizationPercentage: 1
   currentReplicas: 1
   desiredReplicas: 1
-  
