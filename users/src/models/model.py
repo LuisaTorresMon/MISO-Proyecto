@@ -17,8 +17,8 @@ class User(db.Model):
     __tablename__ = 'users'
 
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    id_persona = db.Column(db.Integer)
-    id_empresa = db.Column(db.Integer)
+    id_persona = db.Column(db.Integer, db.ForeignKey('persona.id'))
+    id_empresa = db.Column(db.Integer, db.ForeignKey('empresa.id'))
     id_tipousuario = db.Column(db.Integer, db.ForeignKey('tipousuario.id'), nullable=False)
     nombre_usuario = db.Column(db.String(100), unique=True, nullable=False)
     contrasena = db.Column(db.String(255), nullable=False)
@@ -27,6 +27,8 @@ class User(db.Model):
     es_activo = db.Column(db.Boolean, server_default="true", nullable=False)
     
     tipo_usuario = db.relationship('TipoUsuario', backref='incidentes')
+    persona = db.relationship('Person', backref='incidentes')
+
 
     
 class Person(db.Model):
@@ -69,7 +71,7 @@ class Empresa(db.Model):
     tipo_identificacion = db.Column(db.Integer)
     numero_identificacion = db.Column(db.String(100))
     sector = db.Column(db.String(100))
-    telefono = db.Column(db.Integer)
+    telefono = db.Column(db.String(20))
     pais = db.Column(db.String(100))
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
