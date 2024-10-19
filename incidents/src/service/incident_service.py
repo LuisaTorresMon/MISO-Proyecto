@@ -278,4 +278,4 @@ class IncidentService():
             return db.session.query(Tipo).filter_by(tipo = incident_type).first()
     
         def get_estado_by_nombre(self, estado_incidencia):
-            return db.session.query(Estado).filter_by(estado = estado_incidencia).first()
+            return db.session.query(Estado).filter_by(estado = estado_incidencia).first() 
