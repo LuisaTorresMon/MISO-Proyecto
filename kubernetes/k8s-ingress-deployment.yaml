@@ -3,11 +3,10 @@ kind: Ingress
 metadata:
   name: gateway-ingress
   labels:
-    name: gateway-ingress
+    name: gateway-ingress 
 spec:
   rules:
-    - host: "abcall-back"
-      http:
+    - http:
         paths:
           - pathType: Prefix
             path: /user
