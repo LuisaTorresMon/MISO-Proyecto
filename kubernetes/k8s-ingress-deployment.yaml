@@ -4,22 +4,31 @@ metadata:
   name: gateway-ingress
   labels:
     name: gateway-ingress
+  annotations:
+    kubernetes.io/ingress.global-static-ip-name: "abcall-ip-ingress"
 spec:
   rules:
     - http:
         paths:
           - pathType: Prefix
-            path: /plan
+            path: /user
             backend:
               service:
-                name: plans-service 
+                name: users-service 
                 port:
                   number: 80
           - pathType: Prefix
             path: /incident
             backend:
               service:
-                name: incident-service 
+                name: incidents-service 
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: /plan
+            backend:
+              service:
+                name: plans-service 
                 port:
                   number: 80
                   
