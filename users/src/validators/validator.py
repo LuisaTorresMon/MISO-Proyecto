@@ -54,11 +54,15 @@ class UserValidator():
                                   'confirmar_contrasena', 'email']
         required_fields_agent = ['usuario', 'contrasena', 'nombres', 'apellidos', 'tipo_identificacion', 'numero_identificacion', 'telefono', 'confirmar_contrasena', 
                                  'correo_electronico']
+        required_fields_user = ['usuario', 'contrasena', 'nombres', 'apellidos', 'tipo_identificacion', 'numero_identificacion', 'telefono', 'confirmar_contrasena', 
+                                 'correo_electronico']
         
         if user_type == 'client':
             required_fields = required_fields_client
         elif user_type == 'agent':
             required_fields = required_fields_agent
+        elif user_type == 'user':
+            required_fields = required_fields_user
 
         for field in required_fields:
             if not user.get(field):
