@@ -257,4 +257,48 @@ class UserService():
             "usuario": new_user['nombre_usuario'],
             "empresa": nuevo_agente.nombres
         })
+        
+    def register_user(self, user):
+        user_type = 'user'
+        id_user_type = 3
+
+        UserValidator.validate_registration_data(user, user_type)
+
+        nombre_usuario = user.get('usuario')
+        contrasena = user.get('contrasena')
+        nombres = user.get('nombres')
+        apellidos = user.get('apellidos')
+        tipo_identificacion = user.get('tipo_identificacion')
+        numero_identificacion = user.get('numero_identificacion')
+        telefono = user.get('telefono')
+        correo_electronico = user.get('correo_electronico')
+        id_empresa = user.get('id_empresa')
+
+        logging.debug(id_empresa)
+
+        nuevo_agente = Person(
+            nombres =nombres,
+            apellidos = apellidos,
+            tipo_identificacion = tipo_identificacion,
+            numero_identificacion = numero_identificacion,
+            telefono = telefono,
+            correo_electronico = correo_electronico
+        )
+
+        db.session.add(nuevo_agente)
+        db.session.commit()
+
+        user_data = {
+            "username": nombre_usuario,
+            "password": contrasena,
+            "id_typeuser": id_user_type,
+            "id_person": nuevo_agente.id
+        }
+        new_user = self.create_user(user_data)
+
+        return jsonify({
+            "message": "Usuario registrado exitosamente.",
+            "usuario": new_user['nombre_usuario'],
+            "empresa": nuevo_agente.nombres
+        })
     
