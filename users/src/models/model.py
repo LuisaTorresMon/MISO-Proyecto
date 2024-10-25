@@ -26,8 +26,8 @@ class User(db.Model):
     fecha_actualizacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
     es_activo = db.Column(db.Boolean, server_default="true", nullable=False)
     
-    tipo_usuario = db.relationship('TipoUsuario', backref='incidentes')
-    persona = db.relationship('Person', backref='incidentes')
+    tipo_usuario = db.relationship('TipoUsuario', backref='usuarios')
+    persona = db.relationship('Person', backref='usuarios')
 
 
     

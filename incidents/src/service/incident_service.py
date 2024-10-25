@@ -1,15 +1,22 @@
-from ..models.models import Incidente, IncidenteSchema, Canal, Tipo, Estado, Evidencia, HistoricoIncidencia, EvidenciaHistorico, db 
+from ..models.models import Incidente, IncidenteSchema, EvidenciaHistorico, EvidenciaHistoricoSchema, HistoricoIncidencia, HistoricoIncidenciaSchema, Evidencia, EvidenciaSchema, Canal, Tipo, Estado, HistoricoIncidencia, db 
 from .calls_service import CallsService
 from ..utils.utils import CommonUtils
 from ..errors.errors import ServerSystemException
 from datetime import datetime
 from tinytag import TinyTag
+from dotenv import load_dotenv
 import random, logging, os
 import requests
 
 incident_schema = IncidenteSchema()
 calls_service = CallsService()
 common_utils = CommonUtils()
+history_evidencie_schemma = EvidenciaHistoricoSchema()
+history_schema = HistoricoIncidenciaSchema()
+evidence_schema = EvidenciaSchema()
+
+load_dotenv('.env.template')            
+USER_URL = os.environ.get('USER_PATH')
 
 class IncidentService():
     
@@ -29,24 +36,19 @@ class IncidentService():
                          person_id,
                          token):
             
+            person = {
+                "name": name_person,
+                "lastname": lastname_person,
+                "email": email_person,
+                "identity_type": identity_type_person,
+                "identity_number": identity_number_person,
+                "cellphone": cellphone_person 
+            }
+            
             if not person_id:
-                person_id = self.create_person(
-                         token,
-                         name_person, 
-                         lastname_person, 
-                         email_person, 
-                         identity_type_person,
-                         identity_number_person,
-                         cellphone_person)
+                person_id = self.create_person(token, person)
             else: 
-                self.update_person(
-                         token,
-                         name_person, 
-                         lastname_person, 
-                         email_person, 
-                         identity_type_person,
-                         identity_number_person,
-                         cellphone_person)
+                self.update_person(token, person)
                 
             incident = self.save_incident(incident_type,
                               channel_incident,
@@ -99,32 +101,11 @@ class IncidentService():
                             
               return incident
           
-        def create_person(self, token,  
-                         name_person, 
-                         lastname_person, 
-                         email_person, 
-                         identity_type_person,
-                         identity_number_person,
-                         cellphone_person):
+        def create_person(self, token, person):
             
-            token_sin_bearer = token[len('Bearer '):]
-            logging.debug(f"token sin bearer {token_sin_bearer}")
+            url = f"{USER_URL}/person/create"
 
-            #url = 'http://users:3000/user/person/create'
-            url = 'http://users-service/user/person/create'
-
-            headers = {
-                "Authorization": f"Bearer {token_sin_bearer}",
-                      }
-            
-            person = {
-                "name": name_person,
-                "lastname": lastname_person,
-                "email": email_person,
-                "identity_type": identity_type_person,
-                "identity_number": identity_number_person,
-                "cellphone": cellphone_person 
-            }
+            headers = common_utils.obtener_token(token)
 
             response = requests.post(url, headers=headers, json=person)
             logging.debug(f"codigo de respuesta {response.text}")
@@ -138,32 +119,10 @@ class IncidentService():
             else:
                 raise ServerSystemException
                 
-        def update_person(self, token,  
-                         name_person, 
-                         lastname_person, 
-                         email_person, 
-                         identity_type_person,
-                         identity_number_person,
-                         cellphone_person):
+        def update_person(self, token, person):
             
-            token_sin_bearer = token[len('Bearer '):]
-            logging.debug(f"token sin bearer {token_sin_bearer}")
-
-            #url = f"http://users:3000/user/person/update"
-            url = f"http://users-service/user/person/update"
-
-            headers = {
-                "Authorization": f"Bearer {token_sin_bearer}",
-                      }
-            
-            person = {
-                "name": name_person,
-                "lastname": lastname_person,
-                "email": email_person,
-                "identity_type": identity_type_person,
-                "identity_number": identity_number_person,
-                "cellphone": cellphone_person 
-            }
+            url = f"{USER_URL}/person/create"
+            headers = common_utils.obtener_token(token)
 
             response = requests.put(url, headers=headers, json=person)
             logging.debug(f"codigo de respuesta {response.text}")
@@ -174,7 +133,7 @@ class IncidentService():
         
              logging.debug(f"incident code {incident_code}")
              
-             return incident_code     
+             return incident_code       
             
         def save_upload_files(self, uploaded_files, incident):
             
@@ -262,8 +221,8 @@ class IncidentService():
             
             return evidence
         
-        def find_incidents_by_person(self, id_person):
-           incidents = db.session.query(Incidente).filter_by(persona_id = id_person).all()
+        def find_incidents_by_person(self):
+           incidents = db.session.query(Incidente).all()
            incidents_schema = []
 
            for incident in incidents:
@@ -272,6 +231,86 @@ class IncidentService():
                incidents_schema.append(incident_data)
                           
            return incidents_schema
+       
+        def find_incidents(self, token):
+           incidents = db.session.query(Incidente).all()
+           incidents_schema = []
+
+           for incident in incidents:
+               incident_data = incident_schema.dump(incident)  
+               person = self.get_person(token, incident.persona_id)
+               if person:
+                  incident_data['person'] = person
+               incidents_schema.append(incident_data)
+                          
+           return incidents_schema
+       
+        def find_history_by_incident(self, id_incident):
+           histories = db.session.query(HistoricoIncidencia).filter(HistoricoIncidencia.incidencia_id == id_incident).all()
+           histories_schema = []
+           for history in histories:
+               history_data = history_schema.dump(history)
+               evidences_history = db.session.query(EvidenciaHistorico).filter(EvidenciaHistorico.historico_id == history.id).all()
+               evidencias_schema = []
+
+               for evidence_history in evidences_history:
+                   if evidence_history.evidencia:
+                       evidence = evidence_schema.dump(evidence_history.evidencia)
+                       evidencias_schema.append(evidence)  
+                                  
+               history_data['evidence'] = evidencias_schema
+               histories_schema.append(history_data)
+                          
+           return histories_schema
+                                 
+        def find_incident_by_id(self, id, token):
+            
+            logging.debug(f"id incidencia {id}")
+            incident = db.session.query(Incidente).filter_by(id=id).first()
+
+            logging.debug(f"incident {incident}")
+            incident_data = incident_schema.dump(incident)  
+            person = self.get_person(token, incident.persona_id)
+            asigned_user = self.get_user_incident(token, incident.usuario_asignado_id)
+
+            if person:
+                incident_data['person'] = person
+            if asigned_user:
+                incident_data['usuario_asignado'] = asigned_user
+                          
+            return incident_data
+        
+        def get_person(self, token, id):
+            
+            url = f"{USER_URL}/person/{id}"
+
+            headers = common_utils.obtener_token(token)
+
+            response = requests.get(url, headers=headers)
+            logging.debug(f"codigo de respuesta {response.text}")
+            print(f"codigo de respuesta {response.status_code}")
+
+            if response.status_code == 200: 
+                logging.debug(f"response.json() {response.json()}") 
+                return response.json()
+            else:
+                return None
+            
+        def get_user_incident(self, token, id):
+            
+            url = f"{USER_URL}/get/{id}"
+
+            headers = common_utils.obtener_token(token)
+
+            response = requests.get(url, headers=headers)
+            logging.debug(f"codigo de respuesta {response.text}")
+            print(f"codigo de respuesta {response.status_code}")
+
+            if response.status_code == 200: 
+                logging.debug(f"response.json() {response.json()}") 
+                return response.json()
+            else:
+                return None
        
         def get_canal_by_nombre(self, channel_incident):
             return db.session.query(Canal).filter_by(nombre_canal = channel_incident).first()

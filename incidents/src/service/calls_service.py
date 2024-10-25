@@ -42,3 +42,8 @@ class CallsService():
            calls_schema_person = [calls_schema.dump(call) for call in calls]
            
            return calls_schema_person
+       
+        def get_call_by_id(self, id): 
+            call = db.session.query(Llamada).filter_by(id=id).first()
+            return calls_schema.dump(call)
+       

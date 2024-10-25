@@ -10,6 +10,8 @@ validator_incident = ValidatorIncidents()
 incident_service = IncidentService()
 call_service = CallsService()
 
+
+
 @incident_blueprint.route('/ping', methods=['GET'])
 def healthcheck():
     return 'pong', 200
@@ -114,4 +116,66 @@ def find_incidents_by_person(id):
         logging.debug(err)
         raise ServerSystemException(f"Error a la hora de conultar las llamadas del usuario {err}, porfavor contacte con su administrador")
     
+@incident_blueprint.route('/all', methods=['GET'])
+def find_incidents():
+    try:
+        headers = request.headers
+        token_encabezado = headers.get('Authorization')
+        logging.debug(token_encabezado)
+         
+        validator_incident.validate_token_sent(token_encabezado)
+        validator_incident.valid_token(token_encabezado)
+        
+        return incident_service.find_incidents(token_encabezado)
+    except Exception as err:
+        logging.debug(err)
+        raise ServerSystemException(f"Error a la hora de conultar las incidencias {err}, porfavor contacte con su administrador")
+  
+@incident_blueprint.route('/history/<int:id_incident>', methods=['GET'])
+def find_history_by_incident(id_incident):
+    try:
+        headers = request.headers
+        token_encabezado = headers.get('Authorization')
+        logging.debug(token_encabezado)
+         
+        validator_incident.validate_token_sent(token_encabezado)
+        validator_incident.valid_token(token_encabezado)
+        
+        logging.debug(f"id_incident {id_incident}")
+        
+        return incident_service.find_history_by_incident(id_incident)
+    except Exception as err:
+        logging.debug(err)
+        raise ServerSystemException(f"Error a la hora de conultar las incidencias {err}, porfavor contacte con su administrador")
+   
+    
+@incident_blueprint.route('/get/<int:id>', methods=['GET'])
+def find_incident_by_id(id):
+    try:
+        headers = request.headers
+        token_encabezado = headers.get('Authorization')
+        logging.debug(token_encabezado)
+         
+        validator_incident.validate_token_sent(token_encabezado)
+        validator_incident.valid_token(token_encabezado)
+        
+        return incident_service.find_incident_by_id(id, token_encabezado)
+    except Exception as err:
+        logging.debug(f"excepcion {err}")
+        raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
+    
+@incident_blueprint.route('/call/<int:id>', methods=['GET'])
+def find_call_by_id(id):
+    try:
+        headers = request.headers
+        token_encabezado = headers.get('Authorization')
+        logging.debug(token_encabezado)
+         
+        validator_incident.validate_token_sent(token_encabezado)
+        validator_incident.valid_token(token_encabezado)
+        
+        return call_service.get_call_by_id(id)
+    except Exception as err:
+        logging.debug(f"excepcion {err}")
+        raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
     
