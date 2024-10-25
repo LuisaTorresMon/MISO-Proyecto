@@ -1,6 +1,6 @@
 class ApiError(Exception):
-    code = 422
-    description = "Default message"
+    code = 500
+    description = "Ha ocurrido un error en el servidor"
 
 class TokenNoEnviado(ApiError):
     code = 403

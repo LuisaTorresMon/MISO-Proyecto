@@ -1,4 +1,4 @@
-from ..models.model import User, Empresa, ProductPerson, Product, Person, PersonSchema, ProductSchema, UserSchema, EmpresaSchema, db
+from ..models.model import User, TipoUsuario, Empresa, ProductPerson, Product, Person, PersonSchema, ProductSchema, UserSchema, EmpresaSchema, db
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
@@ -74,8 +74,16 @@ class UserService():
     def signIn(self, user):
         username = user.get('username')
         password = user.get('password')
+        technology = user.get('technology')
 
-        stored_user = User.query.filter_by(nombre_usuario=username).first()
+        if technology == 'WEB':
+            stored_user = User.query.filter_by(nombre_usuario=username).first()
+            if stored_user.tipo_usuario.id == 3:
+                stored_user = None
+        elif technology == 'MOBILE':
+            stored_user = User.query.filter_by(nombre_usuario=username).join(User.tipo_usuario).filter(TipoUsuario.id == 3).first()
+        else:
+            raise BadRequestException
 
         if stored_user is None:
             raise IncorrectUserOrPasswordException
