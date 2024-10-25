@@ -13,22 +13,19 @@ user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
 persona_schema = PersonSchema()
 
-
 class UserService():
 
     def __init__(self):
         pass
 
     def create_user(self, user):
-        print(user)
         self.id_persona = user.get('id_person')
         self.id_empresa = user.get('id_company')
         self.id_tipousuario = user.get('id_typeuser')
         self.username = user.get('username')
         self.password = user.get('password').encode('utf-8')
 
-        # if self.id_persona is None and self.id_empresa is None and self.id_tipousuario is None:
-        if self.id_persona is None and self.id_tipousuario is None:
+        if self.id_persona is None and self.id_empresa is None and self.id_tipousuario is None:
             raise BadRequestException
 
         else:
@@ -260,34 +257,48 @@ class UserService():
             "usuario": new_user['nombre_usuario'],
             "empresa": nuevo_agente.nombres
         })
-
+        
     def register_user(self, user):
-        first_name = user.get('firstName')
-        last_name = user.get('lastName')
-        password = user.get("password")
-        username = user.get("username")
+        user_type = 'user'
+        id_user_type = 3
 
-        new_user_person = Person(
-            nombres=first_name,
-            apellidos=last_name,
-            tipo_identificacion="cc",
-            numero_identificacion="1020"
+        UserValidator.validate_registration_data(user, user_type)
+
+        nombre_usuario = user.get('usuario')
+        contrasena = user.get('contrasena')
+        nombres = user.get('nombres')
+        apellidos = user.get('apellidos')
+        tipo_identificacion = user.get('tipo_identificacion')
+        numero_identificacion = user.get('numero_identificacion')
+        telefono = user.get('telefono')
+        correo_electronico = user.get('correo_electronico')
+        id_empresa = user.get('id_empresa')
+
+        logging.debug(id_empresa)
+
+        nuevo_agente = Person(
+            nombres =nombres,
+            apellidos = apellidos,
+            tipo_identificacion = tipo_identificacion,
+            numero_identificacion = numero_identificacion,
+            telefono = telefono,
+            correo_electronico = correo_electronico
         )
 
-        db.session.add(new_user_person)
+        db.session.add(nuevo_agente)
         db.session.commit()
 
         user_data = {
-            "username": username,
-            "password": password,
-            "id_persona": new_user_person.id,
-            "id_typeuser": 2
+            "username": nombre_usuario,
+            "password": contrasena,
+            "id_typeuser": id_user_type,
+            "id_person": nuevo_agente.id
         }
-
-        print(user_data)
         new_user = self.create_user(user_data)
 
         return jsonify({
-            "message": "Cliente registrado exitosamente.",
-            "usuario": new_user['nombre_usuario']
+            "message": "Usuario registrado exitosamente.",
+            "usuario": new_user['nombre_usuario'],
+            "empresa": nuevo_agente.nombres
         })
+    

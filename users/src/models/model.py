@@ -121,6 +121,23 @@ class TipoUsuarioSchema(SQLAlchemyAutoSchema):
 
 def cargar_datos_iniciales():
     
+    person = db.session.query(Person).filter_by(numero_identificacion="1030661927").first()
+
+    if not person:
+            person = Person(
+                nombres="test",
+                apellidos="test",
+                tipo_identificacion="1",
+                numero_identificacion="1030661927",
+                telefono="3142567890",
+                correo_electronico="testuser@hotmail.com",
+            )
+            db.session.add(person)
+            db.session.commit()
+            print("Nueva persona creada.")
+    else:
+            print("La persona ya existe en la base de datos.")
+    
     if TipoUsuario.query.count() == 0:
         type_users = [
             TipoUsuario(tipo="cliente"),
@@ -133,6 +150,7 @@ def cargar_datos_iniciales():
         print("Datos iniciales cargados en la tabla TipoUsuario")
     else:
         print("La tabla TipoUsuario ya tiene datos")
+        
     
     if User.query.count() == 0: 
         password = "123456"
@@ -142,12 +160,13 @@ def cargar_datos_iniciales():
         users = [
             User(id_empresa=None, id_tipousuario = 1, nombre_usuario="sa", contrasena=hashed_password.decode("utf-8")),  
             User(id_empresa=None, id_tipousuario = 2, nombre_usuario="test_agent", contrasena=hashed_password.decode("utf-8")) 
-
         ]
 
         db.session.bulk_save_objects(users)
         db.session.commit()
         print("Datos iniciales cargados en la tabla users")
+
     else:
         print("La tabla users ya tiene datos")
+        
         
