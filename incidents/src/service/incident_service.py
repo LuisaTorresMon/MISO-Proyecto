@@ -221,8 +221,8 @@ class IncidentService():
             
             return evidence
         
-        def find_incidents_by_person(self):
-           incidents = db.session.query(Incidente).all()
+        def find_incidents_by_person(self,id_person):
+           incidents = db.session.query(Incidente).filter_by(persona_id = id_person).all()
            incidents_schema = []
 
            for incident in incidents:
