@@ -7,6 +7,7 @@ from tinytag import TinyTag
 from dotenv import load_dotenv
 import random, logging, os
 import requests
+import copy
 
 incident_schema = IncidenteSchema()
 calls_service = CallsService()
@@ -57,15 +58,38 @@ class IncidentService():
                               user_id,
                               person_id)
            
-            self.save_incident_history(incident, f" El usuario prueba ha creado la incidencia {incident.codigo} con éxito")
+            self.save_incident_history(incident, f" Se ha creado la incidencia {incident.codigo} con éxito", user_id)
             
             if channel_incident == 'Llamada Telefónica':
                 calls_service.save_call_incidence(incident, user_id, person_id)
                 
             if uploaded_files:
-               self.save_upload_files(uploaded_files, incident)
+               self.save_upload_files(uploaded_files, incident, user_id)
            
             return incident_schema.dump(incident)
+        
+        def update_incident(self, status, 
+                            observations, 
+                            user_creator_id, 
+                            uploaded_files, 
+                            incident_id):
+            
+           incident = db.session.query(Incidente).filter(Incidente.id == incident_id).first()
+           last_status = incident.estado.estado          
+           if(incident.estado_id != int(status)):
+                incident.estado_id = status   
+                db.session.commit()
+
+                self.save_incident_history(incident, f"Se ha cambiado el estado de la incidencia de {last_status} a {incident.estado.estado}", user_creator_id)
+           
+           if(observations):
+                self.save_incident_history(incident, f"Se agrega el comentario {observations}", user_creator_id)
+                
+           if(uploaded_files and len(uploaded_files)):
+                self.save_upload_files(uploaded_files, incident, user_creator_id)
+
+           return incident_schema.dump(incident)
+
        
         def save_incident(self, 
                          incident_type,
@@ -135,7 +159,7 @@ class IncidentService():
              
              return incident_code       
             
-        def save_upload_files(self, uploaded_files, incident):
+        def save_upload_files(self, uploaded_files, incident, user_creator_id):
             
             try:
                 logging.debug("Iniciando el guardado de los archivos adjuntos")
@@ -145,7 +169,7 @@ class IncidentService():
             
                 logging.debug(f" nombre concatenado {files_name_contact}")
 
-                incident_history = self.save_incident_history(incident, f" El usuario prueba ha añadido los archivos {files_name_contact} a la incidencia {incident.codigo}")
+                incident_history = self.save_incident_history(incident, f" El usuario prueba ha añadido los archivos {files_name_contact} a la incidencia {incident.codigo}", user_creator_id)
             
                 for file in uploaded_files:
                     file_name = file.filename
@@ -178,7 +202,7 @@ class IncidentService():
             except Exception as err:
                 logging.debug(f"error a la hora de crear el evidence history {err}")
 
-        def save_incident_history(self, incident, comments):
+        def save_incident_history(self, incident, comments, user_creator_id):
             
             incident_history = None
             try: 
@@ -187,7 +211,7 @@ class IncidentService():
                 incident_history = HistoricoIncidencia(
                     observaciones = comments,
                     incidencia_id = incident.id,
-                    usuario_creador_id = incident.usuario_creador_id,
+                    usuario_creador_id = user_creator_id,
                     estado_id = incident.estado_id,
                     usuario_asignado_id = incident.usuario_asignado_id
                 )

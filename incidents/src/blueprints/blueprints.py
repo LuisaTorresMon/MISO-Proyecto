@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, make_response
 from ..validations.validations import ValidatorIncidents
 from ..service.incident_service import IncidentService
 from ..service.calls_service import CallsService
@@ -86,6 +86,22 @@ def create_incidence():
                                               token_encabezado)
 
     return incident, 201
+
+@incident_blueprint.route('/update/<int:incident_id>', methods=['PUT'])
+def update_incidence(incident_id):
+    headers = request.headers
+    token_encabezado = headers.get('Authorization')
+    logging.debug(token_encabezado)
+    
+    status = request.form.get('status') 
+    observations = request.form.get('observations') 
+    user_creator_id = request.form.get('userCreatorId') 
+    uploaded_files = request.files.getlist('files')    
+    
+    incident = incident_service.update_incident(status, observations, user_creator_id, uploaded_files, incident_id)
+    
+    return make_response(incident, 201)
+
 
 @incident_blueprint.route('/calls/<int:id>', methods=['GET'])
 def find_calls_by_person(id):
