@@ -245,14 +245,20 @@ class IncidentService():
                           
            return incidents_schema
        
-        def find_history_by_incident(self, id_incident):
+        def find_history_by_incident(self, token, id_incident):
            histories = db.session.query(HistoricoIncidencia).filter(HistoricoIncidencia.incidencia_id == id_incident).all()
+
+           
            histories_schema = []
            for history in histories:
                history_data = history_schema.dump(history)
+               
+               user = self.get_user(token, history.usuario_creador_id)
+               history_data['usuario_creador'] = user
+               
                evidences_history = db.session.query(EvidenciaHistorico).filter(EvidenciaHistorico.historico_id == history.id).all()
                evidencias_schema = []
-
+               
                for evidence_history in evidences_history:
                    if evidence_history.evidencia:
                        evidence = evidence_schema.dump(evidence_history.evidencia)
@@ -271,7 +277,7 @@ class IncidentService():
             logging.debug(f"incident {incident}")
             incident_data = incident_schema.dump(incident)  
             person = self.get_person(token, incident.persona_id)
-            asigned_user = self.get_user_incident(token, incident.usuario_asignado_id)
+            asigned_user = self.get_user(token, incident.usuario_asignado_id)
 
             if person:
                 incident_data['person'] = person
@@ -296,7 +302,7 @@ class IncidentService():
             else:
                 return None
             
-        def get_user_incident(self, token, id):
+        def get_user(self, token, id):
             
             url = f"{USER_URL}/get/{id}"
 

@@ -143,7 +143,7 @@ def find_history_by_incident(id_incident):
         
         logging.debug(f"id_incident {id_incident}")
         
-        return incident_service.find_history_by_incident(id_incident)
+        return incident_service.find_history_by_incident(token_encabezado, id_incident)
     except Exception as err:
         logging.debug(err)
         raise ServerSystemException(f"Error a la hora de conultar las incidencias {err}, porfavor contacte con su administrador")

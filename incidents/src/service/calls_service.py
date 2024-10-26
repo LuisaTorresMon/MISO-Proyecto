@@ -24,7 +24,7 @@ class CallsService():
 
             audio = TinyTag.get(audio_path)
 
-            common_utils.upload_file_to_gcs_by_path(audio_path, f"incident-calls/{audio_name}")
+            common_utils.upload_file_to_gcs_by_path(audio_path, f"incident-calls/{audio_name}_{incident.codigo}_{current_date}")
 
             incident_call = Llamada(
                 nombre_grabacion = f"{audio_name}_{incident.codigo}_{current_date}",
