@@ -71,8 +71,10 @@ class IncidentService():
         def update_incident(self, status, 
                             observations, 
                             user_creator_id, 
+                            user_assigned_id,
                             uploaded_files, 
-                            incident_id):
+                            incident_id,
+                            token):
             
            incident = db.session.query(Incidente).filter(Incidente.id == incident_id).first()
            last_status = incident.estado.estado          
@@ -81,6 +83,18 @@ class IncidentService():
                 db.session.commit()
 
                 self.save_incident_history(incident, f"Se ha cambiado el estado de la incidencia de {last_status} a {incident.estado.estado}", user_creator_id)
+           
+           if(incident.usuario_asignado_id != int(user_assigned_id)):
+               
+                last_assigned_user = self.get_user(token, incident.usuario_asignado_id)
+                new_assigned_user = self.get_user(token, user_assigned_id)
+               
+                incident.usuario_asignado_id = user_assigned_id   
+                db.session.commit()
+                
+                if(last_assigned_user and new_assigned_user):
+                    self.save_incident_history(incident, f"Se ha cambiado el usuario asignado de la incidencia de {last_assigned_user['persona']['nombres']} {last_assigned_user['persona']['apellidos']} a {new_assigned_user['persona']['nombres']} {new_assigned_user['persona']['apellidos']}", user_creator_id)
+
            
            if(observations):
                 self.save_incident_history(incident, f"Se agrega el comentario {observations}", user_creator_id)
@@ -272,7 +286,6 @@ class IncidentService():
         def find_history_by_incident(self, token, id_incident):
            histories = db.session.query(HistoricoIncidencia).filter(HistoricoIncidencia.incidencia_id == id_incident).all()
 
-           
            histories_schema = []
            for history in histories:
                history_data = history_schema.dump(history)

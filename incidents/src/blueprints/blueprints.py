@@ -96,9 +96,11 @@ def update_incidence(incident_id):
     status = request.form.get('status') 
     observations = request.form.get('observations') 
     user_creator_id = request.form.get('userCreatorId') 
+    user_assigned_id = request.form.get('assignedTo') 
+
     uploaded_files = request.files.getlist('files')    
     
-    incident = incident_service.update_incident(status, observations, user_creator_id, uploaded_files, incident_id)
+    incident = incident_service.update_incident(status, observations, user_creator_id, user_assigned_id, uploaded_files, incident_id, token_encabezado)
     
     return make_response(incident, 201)
 

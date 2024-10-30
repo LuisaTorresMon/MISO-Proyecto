@@ -157,6 +157,7 @@ class UserService():
         for agent in agents:
 
             agent_data = {
+                'id': agent.id,
                 'nombre_usuario': agent.nombre_usuario,
                 'numero_identificacion': agent.persona.numero_identificacion,
                 'nombre_completo': f"{agent.persona.nombres} {agent.persona.apellidos}",
