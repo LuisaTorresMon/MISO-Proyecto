@@ -24,7 +24,7 @@ class CallsService():
 
             audio = TinyTag.get(audio_path)
 
-            common_utils.upload_file_to_gcs_by_path(audio_path, f"incident-calls/{audio_name}")
+            common_utils.upload_file_to_gcs_by_path(audio_path, f"incident-calls/{audio_name}_{incident.codigo}_{current_date}")
 
             incident_call = Llamada(
                 nombre_grabacion = f"{audio_name}_{incident.codigo}_{current_date}",
@@ -42,3 +42,8 @@ class CallsService():
            calls_schema_person = [calls_schema.dump(call) for call in calls]
            
            return calls_schema_person
+       
+        def get_call_by_id(self, id): 
+            call = db.session.query(Llamada).filter_by(id=id).first()
+            return calls_schema.dump(call)
+       

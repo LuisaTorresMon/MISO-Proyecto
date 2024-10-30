@@ -504,7 +504,7 @@ class TestBlueprints():
 
             assert response_service.status_code == 200
             
-    def test_creacion_incidencia_exitosa_y_consulta_llamada(self, mocker):
+    def test_creacion_incidencia_exitosa_y_consulta_llamada_por_persona(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
@@ -543,3 +543,165 @@ class TestBlueprints():
             response_service = test_client.get('/incident/calls/1', headers=headers)
 
             assert response_service.status_code == 200
+            
+    def test_creacion_incidencia_exitosa_y_consulta_llamada_por_persona(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('google.cloud.storage.Client')
+
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            
+            file_data = {
+                'files': (BytesIO(b"archivo de prueba"), 'test_file.txt')  
+            }
+            
+            form_data = {'name': fake.name(),
+                    'lastName': fake.name(),
+                    'emailClient': f"{fake.word()}@outlook.com",
+                    'identityType': fake.name(),
+                    'cellPhone': fake.random_number(digits=10),
+                    'identityNumber': fake.random_number(digits=10),
+                    'incidentType': 'Petición',
+                    'incidentChannel': 'Llamada Telefónica',
+                    'incidentSubject': fake.sentence(nb_words=8),
+                    'incidentDetail': fake.sentence(nb_words=8),
+                    'user_id': 1,
+                    'person_id': 1              
+                    }
+            
+            form_data.update(file_data)
+            
+            print(form_data)
+            
+            response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
+            incident_data = response_service.get_json()
+            
+            print(incident_data)
+            
+            response_service = test_client.get('/incident/calls/1', headers=headers)
+            response_data = response_service.get_json()
+
+            response_service = test_client.get(f"/incident/call/{response_data[0]['id']}", headers=headers)
+
+
+            assert response_service.status_code == 200
+            
+    def test_creacion_incidencia_exitosa_y_consulta_total_de_incidentes(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_person', return_value=1)
+
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('google.cloud.storage.Client')
+            
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+
+            self.create_incident(test_client, headers)
+            
+            response_service = test_client.get('/incident/all', headers=headers)
+            response_data = response_service.json
+            
+            assert response_service.status_code == 200
+            assert len(response_data) > 0
+            
+    def test_creacion_incidencia_exitosa_y_consulta_incidente_por_id(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=1)
+
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('google.cloud.storage.Client')
+            
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+
+            incident_data = self.create_incident(test_client, headers)
+            
+            response_service = test_client.get(F"/incident/get/{incident_data['id']}", headers=headers)
+            response_data = response_service.json
+            
+            assert response_service.status_code == 200
+            assert response_data['id'] == incident_data['id']
+            
+    def test_creacion_incidencia_exitosa_y_consulta_incidente_historia_por_id(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=1)
+
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('google.cloud.storage.Client')
+            
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+
+            incident_data = self.create_incident(test_client, headers)
+            
+            response_service = test_client.get(F"/incident/history/{incident_data['id']}", headers=headers)
+            response_data = response_service.json
+            
+            assert response_service.status_code == 200
+            assert len(response_data) > 0
+            
+    def test_creacion_incidencia_exitosa_y_actualizacion_incidencia_por_id(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+            mock_response_data = {
+                'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+                }
+            }
+
+            mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=mock_response_data)
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('google.cloud.storage.Client')
+            
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+
+            incident_data = self.create_incident(test_client, headers)
+            
+            file_data = {
+                'files': (BytesIO(b"archivo de prueba"), 'test_file.txt')  
+            }
+            
+            form_data = {'status': 2,
+                        'observations': fake.name(),
+                        'userCreatorId': 2,
+                        'assignedTo': 2}
+            
+            form_data.update(file_data)
+
+            response_service = test_client.put(F"/incident/update/{incident_data['id']}", data=form_data, headers=headers, content_type='multipart/form-data')
+            
+            assert response_service.status_code == 201
+            
+    def create_incident(self, test_client, headers):   
+                    
+        form_data = {'name': fake.name(),
+                    'lastName': fake.name(),
+                    'emailClient': f"{fake.word()}@outlook.com",
+                    'identityType': fake.name(),
+                    'cellPhone': fake.random_number(digits=10),
+                    'identityNumber': fake.random_number(digits=10),
+                    'incidentType': 'Petición',
+                    'incidentChannel': 'Correo Electronico',
+                    'incidentSubject': fake.sentence(nb_words=8),
+                    'incidentDetail': fake.sentence(nb_words=8),
+                    'user_id': 1,
+                    'person_id': 1              
+                    }
+                        
+        print(form_data)
+            
+        response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
+        incident_data = response_service.get_json()
+            
+        print(incident_data)
+        
+        return incident_data
