@@ -23,7 +23,7 @@ class Incidente(db.Model):
     tipo_id = db.Column(db.Integer, db.ForeignKey('tipo.id'), nullable=False)
     
     estado = db.relationship('Estado', backref='incidentes')
-
+    tipo = db.relationship('Tipo', backref='incidentes')
     
 class Canal(db.Model):
     __tablename__ = 'canal'
@@ -88,6 +88,7 @@ class EvidenciaHistorico(db.Model):
     historico_id = db.Column(db.Integer, db.ForeignKey('historico_incidencia.id'), nullable=False)
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
   
+    evidencia = db.relationship('Evidencia', backref='evidencia_historicos')
 
 class IncidenteSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -137,6 +138,15 @@ class LlamadaSchema(SQLAlchemyAutoSchema):
 class HistoricoIncidenciaSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = HistoricoIncidencia
+        include_relationships = True
+        load_instance = True
+        include_fk = True
+
+    id = fields.String()
+    
+class EvidenciaHistoricoSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = EvidenciaHistorico
         include_relationships = True
         load_instance = True
         include_fk = True

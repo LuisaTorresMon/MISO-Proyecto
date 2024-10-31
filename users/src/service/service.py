@@ -2,14 +2,14 @@ from ..models.model import User, TipoUsuario, Empresa, ProductPerson, Product, P
 import bcrypt
 from datetime import datetime, timedelta
 from flask import jsonify
+from sqlalchemy.orm import joinedload
 from flask_jwt_extended import jwt_required, create_access_token, get_current_user, get_jwt
-from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException
+from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException, ResourceNotFound
 from ..validators.validator import UserValidator
 import logging
 
 user_schema = UserSchema()
 product_schema = ProductSchema()
-user_schema = UserSchema()
 empresa_schema = EmpresaSchema()
 persona_schema = PersonSchema()
 
@@ -97,7 +97,7 @@ class UserService():
             "id_company": stored_user.id_empresa,
             "user_type": stored_user.tipo_usuario.tipo
         }
-        
+
         token_de_acceso = create_access_token(identity=str(stored_user.id), additional_claims=additional_claims)
         return {
             "token": token_de_acceso
@@ -157,6 +157,7 @@ class UserService():
         for agent in agents:
 
             agent_data = {
+                'id': agent.id,
                 'nombre_usuario': agent.nombre_usuario,
                 'numero_identificacion': agent.persona.numero_identificacion,
                 'nombre_completo': f"{agent.persona.nombres} {agent.persona.apellidos}",
@@ -171,11 +172,24 @@ class UserService():
     def get_person_by_identity(self, identity_type, identity_number):        
         person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
         return person
-    
-    def get_person_by_id(self, id):        
-        person = Person.query.filter_by(id=id).first()        
-        return person
-    
+
+    def get_person_by_id(self, id):
+        person = Person.query.filter_by(id=id).first()
+        if person:
+            return person
+        else:
+            raise ResourceNotFound
+
+    def get_user_by_id(self, id):
+        user = db.session.query(User).filter_by(id=id).first()
+        if user:
+            user_data = user_schema.dump(user)
+            if user.persona:
+                user_data['persona'] = persona_schema.dump(user.persona)
+            return user_data
+        else:
+            raise ResourceNotFound
+
     def get_products_by_person(self, person_id):
         products = db.session.query(Product).join(ProductPerson).filter(ProductPerson.id_persona == person_id).all()
         products_schema = [product_schema.dump(product) for product in products]

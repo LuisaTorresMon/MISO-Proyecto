@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from google.cloud import storage
 from os import environ
+import logging
 
 
 class CommonUtils():
@@ -26,3 +27,15 @@ class CommonUtils():
         blob = bucket.blob(destination_blob_name) 
 
         blob.upload_from_filename(source_file_path)
+
+    def obtener_token(self, token):
+        
+        token_sin_bearer = token[len('Bearer '):]
+        logging.debug(f"token sin bearer {token_sin_bearer}")
+        
+        headers = {
+           "Authorization": f"Bearer {token_sin_bearer}",
+        }
+        return headers
+        
+        

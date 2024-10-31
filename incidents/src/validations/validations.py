@@ -1,7 +1,15 @@
 import logging
 from ..errors.errors import RequiredFields, BadRequestError, InvalidToken, ErrorService, TokenEmpty
+from ..utils.utils import CommonUtils
 from email_validator import validate_email, EmailNotValidError
+from dotenv import load_dotenv
+import os
 import requests
+
+load_dotenv('.env.template')
+USER_URL = os.environ.get('USER_PATH')
+
+common_utils = CommonUtils()
 
 class ValidatorIncidents():
     def validate_incident_data(self,
@@ -10,7 +18,7 @@ class ValidatorIncidents():
                          subject_incident,
                          detail_incident,
                          token):
-        
+
         self.incident_type = incident_type
         self.channel_incident = channel_incident
         self.subject_incident = subject_incident
@@ -21,13 +29,13 @@ class ValidatorIncidents():
 
         self.validar_campos_requeridos_incidencia()
 
-    def validate_person_data(self, name_person, 
-                         lastname_person, 
-                         email_person, 
+    def validate_person_data(self, name_person,
+                         lastname_person,
+                         email_person,
                          identity_type_person,
                          identity_number_person,
                          cellphone_person):
-        
+
         self.name_person = name_person
         self.lastname_person = lastname_person
         self.identity_type_person = identity_type_person
@@ -51,7 +59,7 @@ class ValidatorIncidents():
             raise RequiredFields("El campo numero de documento esta vacio, recuerda que es obligatorio")   
         if not self.cellphone_person:
             raise RequiredFields("El campo celular esta vacio, recuerda que es obligatorio")   
-        
+
     def validar_campos_requeridos_incidencia(self):
         if not self.incident_type:
             raise RequiredFields("El campo tipo de incidente esta vacio, recuerda que es obligatorio")    
@@ -89,17 +97,8 @@ class ValidatorIncidents():
                 raise BadRequestError('El numero de documento cuando es de tipo Cedula de extranjeria, debe ser numerico y debe tener una longitud de 12 caracteres')
     
     def valid_token(self, token):
-            token_sin_bearer = token[len('Bearer '):]
-            logging.debug(f"token sin bearer {token_sin_bearer}")
-
-            
-            url = 'http://users:3000/user/auth/validate-token'
-            #url = 'http://users-service/user/auth/validate-token' 
-
-
-            headers = {
-                "Authorization": f"Bearer {token_sin_bearer}",
-                      }
+            headers = common_utils.obtener_token(token)
+            url = f"{USER_URL}/auth/validate-token"
 
             response = requests.post(url, headers=headers)
             logging.debug(f"codigo de respuesta {response.text}")
@@ -112,4 +111,4 @@ class ValidatorIncidents():
             
     def validate_token_sent(self, token):
         if token is None:
-            raise TokenEmpty('')
+            raise TokenEmpty('No se ha enviado el token')
