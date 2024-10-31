@@ -217,4 +217,4 @@ def find_call_by_id(id):
     except Exception as err:
         logging.debug(f"excepcion {err}")
         raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
-    
+
