@@ -97,8 +97,8 @@ class UserService():
             "id_company": stored_user.id_empresa,
             "user_type": stored_user.tipo_usuario.tipo
         }
-        token_de_acceso = create_access_token(identity=stored_user.id, additional_claims=additional_claims)
-
+        
+        token_de_acceso = create_access_token(identity=str(stored_user.id), additional_claims=additional_claims)
         return {
             "token": token_de_acceso
         }
@@ -170,6 +170,10 @@ class UserService():
         
     def get_person_by_identity(self, identity_type, identity_number):        
         person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
+        return person
+    
+    def get_person_by_id(self, id):        
+        person = Person.query.filter_by(id=id).first()        
         return person
     
     def get_products_by_person(self, person_id):

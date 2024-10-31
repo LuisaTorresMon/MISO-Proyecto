@@ -27,7 +27,8 @@ class IncidentService():
                          uploaded_files,
                          user_id,
                          person_id,
-                         token):
+                         token,
+                         technology):
             
             if not person_id:
                 person_id = self.create_person(
@@ -39,14 +40,15 @@ class IncidentService():
                          identity_number_person,
                          cellphone_person)
             else: 
-                self.update_person(
-                         token,
-                         name_person, 
-                         lastname_person, 
-                         email_person, 
-                         identity_type_person,
-                         identity_number_person,
-                         cellphone_person)
+                if technology != "MOBILE":
+                    self.update_person(
+                            token,
+                            name_person, 
+                            lastname_person, 
+                            email_person, 
+                            identity_type_person,
+                            identity_number_person,
+                            cellphone_person)
                 
             incident = self.save_incident(incident_type,
                               channel_incident,
@@ -167,6 +169,17 @@ class IncidentService():
 
             response = requests.put(url, headers=headers, json=person)
             logging.debug(f"codigo de respuesta {response.text}")
+
+
+        def get_person_by_id(self, id, token):
+            token_sin_bearer = token[len('Bearer '):]
+            url = f"http://users-service/user/person/{id}"
+
+            headers = {
+                "Authorization": f"Bearer {token_sin_bearer}",
+                      }
+            response = requests.get(url, headers=headers)
+            return response
         
         def generate_incident_code(self):
              random_number = random.randint(1, 5000)

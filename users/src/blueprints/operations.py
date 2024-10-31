@@ -30,6 +30,12 @@ def find_person_by_identity():
     person = user_service.get_person_by_identity(identity_type, identity_number)
     return make_response(person_schema.dump(person), 200)
 
+@users_blueprint.route('/person/<int:id>', methods = ['GET'])
+@jwt_required()
+def find_person_by_id(id):
+    person = user_service.get_person_by_id(id)
+    return make_response(person_schema.dump(person), 200)
+
 @users_blueprint.route('/person/<int:id>/products', methods = ['GET'])
 @jwt_required()
 def get_products_by_person(id):

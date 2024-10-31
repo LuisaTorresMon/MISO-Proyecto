@@ -2,7 +2,7 @@ from flask import Blueprint, request, jsonify
 from ..validations.validations import ValidatorIncidents
 from ..service.incident_service import IncidentService
 from ..service.calls_service import CallsService
-from ..errors.errors import ServerSystemException
+from ..errors.errors import ServerSystemException, BadRequestError
 import logging, os
 
 incident_blueprint = Blueprint('incident', __name__)
@@ -17,20 +17,53 @@ def healthcheck():
 @incident_blueprint.route('/create', methods=['POST'])
 def create_incidence():
     headers = request.headers
+    logging.debug(headers)
     token_encabezado = headers.get('Authorization')
     logging.debug(token_encabezado)
 
-    # Datos cliente
+    technology = headers.get('Technology')
+
     person_id = request.form.get('person_id') 
-    name_person = request.form.get('name')     
-    lastname_person = request.form.get('lastName')     
-    email_person = request.form.get('emailClient') 
-    identity_type_person = request.form.get('identityType')     
-    identity_number_person = request.form.get('identityNumber')  
-    cellphone_person = request.form.get('cellPhone')  
-    
+
+    if technology == 'WEB':
+        logging.debug("INCIDENCE WEB")
+           # Datos cliente
+        user_id = request.form.get('user_id')
+        name_person = request.form.get('name')     
+        lastname_person = request.form.get('lastName')     
+        email_person = request.form.get('emailClient') 
+        identity_type_person = request.form.get('identityType')     
+        identity_number_person = request.form.get('identityNumber')  
+        cellphone_person = request.form.get('cellPhone')  
+
+        logging.debug(f"name_person {name_person}")
+        logging.debug(f"lastname_person {lastname_person}")
+        logging.debug(f"email_person {email_person}")
+        logging.debug(f"identity_type_person {identity_type_person}")
+        logging.debug(f"identity_number_person {identity_number_person}")
+        logging.debug(f"cellphone_person {cellphone_person}")
+
+        validator_incident.validate_person_data(name_person,
+                                            lastname_person, 
+                                            email_person,
+                                            identity_type_person,
+                                            identity_number_person,
+                                            cellphone_person)
+        
+    elif technology == 'MOBILE':
+        name_person = ""
+        lastname_person = ""
+        email_person = ""
+        identity_type_person = ""
+        identity_number_person = ""
+        cellphone_person = ""
+        user_id = person_id
+        logging.debug("INCIDENCE MOBILE")
+    else:
+        raise BadRequestError(f"Techonology not supported: {technology}")
+
     # Datos incidencia  
-    user_id = request.form.get('user_id')
+    
     incident_type = request.form.get('incidentType')     
     channel_incident = request.form.get('incidentChannel')     
     subject_incident = request.form.get('incidentSubject') 
@@ -39,12 +72,7 @@ def create_incidence():
     # Files    
     uploaded_files = request.files.getlist('files')    
     
-    logging.debug(f"name_person {name_person}")
-    logging.debug(f"lastname_person {lastname_person}")
-    logging.debug(f"email_person {email_person}")
-    logging.debug(f"identity_type_person {identity_type_person}")
-    logging.debug(f"identity_number_person {identity_number_person}")
-    logging.debug(f"cellphone_person {cellphone_person}")
+
     logging.debug(f"incident_type {incident_type}")
     logging.debug(f"channel_incident {channel_incident}")
     logging.debug(f"subject_incident {subject_incident}")
@@ -54,19 +82,11 @@ def create_incidence():
     logging.debug(f"user_id {user_id}")
     logging.debug(f"person_id {person_id}")
 
-
-    validator_incident.validate_incident_data(name_person,
-                                              lastname_person, 
-                                              email_person,
-                                              identity_type_person,
-                                              identity_number_person,
-                                              cellphone_person,
-                                              incident_type,
+    validator_incident.validate_incident_data(incident_type,
                                               channel_incident,
                                               subject_incident,
                                               detail_incident,
                                               token_encabezado)
-    
     
     incident = incident_service.create_incident(name_person,
                                               lastname_person, 
@@ -81,7 +101,8 @@ def create_incidence():
                                               uploaded_files,
                                               user_id,
                                               person_id,
-                                              token_encabezado)
+                                              token_encabezado,
+                                              technology)
 
     return incident, 201
 

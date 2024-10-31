@@ -4,24 +4,13 @@ from email_validator import validate_email, EmailNotValidError
 import requests
 
 class ValidatorIncidents():
-    def validate_incident_data(self, name_person, 
-                         lastname_person, 
-                         email_person, 
-                         identity_type_person,
-                         identity_number_person,
-                         cellphone_person,
+    def validate_incident_data(self,
                          incident_type,
                          channel_incident,
                          subject_incident,
                          detail_incident,
                          token):
         
-        self.name_person = name_person
-        self.lastname_person = lastname_person
-        self.identity_type_person = identity_type_person
-        self.identity_number_person = identity_number_person
-        self.email_person = email_person
-        self.cellphone_person = cellphone_person
         self.incident_type = incident_type
         self.channel_incident = channel_incident
         self.subject_incident = subject_incident
@@ -29,10 +18,27 @@ class ValidatorIncidents():
         
         self.validate_token_sent(token)
         self.valid_token(token)
-        self.validar_campos_requeridos()
-        self.validar_formato_tamano_campos()
+
+        self.validar_campos_requeridos_incidencia()
+
+    def validate_person_data(self, name_person, 
+                         lastname_person, 
+                         email_person, 
+                         identity_type_person,
+                         identity_number_person,
+                         cellphone_person):
         
-    def validar_campos_requeridos(self):
+        self.name_person = name_person
+        self.lastname_person = lastname_person
+        self.identity_type_person = identity_type_person
+        self.identity_number_person = identity_number_person
+        self.email_person = email_person
+        self.cellphone_person = cellphone_person
+
+        self.validar_campos_requeridos_persona()
+        self.validar_formato_tamano_campos()
+
+    def validar_campos_requeridos_persona(self):
         if not self.name_person:
             raise RequiredFields("El campo nombre esta vacio, recuerda que es obligatorio")
         if not self.lastname_person:
@@ -45,6 +51,8 @@ class ValidatorIncidents():
             raise RequiredFields("El campo numero de documento esta vacio, recuerda que es obligatorio")   
         if not self.cellphone_person:
             raise RequiredFields("El campo celular esta vacio, recuerda que es obligatorio")   
+        
+    def validar_campos_requeridos_incidencia(self):
         if not self.incident_type:
             raise RequiredFields("El campo tipo de incidente esta vacio, recuerda que es obligatorio")    
         if not self.channel_incident:
@@ -85,8 +93,8 @@ class ValidatorIncidents():
             logging.debug(f"token sin bearer {token_sin_bearer}")
 
             
-            #url = 'http://users:3000/user/auth/validate-token'
-            url = 'http://users-service/user/auth/validate-token' 
+            url = 'http://users:3000/user/auth/validate-token'
+            #url = 'http://users-service/user/auth/validate-token' 
 
 
             headers = {
