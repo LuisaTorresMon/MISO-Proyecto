@@ -1,5 +1,5 @@
 from flask import Flask
-from ..models.models import db
+from ..models.models import db, cargar_datos_iniciales
 from dotenv import load_dotenv
 from os import environ
 
@@ -22,5 +22,7 @@ class Config:
         
         db.init_app(app)
         db.create_all()
+        
+        cargar_datos_iniciales()
 
         return app
