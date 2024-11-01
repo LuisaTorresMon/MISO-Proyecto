@@ -18,7 +18,7 @@ def gateway(service, path):
 
         headers = {}
         if 'Authorization' in request.headers:
-            headers['Authorization'] = request.headers['Authorization']  # Captura el encabezado de autorización
+            headers['Authorization'] = request.headers['Authorization']
             headers['Technology'] = request.headers['Technology']
 
         try:
@@ -34,7 +34,6 @@ def gateway(service, path):
             elif request.method == 'DELETE':
                 response = requests.delete(service_url, headers=headers)
 
-            # Devolver la respuesta del microservicio
             return jsonify(response.json()), response.status_code
 
         except requests.exceptions.RequestException as e:
