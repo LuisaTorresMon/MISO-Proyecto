@@ -189,6 +189,13 @@ class UserService():
             return user_data
         else:
             raise ResourceNotFound
+        
+    def get_user_by_username(self, username):
+        user = db.session.query(User).filter(User.nombre_usuario==username).first()
+        if user:
+            return user_schema.dump(user)
+        else:
+            raise ResourceNotFound
 
     def get_products_by_person(self, person_id):
         products = db.session.query(Product).join(ProductPerson).filter(ProductPerson.id_persona == person_id).all()

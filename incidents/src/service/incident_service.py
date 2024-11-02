@@ -46,18 +46,25 @@ class IncidentService():
                 "identity_number": identity_number_person,
                 "cellphone": cellphone_person
             }
+            
+            user_asigned_id = user_id
 
             if not person_id:
                 person_id = self.create_person(token, person)
             else:
                 if technology != "MOBILE":
                     self.update_person(token, person)
+                    
+            if technology == "MOBILE":
+                user = self.get_user_by_username(token, 'agente_automatico')
+                user_asigned_id = user['id']
                 
             incident = self.save_incident(incident_type,
                               channel_incident,
                               subject_incident,
                               detail_incident,
                               user_id,
+                              user_asigned_id,
                               person_id)
            
             self.save_incident_history(incident, f" Se ha creado la incidencia {incident.codigo} con éxito", user_id)
@@ -113,6 +120,7 @@ class IncidentService():
                          subject_incident,
                          detail_incident,
                          user_id,
+                         user_asigned_id,
                          person_id):
             
               logging.debug("Iniciando el guardado de la incidencia")
@@ -132,7 +140,7 @@ class IncidentService():
                   tipo_id = tipo.id,
                   estado_id =  estado.id,
                   usuario_creador_id = user_id,
-                  usuario_asignado_id = user_id,
+                  usuario_asignado_id = user_asigned_id,
                   persona_id = person_id
               )
               
@@ -355,6 +363,22 @@ class IncidentService():
         def get_user(self, token, id):
 
             url = f"{USER_URL}/get/{id}"
+
+            headers = common_utils.obtener_token(token)
+
+            response = requests.get(url, headers=headers)
+            logging.debug(f"codigo de respuesta {response.text}")
+            print(f"codigo de respuesta {response.status_code}")
+
+            if response.status_code == 200:
+                logging.debug(f"response.json() {response.json()}")
+                return response.json()
+            else:
+                return None
+            
+        def get_user_by_username(self, token, username):
+
+            url = f"{USER_URL}/get/username/{username}"
 
             headers = common_utils.obtener_token(token)
 
