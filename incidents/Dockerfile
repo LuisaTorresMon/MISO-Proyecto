@@ -4,13 +4,13 @@ WORKDIR /app
 
 COPY Pipfile* ./
 
-COPY experimentos-435400-21daef2d3c2c.json /app/experimentos-435400-21daef2d3c2c.json
+# COPY experimentos-435400-21daef2d3c2c.json /app/experimentos-435400-21daef2d3c2c.json
 
 RUN pip install pipenv && pipenv install --ignore-pipfile
 
 COPY . .
 
-ENV GOOGLE_APPLICATION_CREDENTIALS="/app/experimentos-435400-21daef2d3c2c.json"
+# ENV GOOGLE_APPLICATION_CREDENTIALS="/app/experimentos-435400-21daef2d3c2c.json"
 
 ENV FLASK_APP=src/main.py
 
