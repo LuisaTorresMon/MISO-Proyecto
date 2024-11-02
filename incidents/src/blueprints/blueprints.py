@@ -22,8 +22,11 @@ def create_incidence():
     logging.debug(headers)
     token_encabezado = headers.get('Authorization')
     logging.debug(token_encabezado)
+    
+    validator_incident.validate_token_sent(token_encabezado)
+    validator_incident.valid_token(token_encabezado)
+    
     technology = headers.get('Technology')
-
     person_id = request.form.get('person_id') 
 
     if technology == 'WEB':

@@ -89,7 +89,8 @@ class TestService():
                 None,
                 user_id,
                 None,
-                token
+                token,
+                "WEB"
                 )            
             
             assert incident is not None  
@@ -131,7 +132,8 @@ class TestService():
                 files,
                 user_id,
                 person_id,
-                token
+                token,
+                 "WEB"
                 )            
             
             assert incident is not None 
@@ -182,7 +184,8 @@ class TestService():
                 files,
                 user_id,
                 person_id,
-                token
+                token,
+                 "WEB"
                 )    
             
             status= 2

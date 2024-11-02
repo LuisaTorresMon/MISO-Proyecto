@@ -23,9 +23,6 @@ class ValidatorIncidents():
         self.channel_incident = channel_incident
         self.subject_incident = subject_incident
         self.detail_incident = detail_incident
-        
-        self.validate_token_sent(token)
-        self.valid_token(token)
 
         self.validar_campos_requeridos_incidencia()
 

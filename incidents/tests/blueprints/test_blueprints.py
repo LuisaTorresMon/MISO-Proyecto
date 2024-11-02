@@ -56,13 +56,13 @@ class TestBlueprints():
     def test_campos_sin_nombre_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': fake.name(),
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
                     'incidentSubject': fake.sentence(nb_words=8),
@@ -79,13 +79,13 @@ class TestBlueprints():
     def test_campos_sin_apellido_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': fake.name(),
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
                     'incidentSubject': fake.sentence(nb_words=8),
@@ -102,13 +102,13 @@ class TestBlueprints():
     def test_campos_sin_email_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
                     'identityType': fake.name(),
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
                     'incidentSubject': fake.sentence(nb_words=8),
@@ -125,13 +125,13 @@ class TestBlueprints():
     def test_campos_sin_tipo_identificacion_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
                     'incidentSubject': fake.sentence(nb_words=8),
@@ -148,13 +148,13 @@ class TestBlueprints():
     def test_campos_sin_numero_identificacion_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': fake.name(),
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
                     'incidentSubject': fake.sentence(nb_words=8),
@@ -171,11 +171,11 @@ class TestBlueprints():
     def test_campos_sin_telefono_identificacion_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': fake.name(),
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
                     'incidentType': fake.name(),
@@ -194,13 +194,13 @@ class TestBlueprints():
     def test_campos_sin_canal_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': 'test@gmail.com',
                     'identityType': fake.name(),
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': '3142980620',
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
                     'incidentType': fake.name(),
                     'incidentSubject': fake.sentence(nb_words=8),
@@ -217,13 +217,13 @@ class TestBlueprints():
     def test_campos_sin_titulo_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': fake.name(),
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
@@ -240,13 +240,13 @@ class TestBlueprints():
     def test_campos_sin_detalle_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': fake.name(),
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
@@ -263,13 +263,13 @@ class TestBlueprints():
     def test_campos_numero_documento_invalido_cc_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': 'Cédula_Cuidadania',
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
@@ -287,13 +287,13 @@ class TestBlueprints():
     def test_campos_numero_documento_invalido_ce_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': 'Cédula_Extrangeria',
-                    'cellPhone': fake.phone_number(),
+                    'cellPhone': "3142980620",
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
                     'incidentType': fake.name(),
                     'incidentChannel': fake.word(),
@@ -311,11 +311,11 @@ class TestBlueprints():
     def test_campos_telefono_invalido_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': fake.email(),
+                    'emailClient': "test@gmail.com",
                     'identityType': fake.name(),
                     'cellPhone': fake.name(),
                     'identityNumber': fake.pystr(min_chars=2, max_chars=10),
@@ -335,7 +335,7 @@ class TestBlueprints():
     def test_campos_email_invalido_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
@@ -379,7 +379,7 @@ class TestBlueprints():
             mocker.patch('src.service.incident_service.IncidentService.create_person', return_value=1)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
 
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
@@ -409,7 +409,7 @@ class TestBlueprints():
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.cloud.storage.Client')
 
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
@@ -441,7 +441,7 @@ class TestBlueprints():
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
 
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             file_data = {
                 'files': (BytesIO(b"archivo de prueba"), 'test_file.txt')  
@@ -477,7 +477,7 @@ class TestBlueprints():
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
 
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
                
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
@@ -511,7 +511,7 @@ class TestBlueprints():
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
 
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             file_data = {
                 'files': (BytesIO(b"archivo de prueba"), 'test_file.txt')  
@@ -551,7 +551,7 @@ class TestBlueprints():
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
 
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             file_data = {
                 'files': (BytesIO(b"archivo de prueba"), 'test_file.txt')  
@@ -597,7 +597,7 @@ class TestBlueprints():
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
             
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
             self.create_incident(test_client, headers)
             
@@ -617,7 +617,7 @@ class TestBlueprints():
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
             
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
             incident_data = self.create_incident(test_client, headers)
             
@@ -637,7 +637,7 @@ class TestBlueprints():
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
             
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
             incident_data = self.create_incident(test_client, headers)
             
@@ -662,7 +662,7 @@ class TestBlueprints():
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
             
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"}
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
             incident_data = self.create_incident(test_client, headers)
             
