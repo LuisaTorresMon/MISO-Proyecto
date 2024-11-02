@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import requests
+import logging
 
 app = Flask(__name__)
 
@@ -26,7 +27,8 @@ def gateway(service, path):
                 response = requests.get(service_url, params=request.args, headers=headers)
             elif request.method == 'POST':
                 if request.content_type.startswith('multipart/form-data'):
-                    response = requests.post(service_url, data=request.form, files=request.files, headers=headers)
+                    files = [('files', (file.filename, file.stream, file.mimetype)) for file in request.files.getlist('files')]
+                    response = requests.post(service_url, data=request.form, files=files, headers=headers, timeout=10000)
                 else:
                     response = requests.post(service_url, json=request.json, headers=headers)
             elif request.method == 'PUT':

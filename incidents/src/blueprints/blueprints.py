@@ -22,7 +22,6 @@ def create_incidence():
     logging.debug(headers)
     token_encabezado = headers.get('Authorization')
     logging.debug(token_encabezado)
-
     technology = headers.get('Technology')
 
     person_id = request.form.get('person_id') 
