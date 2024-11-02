@@ -97,8 +97,8 @@ class UserService():
             "id_company": stored_user.id_empresa,
             "user_type": stored_user.tipo_usuario.tipo
         }
-        token_de_acceso = create_access_token(identity=stored_user.id, additional_claims=additional_claims)
 
+        token_de_acceso = create_access_token(identity=str(stored_user.id), additional_claims=additional_claims)
         return {
             "token": token_de_acceso
         }
@@ -172,15 +172,15 @@ class UserService():
     def get_person_by_identity(self, identity_type, identity_number):        
         person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
         return person
-    
-    def get_person_by_id(self, id):        
-        person = Person.query.filter_by(id=id).first() 
+
+    def get_person_by_id(self, id):
+        person = Person.query.filter_by(id=id).first()
         if person:
             return person
         else:
             raise ResourceNotFound
-        
-    def get_user_by_id(self, id):        
+
+    def get_user_by_id(self, id):
         user = db.session.query(User).filter_by(id=id).first()
         if user:
             user_data = user_schema.dump(user)
@@ -188,8 +188,15 @@ class UserService():
                 user_data['persona'] = persona_schema.dump(user.persona)
             return user_data
         else:
-            raise ResourceNotFound       
-    
+            raise ResourceNotFound
+        
+    def get_user_by_username(self, username):
+        user = db.session.query(User).filter(User.nombre_usuario==username).first()
+        if user:
+            return user_schema.dump(user)
+        else:
+            raise ResourceNotFound
+
     def get_products_by_person(self, person_id):
         products = db.session.query(Product).join(ProductPerson).filter(ProductPerson.id_persona == person_id).all()
         products_schema = [product_schema.dump(product) for product in products]

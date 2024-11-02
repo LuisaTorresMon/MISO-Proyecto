@@ -117,6 +117,28 @@ class TestOperations():
             
             assert response_query.status_code == 200
             
+    def test_find_user_by_username(self):   
+        with app.test_client() as test_client:
+          
+            token = self.generate_token()
+            
+            headers = {'Authorization': f"Bearer {token}"}
+
+            user_data = {
+                'id_person': '4',
+                'id_company': None,
+                'id_typeuser': '1',
+                'username': fake.user_name(),
+                'password': 'password123'
+            }
+
+            user = test_client.post('/user/create', json=user_data)
+            user_data = user.get_json()
+            
+            response_query = test_client.get(f"/user/get/username/{user_data['nombre_usuario']}", headers=headers)
+            
+            assert response_query.status_code == 200
+            
 
     def test_find_product_by_person(self):   
         with app.test_client() as test_client:

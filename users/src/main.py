@@ -29,7 +29,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = f"postgresql://{db_user}:{db_password}@{
 '''
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 app.config["PROPAGATE_EXCEPTIONS"] = True
-app.config['JWT_SECRET_KEY'] = 'frase-secreta'
+app.config['JWT_SECRET_KEY'] = 'E5P0Xc7J3deF5L5M8D9DjA3gW6F5Kz7g'
 app.config["JWT_ACCESS_TOKEN_EXPIRES"] = timedelta(days=10)
 app.config["JWT_REFRESH_TOKEN_EXPIRES"] = timedelta(days=30)
 

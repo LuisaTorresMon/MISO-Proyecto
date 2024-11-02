@@ -36,6 +36,12 @@ def find_user_by_id(id):
     user = user_service.get_user_by_id(id)
     return make_response(user, 200)
 
+@users_blueprint.route('/get/username/<string:username>', methods = ['GET'])
+@jwt_required()
+def find_user_by_username(username):
+    user = user_service.get_user_by_username(username)
+    return make_response(user, 200)
+
 @users_blueprint.route('/person/<int:id>', methods = ['GET'])
 @jwt_required()
 def find_person_by_id(id):

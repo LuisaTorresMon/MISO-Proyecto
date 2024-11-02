@@ -6,41 +6,44 @@ from dotenv import load_dotenv
 import os
 import requests
 
-load_dotenv('.env.template')            
+load_dotenv('.env.template')
 USER_URL = os.environ.get('USER_PATH')
 
 common_utils = CommonUtils()
 
 class ValidatorIncidents():
-    def validate_incident_data(self, name_person, 
-                         lastname_person, 
-                         email_person, 
-                         identity_type_person,
-                         identity_number_person,
-                         cellphone_person,
+    def validate_incident_data(self,
                          incident_type,
                          channel_incident,
                          subject_incident,
                          detail_incident,
                          token):
-        
+
+        self.incident_type = incident_type
+        self.channel_incident = channel_incident
+        self.subject_incident = subject_incident
+        self.detail_incident = detail_incident
+
+        self.validar_campos_requeridos_incidencia()
+
+    def validate_person_data(self, name_person,
+                         lastname_person,
+                         email_person,
+                         identity_type_person,
+                         identity_number_person,
+                         cellphone_person):
+
         self.name_person = name_person
         self.lastname_person = lastname_person
         self.identity_type_person = identity_type_person
         self.identity_number_person = identity_number_person
         self.email_person = email_person
         self.cellphone_person = cellphone_person
-        self.incident_type = incident_type
-        self.channel_incident = channel_incident
-        self.subject_incident = subject_incident
-        self.detail_incident = detail_incident
-        
-        self.validate_token_sent(token)
-        self.valid_token(token)
-        self.validar_campos_requeridos()
+
+        self.validar_campos_requeridos_persona()
         self.validar_formato_tamano_campos()
-        
-    def validar_campos_requeridos(self):
+
+    def validar_campos_requeridos_persona(self):
         if not self.name_person:
             raise RequiredFields("El campo nombre esta vacio, recuerda que es obligatorio")
         if not self.lastname_person:
@@ -53,6 +56,8 @@ class ValidatorIncidents():
             raise RequiredFields("El campo numero de documento esta vacio, recuerda que es obligatorio")   
         if not self.cellphone_person:
             raise RequiredFields("El campo celular esta vacio, recuerda que es obligatorio")   
+
+    def validar_campos_requeridos_incidencia(self):
         if not self.incident_type:
             raise RequiredFields("El campo tipo de incidente esta vacio, recuerda que es obligatorio")    
         if not self.channel_incident:
@@ -90,7 +95,7 @@ class ValidatorIncidents():
     
     def valid_token(self, token):
             headers = common_utils.obtener_token(token)
-            url = f"{USER_URL}/auth/validate-token" 
+            url = f"{USER_URL}/auth/validate-token"
 
             response = requests.post(url, headers=headers)
             logging.debug(f"codigo de respuesta {response.text}")
