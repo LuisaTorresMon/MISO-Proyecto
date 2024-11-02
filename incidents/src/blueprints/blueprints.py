@@ -31,7 +31,7 @@ def create_incidence():
 
     if technology == 'WEB':
         logging.debug("INCIDENCE WEB")
-           # Datos cliente
+
         user_id = request.form.get('user_id')
         name_person = request.form.get('name')     
         lastname_person = request.form.get('lastName')     
