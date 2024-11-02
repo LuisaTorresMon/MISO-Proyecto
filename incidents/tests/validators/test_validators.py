@@ -19,201 +19,125 @@ class TestValidations():
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
-            
-            name = None
-            last_name=  fake.name()
-            email_client= fake.email()
-            identity_type= fake.name()
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= fake.phone_number()
+
             incident_type= fake.name()
             incident_channel= fake.word()
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= fake.sentence(nb_words=8)
             
-            with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+            validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
             
     def test_campos_sin_apellido_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
             
-            name = fake.name()
-            last_name = None
-            email_client= fake.email()
-            identity_type= fake.name()
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= fake.phone_number()
             incident_type= fake.name()
             incident_channel= fake.word()
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= fake.sentence(nb_words=8)
             
-            with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+            validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
             
     def test_campos_sin_email_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
             
-            name = fake.name()
-            last_name = fake.name()
-            email_client= None
-            identity_type= fake.name()
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= fake.phone_number()
             incident_type= fake.name()
             incident_channel= fake.word()
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= fake.sentence(nb_words=8)
             
-            with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+            validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
          
     def test_campos_sin_tipo_identificacion_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
             
-            name = fake.name()
-            last_name = fake.name()
-            email_client= fake.email()
-            identity_type= None
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= fake.phone_number()
             incident_type= fake.name()
             incident_channel= fake.word()
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= fake.sentence(nb_words=8)
             
-            with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+            validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
          
     def test_campos_sin_numero_identificacion_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
             
-            name = fake.name()
-            last_name = fake.name()
-            email_client= fake.email()
-            identity_type= fake.pystr(min_chars=2, max_chars=10)
-            identity_number= None
-            cell_phone= fake.phone_number()
             incident_type= fake.name()
             incident_channel= fake.word()
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= fake.sentence(nb_words=8)
             
-            with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+            validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
         
     def test_campos_sin_celular_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
             
-            name = fake.name()
-            last_name = fake.name()
-            email_client= fake.email()
-            identity_type= fake.pystr(min_chars=2, max_chars=10)
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= None
             incident_type= fake.name()
             incident_channel= fake.word()
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= fake.sentence(nb_words=8)
             
-            with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+            validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
          
     def test_campos_sin_tipo_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
-            
-            name = fake.name()
-            last_name = fake.name()
-            email_client= fake.email()
-            identity_type= fake.pystr(min_chars=2, max_chars=10)
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= fake.phone_number()
+
             incident_type= None
             incident_channel= fake.word()
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= fake.sentence(nb_words=8)
             
             with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+                validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
          
     def test_campos_sin_canal_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
             
-            name = fake.name()
-            last_name = fake.name()
-            email_client= fake.email()
-            identity_type= fake.pystr(min_chars=2, max_chars=10)
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= fake.phone_number()
             incident_type= fake.word()
             incident_channel= None
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= fake.sentence(nb_words=8)
             
             with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+                validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
     
     def test_campos_sin_titulo_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
-            
-            name = fake.name()
-            last_name = fake.name()
-            email_client= fake.email()
-            identity_type= fake.pystr(min_chars=2, max_chars=10)
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= fake.phone_number()
+
             incident_type= fake.word()
             incident_channel= fake.word()
             incident_subject = None,
             incident_detail= fake.sentence(nb_words=8)
             
             with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+                validator.validate_incident_data(incident_type, incident_channel, incident_subject, incident_detail, token) 
          
     def test_campos_sin_titulo_incidencia_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
-            
-            name = fake.name()
-            last_name = fake.name()
-            email_client= fake.email()
-            identity_type= fake.pystr(min_chars=2, max_chars=10)
-            identity_number= fake.pystr(min_chars=2, max_chars=10)
-            cell_phone= fake.phone_number()
+
             incident_type= fake.word()
             incident_channel= fake.word()
             incident_subject = fake.sentence(nb_words=8),
             incident_detail= None
             
             with pytest.raises(RequiredFields):
-                validator.validate_incident_data(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
-                validator.validar_campos_requeridos(name, last_name, email_client, identity_type, identity_number, cell_phone, incident_type, incident_channel, incident_subject, incident_detail, token) 
+                validator.validate_incident_data( incident_type, incident_channel, incident_subject, incident_detail, token) 
          
     def test_email_valido(self):
         with app.test_client() as test_client:

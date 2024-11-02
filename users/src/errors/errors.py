@@ -1,6 +1,6 @@
 class ApiError(Exception):
-    code = 422
-    description = "Default message"
+    code = 500
+    description = "Ha ocurrido un error en el servidor"
 
 class TokenNoEnviado(ApiError):
     code = 403
@@ -41,6 +41,10 @@ class TelefonoNoNumerico(ApiError):
 class PassNoCoincide(ApiError):
     code = 400
     description = "Las contraseñas no coinciden"
+    
+class ResourceNotFound(ApiError):
+    code = 404
+    description = "El recurso no ha sido encontrado"
 
 class PassNoValido(ApiError):
     code = 400

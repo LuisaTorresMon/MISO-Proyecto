@@ -76,6 +76,70 @@ class TestOperations():
             assert response_query.status_code == 200
             assert data_query.get('tipo_identificacion') == person_data.get('tipo_identificacion') and data_query.get('numero_identificacion') == person_data.get('numero_identificacion')
 
+    def test_find_person_by_id(self):   
+        with app.test_client() as test_client:
+          
+            token = self.generate_token()
+
+            headers = {'Authorization': f"Bearer {token}"}
+
+            person_response = self.create_person(headers)
+            print(person_response.text)
+            print(person_response.get_json())
+               
+            person_data = person_response.get_json()
+            response_query = test_client.get(f"/user/person/{person_data['id']}",json=person_data, headers=headers)
+            data_query = response_query.get_json()
+            
+            assert response_query.status_code == 200
+            assert data_query.get('tipo_identificacion') == person_data.get('tipo_identificacion') and data_query.get('numero_identificacion') == person_data.get('numero_identificacion')
+
+    def test_find_user_by_id(self):   
+        with app.test_client() as test_client:
+          
+            token = self.generate_token()
+            
+            headers = {'Authorization': f"Bearer {token}"}
+
+            user_data = {
+                'id_person': '4',
+                'id_company': None,
+                'id_typeuser': '1',
+                'username': fake.user_name(),
+                'password': 'password123'
+            }
+
+            user = test_client.post('/user/create', json=user_data)
+            user_data = user.get_json()
+            
+            response_query = test_client.get(f"/user/get/{user_data['id']}", headers=headers)
+            data_query = response_query.get_json()
+            
+            assert response_query.status_code == 200
+            
+    def test_find_user_by_username(self):   
+        with app.test_client() as test_client:
+          
+            token = self.generate_token()
+            
+            headers = {'Authorization': f"Bearer {token}"}
+
+            user_data = {
+                'id_person': '4',
+                'id_company': None,
+                'id_typeuser': '1',
+                'username': fake.user_name(),
+                'password': 'password123'
+            }
+
+            user = test_client.post('/user/create', json=user_data)
+            user_data = user.get_json()
+            
+            response_query = test_client.get(f"/user/get/username/{user_data['nombre_usuario']}", headers=headers)
+            
+            assert response_query.status_code == 200
+            
+
     def test_find_product_by_person(self):   
         with app.test_client() as test_client:
           
@@ -170,13 +234,14 @@ class TestOperations():
           
             login_data = {
                 "username": "sa",
-                "password": "123456"
+                "password": "123456",
+                "technology": "WEB"
             }
                         
             response_jwt = test_client.post('/user/auth/login',json=login_data)
             data_jwt = response_jwt.get_json()
             
-            return data_jwt.get('token')       
+            return data_jwt.get('token')     
         
     def test_health(self):
         with app.test_client() as test_client:

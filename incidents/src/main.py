@@ -7,7 +7,7 @@ from .errors.errors import ApiError
 
 app = Config.init()
 
-cors = CORS(app)
+cors = CORS(app, resources={r"/*": {"origins": "*"}}, expose_headers=["Authorization", "Technology"])
 
 logging.basicConfig(level=logging.DEBUG) 
 

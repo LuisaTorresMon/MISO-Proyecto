@@ -30,6 +30,24 @@ def find_person_by_identity():
     person = user_service.get_person_by_identity(identity_type, identity_number)
     return make_response(person_schema.dump(person), 200)
 
+@users_blueprint.route('/get/<int:id>', methods = ['GET'])
+@jwt_required()
+def find_user_by_id(id):
+    user = user_service.get_user_by_id(id)
+    return make_response(user, 200)
+
+@users_blueprint.route('/get/username/<string:username>', methods = ['GET'])
+@jwt_required()
+def find_user_by_username(username):
+    user = user_service.get_user_by_username(username)
+    return make_response(user, 200)
+
+@users_blueprint.route('/person/<int:id>', methods = ['GET'])
+@jwt_required()
+def find_person_by_id(id):
+    person = user_service.get_person_by_id(id)
+    return make_response(person_schema.dump(person), 200)
+
 @users_blueprint.route('/person/<int:id>/products', methods = ['GET'])
 @jwt_required()
 def get_products_by_person(id):
@@ -68,7 +86,7 @@ def register_agent():
 def register_user():
     data = request.get_json()
     result = user_service.register_user(data)
-    return result
+    return make_response(result, 201)
 
 @users_blueprint.route('/agent/<int:id_empresa>', methods = ['GET'])
 @jwt_required()

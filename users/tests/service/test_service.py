@@ -159,7 +159,8 @@ class TestServices():
     def test_create_user_bad_credentials_by_username_raises_exception(self, mocker):
         mock_user = {
             'username': 'invalid_username',
-            'password': 'password123'
+            'password': 'password123',
+            "technology": "MOBILE"
         }
         mocker.patch('src.models.model.User.query.filter_by', return_value=mocker.Mock(first=lambda: None))
 

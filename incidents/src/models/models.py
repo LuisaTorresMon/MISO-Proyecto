@@ -23,7 +23,7 @@ class Incidente(db.Model):
     tipo_id = db.Column(db.Integer, db.ForeignKey('tipo.id'), nullable=False)
     
     estado = db.relationship('Estado', backref='incidentes')
-
+    tipo = db.relationship('Tipo', backref='incidentes')
     
 class Canal(db.Model):
     __tablename__ = 'canal'
@@ -88,6 +88,7 @@ class EvidenciaHistorico(db.Model):
     historico_id = db.Column(db.Integer, db.ForeignKey('historico_incidencia.id'), nullable=False)
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=False)
   
+    evidencia = db.relationship('Evidencia', backref='evidencia_historicos')
 
 class IncidenteSchema(SQLAlchemyAutoSchema):
     class Meta:
@@ -143,6 +144,15 @@ class HistoricoIncidenciaSchema(SQLAlchemyAutoSchema):
 
     id = fields.String()
     
+class EvidenciaHistoricoSchema(SQLAlchemyAutoSchema):
+    class Meta:
+        model = EvidenciaHistorico
+        include_relationships = True
+        load_instance = True
+        include_fk = True
+
+    id = fields.String()
+    
 class EvidenciaSchema(SQLAlchemyAutoSchema):
     class Meta:
         model = Evidencia
@@ -152,3 +162,100 @@ class EvidenciaSchema(SQLAlchemyAutoSchema):
 
     id = fields.String()
     
+def cargar_datos_iniciales():
+    insert_tipo_data()
+    insert_estado_data()
+    insert_canal_data()
+    insert_incident_test()
+
+def insert_tipo_data():
+    tipos_data = [
+        {'id': 1, 'tipo': 'Petición'},
+        {'id': 2, 'tipo': 'Queja/Reclamo'},
+        {'id': 3, 'tipo': 'Sugerencia'}
+    ]
+
+    for tipo_data in tipos_data:
+        tipo_exists = Tipo.query.filter_by(id=tipo_data['id']).first()
+        if not tipo_exists:
+            new_tipo = Tipo(id=tipo_data['id'], tipo=tipo_data['tipo'])
+            db.session.add(new_tipo)
+            print(f"Insertando tipo: {tipo_data['tipo']}")
+        else:
+            print(f"Tipo '{tipo_data['tipo']}' ya existe en la base de datos.")
+
+    db.session.commit()
+
+
+def insert_estado_data():
+    estados_data = [
+        {'id': 1, 'estado': 'Abierto'},
+        {'id': 2, 'estado': 'Desestimado'},
+        {'id': 3, 'estado': 'Escalado'},
+        {'id': 4, 'estado': 'Cerrado Satisfactoriamente'},
+        {'id': 5, 'estado': 'Cerrado Insatisfactoriamente'},
+        {'id': 6, 'estado': 'Reaperturado'}
+    ]
+
+    for estado_data in estados_data:
+        estado_exists = Estado.query.filter_by(id=estado_data['id']).first()
+        if not estado_exists:
+            new_estado = Estado(id=estado_data['id'], estado=estado_data['estado'])
+            db.session.add(new_estado)
+            print(f"Insertando estado: {estado_data['estado']}")
+        else:
+            print(f"Estado '{estado_data['estado']}' ya existe en la base de datos.")
+
+    db.session.commit()
+
+def insert_canal_data():
+    canales_data = [
+        {'id': 1, 'nombre_canal': 'Llamada Telefónica', 'precio': 10000.0},
+        {'id': 2, 'nombre_canal': 'Correo Electrónico', 'precio': 30000.0},
+        {'id': 3, 'nombre_canal': 'App Movil', 'precio': 50000.0}
+    ]
+
+    for canal_data in canales_data:
+        canal_exists = Canal.query.filter_by(id=canal_data['id']).first()
+        if not canal_exists:
+            new_canal = Canal(
+                id=canal_data['id'],
+                nombre_canal=canal_data['nombre_canal'],
+                precio=canal_data['precio']
+            )
+            db.session.add(new_canal)
+            print(f"Insertando canal: {canal_data['nombre_canal']}")
+        else:
+            print(f"Canal '{canal_data['nombre_canal']}' ya existe en la base de datos.")
+
+    db.session.commit()
+    
+def insert_incident_test():
+    incident_test = Incidente.query.filter(Incidente.codigo == 'INC00000').first()
+    if not incident_test:
+        incident = Incidente(
+                  codigo = 'INC00000',
+                  descripcion = 'Detalle incidencia INC00000',
+                  asunto = 'Asunto incidencia INC0000',
+                  canal_id = 1,
+                  tipo_id = 1,
+                  estado_id =  1,
+                  usuario_creador_id = 1,
+                  usuario_asignado_id = 1,
+                  persona_id = 1
+              )
+        
+        db.session.add(incident)
+        db.session.commit()
+
+        incident_history = HistoricoIncidencia(
+                    observaciones = 'Se ha creado la incidencia INC00000 con exito',
+                    incidencia_id = incident.id,
+                    usuario_creador_id = 1,
+                    estado_id = 1,
+                    usuario_asignado_id = 1
+        )
+        
+        db.session.add(incident_history)
+        db.session.commit()
+
