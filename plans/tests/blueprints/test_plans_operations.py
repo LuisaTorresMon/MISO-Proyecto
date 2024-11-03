@@ -100,7 +100,7 @@ class TestPlans():
                     )
             
             get_command = GetActiveContract(empresa_id=1)
-            response, status_code = get_command.execute()
+            response, status_code = get_command.execute() 
 
             assert status_code == 200
             assert response.json["empresa_id"] == 1
