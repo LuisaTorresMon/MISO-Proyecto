@@ -88,14 +88,23 @@ class TestPlans():
     
     def test_get_active_contract_success(self, mock_contract):
         with app.test_client() as test_client:
-            mock_contract.return_value.first.return_value = Contract(empresa_id=1, plan_id=1)
+            data = {
+                "plan_id": 1,
+                "empresa_id": 1
+            }
 
+            test_client.post(
+                        '/plan/contract',  
+                        data=json.dumps(data),
+                        content_type='application/json'
+                    )
+            
             get_command = GetActiveContract(empresa_id=1)
-            response, status_code = get_command.execute()
+            response, status_code = get_command.execute() 
 
             assert status_code == 200
             assert response.json["empresa_id"] == 1
-            assert response.json["plan_id"] == '2'
+            assert response.json["plan_id"] == '1'
 
     def test_get_active_contract_not_found(self, mock_contract):
         with app.test_client() as test_client:
