@@ -3,6 +3,8 @@ from flask import jsonify, request
 import requests
 from .base_command import BaseCommannd
 from src.models.model import Contract, Plan, db, ContractSchema, ContractGetJsonSchema
+from sqlalchemy import update
+
 
 contract_schema = ContractSchema()
 
@@ -13,6 +15,10 @@ class Create(BaseCommannd):
         self.empresa_id = data_contract.get('empresa_id')
 
     def execute(self):
+        
+        update_stmt = update(Contract).where(Contract.empresa_id == f"{self.empresa_id}").values(es_activo=False)
+        db.session.execute(update_stmt)
+        db.session.commit()
 
         plan = Plan.query.filter_by(id=self.plan_id).first()
         if not plan:
