@@ -1,6 +1,6 @@
 from flask import jsonify
 from sqlalchemy import func
-from ..models.models import Incidente, IncidenteSchema, Canal, db
+from ..models.models import Estado, Incidente, IncidenteSchema, Canal, Tipo, db
 from ..utils.utils import CommonUtils
 from ..errors.errors import ServerSystemException
 from dotenv import load_dotenv
@@ -47,10 +47,12 @@ class BoardService():
             Incidente.asunto,
             Incidente.fecha_creacion,
             Incidente.fecha_actualizacion,
-            Incidente.canal_id,
-            Incidente.estado_id,
-            Incidente.tipo_id
-        )
+            Canal.nombre_canal.label('nombre_canal'),
+            Estado.estado.label('estado'),
+            Tipo.tipo.label('tipo')
+        ).join(Canal, Incidente.canal_id == Canal.id) \
+        .join(Estado, Incidente.estado_id == Estado.id) \
+        .join(Tipo, Incidente.tipo_id == Tipo.id)
         
         if canal_id:
             query = query.filter(Incidente.canal_id == canal_id)
@@ -70,11 +72,11 @@ class BoardService():
                 "id": incidente.id,
                 "codigo": incidente.codigo,
                 "asunto": incidente.asunto,
-                "fecha_creacion": incidente.fecha_creacion,
-                "fecha_actualizacion": incidente.fecha_actualizacion,
-                "canal_id": incidente.canal_id,
-                "estado_id": incidente.estado_id,
-                "tipo_id": incidente.tipo_id
+                "fecha_creacion": incidente.fecha_creacion.strftime('%m/%d/%Y') if incidente.fecha_creacion else None,
+                "fecha_actualizacion": incidente.fecha_actualizacion.strftime('%m/%d/%Y') if incidente.fecha_actualizacion else None,
+                "canal": incidente.nombre_canal,
+                "estado": incidente.estado,
+                "tipo": incidente.tipo
             }
             for incidente in incidentes
         ]
