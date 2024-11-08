@@ -1,7 +1,9 @@
+from datetime import datetime
 from flask import Blueprint, request, jsonify, make_response
 from ..validations.validations import ValidatorIncidents
 from ..service.incident_service import IncidentService
 from ..service.calls_service import CallsService
+from ..service.board_service import BoardService
 from ..errors.errors import ServerSystemException, BadRequestError
 import logging, os
 
@@ -9,7 +11,7 @@ incident_blueprint = Blueprint('incident', __name__)
 validator_incident = ValidatorIncidents()
 incident_service = IncidentService()
 call_service = CallsService()
-
+board_service = BoardService()
 
 
 @incident_blueprint.route('/ping', methods=['GET'])
@@ -220,3 +222,24 @@ def find_call_by_id(id):
         logging.debug(f"excepcion {err}")
         raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
 
+@incident_blueprint.route('/channels/percentage', methods=['GET'])
+def get_percentage_of_incidents_by_channel():
+    try:
+        canal_id = request.args.get('canal_id', type=int)
+        estado_id = request.args.get('estado_id', type=int)
+        fecha_inicio = request.args.get('fecha_inicio', type=str)
+        fecha_fin = request.args.get('fecha_fin', type=str)
+
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d') if fecha_inicio else None
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d') if fecha_fin else None
+
+        return board_service.get_percentage_by_channel(
+            canal_id=canal_id,
+            estado_id=estado_id,
+            fecha_inicio=fecha_inicio,
+            fecha_fin=fecha_fin
+        )
+    except Exception as err:
+        logging.debug(f"excepcion {err}")
+        raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
+    
