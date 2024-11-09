@@ -5,9 +5,7 @@ from ..errors.errors import ServerSystemException
 from datetime import datetime
 from tinytag import TinyTag
 from dotenv import load_dotenv
-import random, logging, os
-import requests
-import copy
+import random, logging, os, requests, calendar
 
 incident_schema = IncidenteSchema()
 calls_service = CallsService()
@@ -400,3 +398,20 @@ class IncidentService():
     
         def get_estado_by_nombre(self, estado_incidencia):
             return db.session.query(Estado).filter_by(estado = estado_incidencia).first() 
+        
+        def get_number_incident_by_channel_and_month(self, channel_id, month): 
+            
+            first_day = datetime(datetime.now().year, month, 1)
+            last_day = datetime(datetime.now().year, month, calendar.monthrange(datetime.now().year, month)[1], 23, 59, 00)      
+       
+            logging.debug(first_day)
+            logging.debug(last_day)
+       
+            channel = db.session.query(Canal).filter(Canal.id == channel_id).first()
+            incidents_count = db.session.query(Incidente).filter(
+               Incidente.fecha_creacion.between(first_day, last_day),
+               Incidente.canal_id == channel_id
+            ).count()
+              
+            return {"incident_count": incidents_count, "total_price": (incidents_count * channel.precio), "channel_price": channel.precio}
+       
