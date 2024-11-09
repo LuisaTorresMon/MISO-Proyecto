@@ -2,7 +2,7 @@ import json
 import pytest
 from faker import Faker
 from src.main import app
-from src.models.models import db, Canal, Estado, Tipo 
+from src.models.models import Incidente, db, Canal, Estado, Tipo 
 from google.auth.credentials import AnonymousCredentials 
 from datetime import datetime, timedelta
 from io import BytesIO
@@ -705,3 +705,188 @@ class TestBlueprints():
         print(incident_data)
         
         return incident_data
+    
+    def test_get_percentage_of_incidents_by_channel_no_filters(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+            
+            response = test_client.get('/incident/channels/percentage', headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert 'Llamada Telefónica' in data
+            assert 'Correo Electronico' in data
+
+    def test_get_percentage_of_incidents_by_channel_with_canal_filter(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+            
+            response = test_client.get('/incident/channels/percentage', query_string={'canal_id': 1}, headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert 'Llamada Telefónica' in data
+            assert sum(data.values()) == 100
+
+    def test_get_percentage_of_incidents_by_channel_with_estado_filter(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            response = test_client.get('/incident/channels/percentage', query_string={'estado_id': 2}, headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert 'Correo Electronico' in data
+            assert sum(data.values()) == 100
+    
+    def test_get_percentage_of_incidents_by_channel_with_date_range(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            db.session.query(Incidente).delete()
+            db.session.commit()
+
+            incidentes = [
+                Incidente(
+                    codigo=fake.uuid4(),
+                    descripcion=fake.text(),
+                    asunto=fake.sentence(),
+                    fecha_creacion=datetime.now() - timedelta(days=2),
+                    fecha_actualizacion=datetime.now() - timedelta(days=1),
+                    canal_id=1,
+                    usuario_creador_id=1,
+                    usuario_asignado_id=2,
+                    persona_id=1,
+                    estado_id=1,
+                    tipo_id=1
+                ),
+                Incidente(
+                    codigo=fake.uuid4(),
+                    descripcion=fake.text(),
+                    asunto=fake.sentence(),
+                    fecha_creacion=datetime.now() - timedelta(days=5),
+                    fecha_actualizacion=datetime.now() - timedelta(days=4),
+                    canal_id=2,
+                    usuario_creador_id=1,
+                    usuario_asignado_id=2,
+                    persona_id=1,
+                    estado_id=2,
+                    tipo_id=2
+                )
+            ]
+            db.session.bulk_save_objects(incidentes)
+            db.session.commit()
+
+            fecha_inicio = (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
+            fecha_fin = (datetime.now() - timedelta(days=3)).strftime('%Y-%m-%d')
+            
+            response = test_client.get('/incident/channels/percentage', query_string={'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
+            data = response.get_json()
+            
+            assert response.status_code == 200
+            assert 'Correo Electrónico' in data
+            assert sum(data.values()) == 100
+    
+    def test_get_percentage_of_incidents_by_channel_with_combined_filters(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            fecha_inicio = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
+            fecha_fin = datetime.now().strftime('%Y-%m-%d')
+            
+            response = test_client.get('/incident/channels/percentage', query_string={'canal_id': 1, 'estado_id': 1, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert 'Llamada Telefónica' in data
+            assert sum(data.values()) == 100
+
+    def test_get_percentage_of_incidents_by_channel_missing_authorization(self, mocker):
+        with app.test_client() as test_client:
+            response = test_client.get('/incident/channels/percentage')
+            data = response.get_json()
+
+            assert response.status_code == 500
+            assert 'msg' in data
+            assert data['msg'] == 'Error a la hora de conultar el detalle de la incidencia No se ha enviado el token, porfavor contacte con su administrador'
+
+    def test_get_summary_incidents_no_filters(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            response = test_client.get('/incident/summary', headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert data['total'] == 2
+            assert all("id" in incident for incident in data['incidentes'])
+    
+    def test_get_summary_incidents_with_canal_filter(self, mocker):
+       with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            response = test_client.get('/incident/summary', query_string={'canal_id': 1}, headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert data['total'] == 1
+            assert data['incidentes'][0]['canal'] == 'Llamada Telefónica'
+    
+    def test_get_summary_incidents_with_estado_filter(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            response = test_client.get('/incident/summary', query_string={'estado_id': 2}, headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert data['total'] == 1
+            assert data['incidentes'][0]['estado'] == 'Desestimado'
+
+    def test_get_summary_incidents_with_date_range(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            fecha_inicio = (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
+            fecha_fin = (datetime.now() - timedelta(days=3)).strftime('%Y-%m-%d')
+            
+            response = test_client.get('/incident/summary', query_string={'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert data['total'] == 1
+            assert data['incidentes'][0]['canal'] == 'Correo Electrónico'
+    
+    def test_get_summary_incidents_with_combined_filters(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            fecha_inicio = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
+            fecha_fin = datetime.now().strftime('%Y-%m-%d')
+            
+            response = test_client.get('/incident/summary', query_string={'canal_id': 1, 'estado_id': 1, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
+            data = response.get_json()
+
+            assert response.status_code == 200
+            assert data['total'] == 1
+            assert data['incidentes'][0]['canal'] == 'Llamada Telefónica'
+            assert data['incidentes'][0]['estado'] == 'Abierto'
+
+    def test_get_summary_incidents_missing_authorization(self):
+        with app.test_client() as test_client:
+            response = test_client.get('/incident/summary')
+            data = response.get_json()
+
+            assert response.status_code == 500
+            assert 'msg' in data
+            assert 'Error a la hora de conultar el detalle de la incidencia' in data['msg']
