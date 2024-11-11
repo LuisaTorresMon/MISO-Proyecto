@@ -14,6 +14,21 @@ USER_URL = os.environ.get('USER_PATH')
 
 class BoardService():
     def get_percentage_by_channel(self, canal_id=None, estado_id=None, fecha_inicio=None, fecha_fin=None):
+        base_query = db.session.query(
+            func.count(Incidente.id).label("total")
+        )
+
+        if estado_id:
+            base_query = base_query.filter(Incidente.estado_id == estado_id)
+        if fecha_inicio and fecha_fin:
+            base_query = base_query.filter(Incidente.fecha_creacion.between(fecha_inicio, fecha_fin))
+        elif fecha_inicio:
+            base_query = base_query.filter(Incidente.fecha_creacion >= fecha_inicio)
+        elif fecha_fin:
+            base_query = base_query.filter(Incidente.fecha_actualizacion <= fecha_fin)
+
+        total_incidents = base_query.scalar() or 1
+
         query = db.session.query(
             Canal.nombre_canal.label("canal"),
             func.count(Incidente.id).label("total")
@@ -30,7 +45,7 @@ class BoardService():
         elif fecha_fin:
             query = query.filter(Incidente.fecha_actualizacion <= fecha_fin)
     
-        total_incidents = query.with_entities(func.count(Incidente.id)).scalar() or 1
+        #total_incidents = query.with_entities(func.count(Incidente.id)).scalar() or 1
     
         results = query.group_by(Canal.nombre_canal).all()
     
