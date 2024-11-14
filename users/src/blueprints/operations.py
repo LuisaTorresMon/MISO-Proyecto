@@ -112,3 +112,12 @@ def validate_token():
 @users_blueprint.route('/ping', methods = ['GET'])
 def health():
     return 'pong', 200
+
+@users_blueprint.route('/ia/user', methods = ['GET'])
+def get_ia_user():
+    headers = request.headers
+    logging.debug(headers)
+    ia_user = headers.get('x-ia-user')
+    if not ia_user:
+        result = user_service.get_user_by_username("agente_ia")
+        return make_response(result, 200)
