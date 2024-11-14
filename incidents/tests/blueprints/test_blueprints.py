@@ -9,7 +9,7 @@ from io import BytesIO
 
 fake = Faker()       
         
-class TestBlueprints():
+class TestBlueprints:
     
     @pytest.fixture(scope='session', autouse=True)
     def populate_database(self):

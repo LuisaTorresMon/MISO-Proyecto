@@ -6,7 +6,7 @@ from .blueprints.blueprints import incident_blueprint
 from .errors.errors import ApiError
 from .subscribe.subscribe_ia_response import subscribe
 import threading
-
+''''''
 app = Config.init()
 
 cors = CORS(app, resources={r"/*": {"origins": "*"}}, expose_headers=["Authorization", "Technology"])
