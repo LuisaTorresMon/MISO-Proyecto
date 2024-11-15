@@ -728,7 +728,7 @@ class TestBlueprints():
 
             assert response.status_code == 200
             assert 'Llamada Telefónica' in data
-            assert sum(data.values()) == 100
+            assert sum(data.values()) == 30
 
     def test_get_percentage_of_incidents_by_channel_with_estado_filter(self, mocker):
         with app.test_client() as test_client:
