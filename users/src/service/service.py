@@ -250,7 +250,8 @@ class UserService():
         return jsonify({
             "message": "Cliente registrado exitosamente.",
             "usuario": new_user['nombre_usuario'],
-            "empresa": nueva_empresa.nombre_empresa
+            "empresa": nueva_empresa.nombre_empresa,
+            "id_company": nueva_empresa.id
         })
 
     def register_agent(self, user):

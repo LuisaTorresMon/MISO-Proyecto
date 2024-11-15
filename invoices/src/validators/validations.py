@@ -27,3 +27,9 @@ class ValidatorInvoice():
     def validate_token_sent(self, token):
         if token is None:
             raise InvoiceGeneralIntegration(403, 'No se ha enviado el token')
+        
+    def validate_data_pay(self, invoice_id, payment_method_id):
+        if not invoice_id:
+            raise InvoiceGeneralIntegration(403, 'El id de la factura no se ha enviado')
+        if not payment_method_id:
+            raise InvoiceGeneralIntegration(403, 'El id del metodo de pago no se ha enviado')

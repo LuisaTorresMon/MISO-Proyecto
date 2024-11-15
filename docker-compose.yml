@@ -28,7 +28,7 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
-      SENGRID_TOKEN: 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
+      SENGRID_TOKEN: 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
     depends_on:
       invoice_db:
         condition: service_healthy
@@ -127,6 +127,8 @@ services:
       POSTGRES_DB: monitor_payment
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
+    ports:
+      - 5436:5432
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 2s

@@ -27,8 +27,6 @@ INCIDENT_URL = os.environ.get('INCIDENT_PATH')
 PLAN_URL = os.environ.get('PLAN_PATH')
 USER_URL = os.environ.get('USER_PATH')
 
-#publisher = pubsub_v1.PublisherClient()
-
 CALL_CHANNEL_ID = 1
 EMAIL_CHANNEL_ID = 2
 MOBILE_APP_CHANNEL_ID = 3
@@ -283,6 +281,8 @@ class InvoiceService():
         
         response = common_utils.send_email(email, subject, content, attached_pdf)
         
+        print(f"email reposnse {response}")
+        
         return response
             
     def get_invoice_pdf(self, token, invoice_id, lang):
@@ -297,7 +297,7 @@ class InvoiceService():
       env = Environment(loader=FileSystemLoader(template_dir))
       
       logo_path = os.path.join(template_dir, 'logo.png')
-
+      
       logging.debug(template_dir)
       
       template = ''
@@ -319,25 +319,38 @@ class InvoiceService():
             
       invoices_schema = [invoice_schema.dump(invoice) for invoice in invoices]
       return invoices_schema
+  
+    def update_state_invoice(self, state, id_invoice):
+        invoice = db.session.query(Invoice).filter(Invoice.id == id_invoice).first()
+        
+        invoice.estado_factura = state        
+        db.session.commit()
+        
+        return invoice_schema.dump(invoice)        
 
-    def encolar(self, invoice):
+    def pay_menthod_queue(self, invoice_id, payment_method_id):
+        
+        publisher = pubsub_v1.PublisherClient()
+        
+        invoice = db.session.query(Invoice).filter(Invoice.id == invoice_id).first()
         
         credentials, project = google.auth.default()
         logging.debug(f"Current account: {credentials.service_account_email}")
         
         logging.debug('Entrando a encolar')
         topic_path = publisher.topic_path(projec_id, tema_publicacion)
+        
+        booleano_aleatorio = random.choice([True, False])
 
         payment_json = json.dumps({
              'valor_pagado': invoice.valor_pagar,
-             'medio_pago_id': 2,
+             'medio_pago_id': payment_method_id,
              'facturacion_id': invoice.id,
-             'es_excepcion': self.es_excepcion
+             'es_excepcion': booleano_aleatorio
         })
         
         logging.debug(f"Entrando a encolar {payment_json}")
 
-        
-        #future = publisher.publish(topic_path, payment_json.encode("utf-8"))
-        #future.result()
+        future = publisher.publish(topic_path, payment_json.encode("utf-8"))
+        future.result()
         logging.debug('Encolado')

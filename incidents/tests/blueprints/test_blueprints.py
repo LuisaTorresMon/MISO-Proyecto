@@ -681,6 +681,29 @@ class TestBlueprints():
             
             assert response_service.status_code == 201
             
+    def test_creacion_incidencia_exitosa_y_consulta_canal_mes(self, mocker):
+        with app.test_client() as test_client:
+            mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+            mock_response_data = {
+                'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+                }
+            }
+
+            mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=mock_response_data)
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('google.cloud.storage.Client')
+            
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+            
+            mes_actual = datetime.now().month
+
+            response_service = test_client.get(F"/incident/channel/2/{mes_actual}", headers=headers)
+            
+            assert response_service.status_code == 200      
+            
     def create_incident(self, test_client, headers):   
                     
         form_data = {'name': fake.name(),
