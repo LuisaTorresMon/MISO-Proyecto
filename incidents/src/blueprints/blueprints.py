@@ -265,8 +265,8 @@ def get_summary_incidents():
         fecha_inicio = request.args.get('fecha_inicio', type=str)
         fecha_fin = request.args.get('fecha_fin', type=str)
 
-        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d') if fecha_inicio else None
-        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d') if fecha_fin else None
+        fecha_inicio = datetime.strptime(fecha_inicio, '%m/%d/%Y') if fecha_inicio else None
+        fecha_fin = datetime.strptime(fecha_fin, '%m/%d/%Y') if fecha_fin else None
 
         return board_service.get_summarized_incidents(
             canal_id=canal_id,

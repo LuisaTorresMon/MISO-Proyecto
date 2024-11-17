@@ -19,7 +19,7 @@ class Report(db.Model):
     nombre_reporte = db.Column(db.String(255), nullable=False)
     fecha_creacion = db.Column(db.DateTime, server_default=func.now(), nullable=True)
     fecha_inicio = db.Column(db.DateTime, nullable=True)
-    fecha_final = db.Column(db.DateTime, nullable=True)
+    fecha_fin = db.Column(db.DateTime, nullable=True)
     estado_id = db.Column(db.Integer, nullable=True)
     tipo_id = db.Column(db.Integer, nullable=True)
     canal_id = db.Column(db.Integer, nullable=True)    
@@ -32,3 +32,4 @@ class ReportSchema(SQLAlchemyAutoSchema):
         include_fk = True
 
     id = fields.String()
+    
