@@ -9,7 +9,8 @@ MICROSERVICES = {
     'invoice': 'http://localhost:3002',
     'payment': 'http://localhost:3001',
     'plan': 'http://localhost:3003',
-    'user': 'http://localhost:3000'
+    'user': 'http://localhost:3000',
+    'report': 'http://localhost:3005'
 }
 
 @app.route('/<service>/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])
