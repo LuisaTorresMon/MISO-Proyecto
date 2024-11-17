@@ -5,6 +5,8 @@ from ..models.model import db, Report, ReportSchema
 from ..errors.errors import ServerSystemException
 from dotenv import load_dotenv
 import random, logging, os
+from weasyprint import HTML
+from jinja2 import Environment, FileSystemLoader, Template
 
 report_schema = ReportSchema()
 
@@ -33,8 +35,7 @@ class ReportService():
 
         except requests.RequestException as e:
             logging.error(f"Error al obtener los incidentes desde {url}: {e}")
-            #raise ServerSystemException("No se pudo obtener los datos de los incidentes. Por favor, contacte al administrador.")
-            raise ("No se pudo obtener los datos de los incidentes. Por favor, contacte al administrador.")
+            raise ServerSystemException("No se pudo obtener los datos de los incidentes. Por favor, contacte al administrador.")
         
     def save_report(self, nombre_reporte, incidentes, estado_id=None, tipo_id=None, canal_id=None, fecha_inicio=None, fecha_fin=None):
         try:
@@ -57,5 +58,29 @@ class ReportService():
         except Exception as e:
             db.session.rollback()
             logging.error(f"Error al guardar el reporte en la base de datos: {e}")
-            #raise ServerSystemException("No se pudo guardar el reporte. Por favor, contacte al administrador.")
-            raise ("No se pudo guardar el reporte. Por favor, contacte al administrador.")
+            raise ServerSystemException("No se pudo guardar el reporte. Por favor, contacte al administrador.")
+
+    def generate_pdf_report(self, nombre_reporte, incidentes):
+        try:
+            template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates'))
+            env = Environment(loader=FileSystemLoader(template_dir))
+
+            logo_path = os.path.join(template_dir, 'logo.png')
+
+            template = env.get_template("template_es.html")
+
+            output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../generated_reports'))
+            os.makedirs(output_dir, exist_ok=True)
+
+            pdf_file = os.path.join(output_dir, f"{nombre_reporte}.pdf")
+
+            rendered_html = template.render(nombre_reporte=nombre_reporte, incidentes=incidentes, logo_path=logo_path)
+
+            HTML(string=rendered_html).write_pdf(pdf_file)
+
+            return pdf_file
+
+        except Exception as e:
+            logging.error(f"Error al generar el PDF: {e}")
+            #raise ServerSystemException("No se pudo generar el PDF del reporte. Por favor, contacte al administrador.")
+            raise ("No se pudo generar el PDF del reporte. Por favor, contacte al administrador.")

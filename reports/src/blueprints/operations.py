@@ -1,6 +1,6 @@
 from datetime import datetime
 import logging
-from flask import Flask, jsonify, make_response, request, Blueprint
+from flask import Flask, jsonify, make_response, request, Blueprint, send_file
 
 from ..errors.errors import ServerSystemException, BadRequestException
 from ..service.report_service import ReportService
@@ -57,7 +57,15 @@ def save_report():
             fecha_fin=fecha_fin
         )
 
-        return jsonify(message="Reporte guardado exitosamente"), 201
+        pdf_file = service_report.generate_pdf_report(nombre_reporte, incidentes)
+
+        # Respuesta con el mensaje y el PDF generado
+        return send_file(
+            pdf_file,
+            as_attachment=True,
+            download_name=f"{nombre_reporte}.pdf",
+            mimetype='application/pdf'
+        )
 
     except Exception as err:
         logging.debug(f"Excepción al guardar el reporte: {err}")
