@@ -5,8 +5,6 @@ from ..models.model import db, Report, ReportSchema
 from ..errors.errors import ServerSystemException
 from dotenv import load_dotenv
 import random, logging, os
-from weasyprint import HTML
-from jinja2 import Environment, FileSystemLoader, Template
 
 report_schema = ReportSchema()
 
@@ -61,6 +59,9 @@ class ReportService():
             raise ServerSystemException("No se pudo guardar el reporte. Por favor, contacte al administrador.")
 
     def generate_pdf_report(self, nombre_reporte, incidentes):
+        from weasyprint import HTML
+        from jinja2 import Environment, FileSystemLoader, Template
+
         try:
             template_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../templates'))
             env = Environment(loader=FileSystemLoader(template_dir))
@@ -82,5 +83,4 @@ class ReportService():
 
         except Exception as e:
             logging.error(f"Error al generar el PDF: {e}")
-            #raise ServerSystemException("No se pudo generar el PDF del reporte. Por favor, contacte al administrador.")
-            raise ("No se pudo generar el PDF del reporte. Por favor, contacte al administrador.")
+            raise ServerSystemException("No se pudo generar el PDF del reporte. Por favor, contacte al administrador.")

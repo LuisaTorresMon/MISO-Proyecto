@@ -59,7 +59,6 @@ def save_report():
 
         pdf_file = service_report.generate_pdf_report(nombre_reporte, incidentes)
 
-        # Respuesta con el mensaje y el PDF generado
         return send_file(
             pdf_file,
             as_attachment=True,
@@ -69,8 +68,7 @@ def save_report():
 
     except Exception as err:
         logging.debug(f"Excepción al guardar el reporte: {err}")
-        #raise ServerSystemException(f"Error al guardar el reporte: {err}, contacte con el administrador")
-        raise (f"Error al guardar el reporte: {err}, contacte con el administrador")
+        raise ServerSystemException(f"Error al guardar el reporte: {err}, contacte con el administrador")
     
 @operations_blueprint.route('/ping', methods = ['GET'])
 def health():
