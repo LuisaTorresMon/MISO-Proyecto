@@ -52,8 +52,6 @@ class BoardService():
         elif fecha_fin:
             query = query.filter(func.date(Incidente.fecha_actualizacion) <= fecha_fin)
     
-        #total_incidents = query.with_entities(func.count(Incidente.id)).scalar() or 1
-    
         results = query.group_by(Canal.nombre_canal).all()
     
         percentages = {
