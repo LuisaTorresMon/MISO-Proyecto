@@ -89,6 +89,25 @@ services:
       - app_net
       - incident_net
 
+  ia:
+    build: ./ia/
+    ports:
+      - "3005:3005"
+    environment:
+      DB_NAME: monitor_incident
+      DB_HOST: incident_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      USERS_PATH: "http://users:3000"
+      OPENAI_API_KEY: ${OPENAI_API_KEY}
+    depends_on:
+      incident_db:
+        condition: service_healthy
+    networks:
+      - app_net
+      - ia_net
+
   user_db:
     image: postgres
     environment:
@@ -176,3 +195,4 @@ networks:
   plan_net:
   incident_net:
   user_net:
+  ia_net:

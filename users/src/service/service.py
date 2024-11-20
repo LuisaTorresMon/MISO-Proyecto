@@ -7,6 +7,7 @@ from flask_jwt_extended import jwt_required, create_access_token, get_current_us
 from ..errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException, ResourceNotFound
 from ..validators.validator import UserValidator
 import logging
+from sqlalchemy import or_
 
 user_schema = UserSchema()
 product_schema = ProductSchema()
@@ -81,7 +82,7 @@ class UserService():
             if stored_user.tipo_usuario.id == 3:
                 stored_user = None
         elif technology == 'MOBILE':
-            stored_user = User.query.filter_by(nombre_usuario=username).join(User.tipo_usuario).filter(TipoUsuario.id == 3).first()
+            stored_user = User.query.filter_by(nombre_usuario=username).join(User.tipo_usuario).filter(or_(TipoUsuario.id == 3, TipoUsuario.id == 1)).first()
         else:
             raise BadRequestException
 
