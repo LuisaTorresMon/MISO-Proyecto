@@ -222,6 +222,22 @@ def find_call_by_id(id):
         logging.debug(f"excepcion {err}")
         raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
 
+@incident_blueprint.route('/channel/<int:channel>/<int:month>', methods=['GET'])
+def find_channel(channel, month):
+    
+    try:
+        headers = request.headers
+        token_encabezado = headers.get('Authorization')
+        logging.debug(token_encabezado)
+         
+        validator_incident.validate_token_sent(token_encabezado)
+        validator_incident.valid_token(token_encabezado)
+        
+        return incident_service.get_number_incident_by_channel_and_month(channel, month)
+    except Exception as err:
+        logging.debug(f"excepcion {err}")
+        raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
+
 @incident_blueprint.route('/channels/percentage', methods=['GET'])
 def get_percentage_of_incidents_by_channel():
     try:
@@ -249,6 +265,7 @@ def get_percentage_of_incidents_by_channel():
     except Exception as err:
         logging.debug(f"excepcion {err}")
         raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
+    
     
 @incident_blueprint.route('/summary', methods=['GET'])
 def get_summary_incidents():
