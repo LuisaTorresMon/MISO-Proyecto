@@ -11,8 +11,8 @@ validator_invoice = ValidatorInvoice()
 def healthcheck():
     return 'pong', 200
 
-@invoice_blueprint.route('/create/<int:month>/<int:empresa_id>', methods=['POST'])
-def get_invoice_by_enterprise(month, empresa_id):
+@invoice_blueprint.route('/create/<int:month>/<int:empresa_id>/<string:lang>', methods=['POST'])
+def get_invoice_by_enterprise(month, empresa_id,lang):
     
     headers = request.headers
     token_encabezado = headers.get('Authorization')
@@ -21,7 +21,7 @@ def get_invoice_by_enterprise(month, empresa_id):
     validator_invoice.validate_token_sent(token_encabezado)
     validator_invoice.valid_token(token_encabezado)
     
-    invoice_response = invoice_service.build_invoice_client(token_encabezado, month, empresa_id)
+    invoice_response = invoice_service.build_invoice_client(token_encabezado, month, empresa_id, lang)
 
     return invoice_response, 201
 

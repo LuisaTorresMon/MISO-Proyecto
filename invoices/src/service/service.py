@@ -34,7 +34,7 @@ DOLAR_EXCHANGE = 4300
 
 class InvoiceService():
     
-    def build_invoice_client(self, token, month, company_id):
+    def build_invoice_client(self, token, month, company_id, lang):
                
         invoice = db.session.query(Invoice).filter(
             Invoice.empresa_id == company_id,
@@ -45,18 +45,27 @@ class InvoiceService():
         logging.debug(f"active_plan {active_plan}")
 
         if not active_plan:
-            raise InvoiceGeneralIntegration(404, "No tienes un plan activo, por ende no se puede cargar la factura")
-        
+            if lang == 'es':
+                raise InvoiceGeneralIntegration(416, "No tienes un plan activo, por ende no se puede cargar la factura")
+            else:
+                raise InvoiceGeneralIntegration(416, "You do not have an active plan, therefore the invoice cannot be charged.")
+
         initial_date_plan_string = active_plan['fecha_inicio_plan']
         initial_date_month = datetime.fromisoformat(initial_date_plan_string).month
                         
         if(initial_date_month > month):
-            raise InvoiceGeneralIntegration(404, "El mes de busqueda es menor a la fecha de inicio de vigencia del plan")
+            if lang == 'es':
+                raise InvoiceGeneralIntegration(404, "El mes de busqueda es menor a la fecha de inicio de vigencia del plan")
+            else:
+                raise InvoiceGeneralIntegration(404, "The search month is less than the effective date of the plan.")
+      
 
         current_month = datetime.now().month
         if(current_month < month):
-            raise InvoiceGeneralIntegration(404, "El mes de busqueda es mayor al mes actual")
-
+            if lang == 'es':
+                raise InvoiceGeneralIntegration(404, "El mes de busqueda es mayor al mes actual")
+            else:
+                raise InvoiceGeneralIntegration(404, "The search month is greater than the current month.")              
         
         if(invoice):
             if(invoice.estado_factura == 'Pendiente'):

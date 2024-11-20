@@ -25,7 +25,7 @@ class TestBlueprints():
         mocker.patch('src.service.service.InvoiceService.get_incidents_count_by_username', return_value={'total_price': 1, 'incident_count': 1, 'channel_price': 1})
         mocker.patch('src.service.service.InvoiceService.get_active_plan_by_company', return_value={'fecha_inicio_plan': f"{first_day_year}", 'precio_plan': 500})
 
-        response_service = test_client.post('/invoice/create/5/1', headers=headers)
+        response_service = test_client.post('/invoice/create/5/1/es', headers=headers)
         invoice_data = response_service.get_json()
         
         print(invoice_data)
@@ -45,7 +45,7 @@ class TestBlueprints():
 
         mocker.patch('src.service.service.InvoiceService.get_company', return_value={'total_price': 1, 'incident_count': 1, 'channel_price': 1})
 
-        response_service = test_client.post('/invoice/create/5/1', headers=headers)
+        response_service = test_client.post('/invoice/create/5/1/es', headers=headers)
         invoice_data = response_service.get_json()
         
         print(invoice_data)
@@ -66,7 +66,7 @@ class TestBlueprints():
         mocker.patch('src.service.service.InvoiceService.get_incidents_count_by_username', return_value={'total_price': 1, 'incident_count': 1, 'channel_price': 1})
         mocker.patch('src.service.service.InvoiceService.get_company', return_value={'total_price': 1, 'incident_count': 1, 'channel_price': 1})
 
-        response_service = test_client.post('/invoice/create/5/1', headers=headers)
+        response_service = test_client.post('/invoice/create/5/1/es', headers=headers)
         invoice_data = response_service.get_json()
         
         print(invoice_data)
@@ -98,7 +98,7 @@ class TestBlueprints():
         mocker.patch('src.service.service.InvoiceService.get_incidents_count_by_username', return_value={'total_price': 1, 'incident_count': 1, 'channel_price': 1})
         mocker.patch('src.service.service.InvoiceService.get_company', return_value={'total_price': 1, 'incident_count': 1, 'channel_price': 1})
 
-        response_service = test_client.post('/invoice/create/5/1', headers=headers)
+        response_service = test_client.post('/invoice/create/5/1/es', headers=headers)
         invoice_data = response_service.get_json()
         
         print(invoice_data)
@@ -128,7 +128,7 @@ class TestBlueprints():
         mocker.patch('src.service.service.InvoiceService.get_incidents_count_by_username', return_value={'total_price': 1, 'incident_count': 1, 'channel_price': 1})
         mocker.patch('src.service.service.InvoiceService.get_company', return_value={'total_price': 1, 'incident_count': 1, 'channel_price': 1})
 
-        response_service = test_client.post('/invoice/create/5/1', headers=headers)
+        response_service = test_client.post('/invoice/create/5/1/es', headers=headers)
         invoice_data = response_service.get_json()
         
         print(invoice_data)
