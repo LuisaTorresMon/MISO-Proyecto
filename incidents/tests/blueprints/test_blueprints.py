@@ -859,6 +859,8 @@ class TestBlueprints:
         with app.test_client() as test_client:
             response = test_client.get('/incident/channels/percentage')
             data = response.get_json()
+            
+            print(f"response {response.text}")
 
             assert response.status_code == 500
             assert 'msg' in data
