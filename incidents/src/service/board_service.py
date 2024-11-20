@@ -5,6 +5,7 @@ from ..utils.utils import CommonUtils
 from ..errors.errors import ServerSystemException
 from dotenv import load_dotenv
 import random, logging, os
+from datetime import datetime
 
 incident_schema = IncidenteSchema()
 common_utils = CommonUtils()
@@ -33,27 +34,33 @@ class BoardService():
             Canal.nombre_canal.label("canal"),
             func.count(Incidente.id).label("total")
         ).join(Canal, Incidente.canal_id == Canal.id)
+
+        if fecha_inicio:
+            fecha_inicio = fecha_inicio.date()
+
+        if fecha_fin:
+            fecha_fin = fecha_fin.date()
     
         if canal_id:
             query = query.filter(Incidente.canal_id == canal_id)
         if estado_id:
             query = query.filter(Incidente.estado_id == estado_id)
         if fecha_inicio and fecha_fin:
-            query = query.filter(Incidente.fecha_creacion.between(fecha_inicio, fecha_fin))
+            query = query.filter(func.date(Incidente.fecha_creacion).between(fecha_inicio, fecha_fin))
         elif fecha_inicio:
-            query = query.filter(Incidente.fecha_creacion >= fecha_inicio)
+            query = query.filter(func.date(Incidente.fecha_creacion) >= fecha_inicio)
         elif fecha_fin:
-            query = query.filter(Incidente.fecha_actualizacion <= fecha_fin)
-    
-        #total_incidents = query.with_entities(func.count(Incidente.id)).scalar() or 1
+            query = query.filter(func.date(Incidente.fecha_actualizacion) <= fecha_fin)
     
         results = query.group_by(Canal.nombre_canal).all()
     
         percentages = {
             canal: round((total / total_incidents) * 100) for canal, total in results
         }
-        
-        return percentages
+
+        key_value_array = [{"channel": canal, "value": percentage} for canal, percentage in percentages.items()]
+
+        return jsonify(channels=key_value_array)
     
     def get_summarized_incidents(self, canal_id=None, estado_id=None, fecha_inicio=None, fecha_fin=None):        
         query = db.session.query(
@@ -68,17 +75,23 @@ class BoardService():
         ).join(Canal, Incidente.canal_id == Canal.id) \
         .join(Estado, Incidente.estado_id == Estado.id) \
         .join(Tipo, Incidente.tipo_id == Tipo.id)
-        
+
+        if fecha_inicio:
+            fecha_inicio = fecha_inicio.date()
+
+        if fecha_fin:
+            fecha_fin = fecha_fin.date()
+
         if canal_id:
             query = query.filter(Incidente.canal_id == canal_id)
         if estado_id:
             query = query.filter(Incidente.estado_id == estado_id)
         if fecha_inicio and fecha_fin:
-            query = query.filter(Incidente.fecha_creacion.between(fecha_inicio, fecha_fin))
+            query = query.filter(func.date(Incidente.fecha_creacion).between(fecha_inicio, fecha_fin))
         elif fecha_inicio:
-            query = query.filter(Incidente.fecha_creacion >= fecha_inicio)
+            query = query.filter(func.date(Incidente.fecha_creacion) >= fecha_inicio)
         elif fecha_fin:
-            query = query.filter(Incidente.fecha_actualizacion <= fecha_fin)
+            query = query.filter(func.date(Incidente.fecha_actualizacion) <= fecha_fin)
         
         incidentes = query.all()
         

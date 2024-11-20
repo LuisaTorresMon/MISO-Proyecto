@@ -6,7 +6,7 @@ from datetime import datetime
 from src.main import app
 from src.models.model import db, Product, ProductPerson
 from src.service.service import UserService
-from src.errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException
+from src.errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException, ResourceNotFound
 
 fake = Faker()    
 user_service = UserService()
@@ -171,6 +171,36 @@ class TestServices():
         with pytest.raises(IncorrectUserOrPasswordException ):
             user_service.signIn(mock_user)
 
+    def test_get_user_by_username_raises_exception(self, mocker):
+        mock_user_query = mocker.MagicMock()
+        mock_user_query.first.return_value = None
+        mocker.patch('src.models.model.User.query.filter_by', return_value=mock_user_query)
+        with pytest.raises(ResourceNotFound ):
+            user_service.get_user_by_username(fake.user_name())
+
+    def test_get_user_by_id_raises_exception(self, mocker):
+        mock_user_query = mocker.MagicMock()
+        mock_user_query.first.return_value = None
+        mocker.patch('src.models.model.User.query.filter_by', return_value=mock_user_query)
+        with pytest.raises(ResourceNotFound ):
+            user_service.get_user_by_id(fake.user_name())
+
+    def test_get_person_by_id_raises_exception(self, mocker):
+        mock_user_query = mocker.MagicMock()
+        mock_user_query.first.return_value = None
+        mocker.patch('src.models.model.User.query.filter_by', return_value=mock_user_query)
+        with pytest.raises(ResourceNotFound ):
+            user_service.get_person_by_id(fake.random_number())
+
+    def test_get_agents_by_company_is_empty(self, mocker):
+        mock_user_query = mocker.MagicMock()
+        mock_user_query.first.return_value = None
+        mocker.patch('src.models.model.User.query.filter_by', return_value=[])
+
+        agents = user_service.get_agents_by_company(fake.random_number())
+
+        assert len(agents) == 0
+
     def create_product(self):
         with app.test_client() as test_client:
 
@@ -230,3 +260,4 @@ class TestServices():
         hashed_password = bcrypt.hashpw(password, salt)
 
         return hashed_password.decode('utf-8')
+

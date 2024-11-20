@@ -122,6 +122,7 @@ class TipoUsuarioSchema(SQLAlchemyAutoSchema):
 def cargar_datos_iniciales():
     
     automated_person = db.session.query(Person).filter_by(numero_identificacion="0000000001").first()
+    ia_person = db.session.query(Person).filter_by(numero_identificacion="0000000002").first()
     person = db.session.query(Person).filter_by(numero_identificacion="1030661927").first()
 
     if not person:
@@ -140,7 +141,7 @@ def cargar_datos_iniciales():
             print("La persona ya existe en la base de datos.")
             
     if not automated_person:
-            person = Person(
+            automated_person = Person(
                 nombres="agente",
                 apellidos="automatico",
                 tipo_identificacion="1",
@@ -148,9 +149,24 @@ def cargar_datos_iniciales():
                 telefono="3142567890",
                 correo_electronico="automation_test@hotmail.com",
             )
-            db.session.add(person)
+            db.session.add(automated_person)
             db.session.commit()
             print("Nueva persona creada.")
+    else:
+            print("La persona ya existe en la base de datos.")
+
+    if not ia_person:
+            ia_person = Person(
+                nombres="ia",
+                apellidos="automatico",
+                tipo_identificacion="2",
+                numero_identificacion="0000000002",
+                telefono="3142567890",
+                correo_electronico="ia_test@hotmail.com",
+            )
+            db.session.add(ia_person)
+            db.session.commit()
+            print("Usuario IA creado")
     else:
             print("La persona ya existe en la base de datos.")
     
@@ -175,7 +191,7 @@ def cargar_datos_iniciales():
 
         users = [
             User(id_empresa=None, id_tipousuario = 1, id_persona=person.id, nombre_usuario="sa", contrasena=hashed_password.decode("utf-8")),  
-            User(id_empresa=None, id_tipousuario = 2, id_persona=person.id, nombre_usuario="test_agent", contrasena=hashed_password.decode("utf-8")) 
+            User(id_empresa=None, id_tipousuario = 2, id_persona=automated_person.id, nombre_usuario="test_agent", contrasena=hashed_password.decode("utf-8")),
         ]
 
         db.session.bulk_save_objects(users)
@@ -195,5 +211,17 @@ def cargar_datos_iniciales():
                                 contrasena='1')
         
         db.session.add(automation_agent) 
+        db.session.commit()
+
+    ia_agent = db.session.query(User).filter(User.nombre_usuario == "agente_ia").first()
+    if not ia_agent:
+        ia_person = db.session.query(Person).filter(Person.numero_identificacion == '0000000002').first()
+        ia_agent = User(id_empresa=None,
+                                id_persona=ia_person.id,
+                                id_tipousuario=2,
+                                nombre_usuario="agente_ia",
+                                contrasena='1')
+
+        db.session.add(ia_agent)
         db.session.commit()
         

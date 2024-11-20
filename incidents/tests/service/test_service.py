@@ -1,6 +1,9 @@
 from datetime import datetime, timedelta
+
+import faker
 import pytest
 from io import BytesIO
+import json
 from faker import Faker
 from src.main import app
 from src.models.models import Incidente, db, Canal, Estado, Tipo 
@@ -15,7 +18,7 @@ incident_service = IncidentService()
 call_service = CallsService()
 board_service = BoardService()
 
-class TestService():
+class TestService:
 
     @pytest.fixture(scope='session', autouse=True)
     def populate_database(self):
@@ -64,7 +67,8 @@ class TestService():
     def test_creacion_incidencia_exitosa_creacion_persona(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.requests.post', return_value=mocker.Mock(status_code=201, json=lambda: {'id': 1}))
-
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('src.service.incident_service.publish_ia_request')
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
             
             name = fake.name()
@@ -104,6 +108,8 @@ class TestService():
             mocker.patch('src.service.incident_service.requests.put', return_value=mocker.Mock(status_code=201, json=lambda: {'id': 1}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('src.service.incident_service.publish_ia_request')
 
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
             
@@ -145,6 +151,9 @@ class TestService():
     def test_creacion_incidencia_exitosa_actualizacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.requests.put', return_value=mocker.Mock(status_code=201, json=lambda: {'id': 1}))
+            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('src.service.incident_service.publish_ia_request')
+
             mock_response_data = {
                 'persona': {
                 'apellidos': 'ApellidoAntiguo',
@@ -237,17 +246,30 @@ class TestService():
                                   fecha_actualizacion=datetime.now() + timedelta(hours=1), usuario_creador_id=1, usuario_asignado_id=1, persona_id=1, tipo_id=1)
 
             percentages = board_service.get_percentage_by_channel()
-            assert percentages == {
-                'Llamada Telefónica': 50,
-                'Correo Electrónico': 30,
-                'App Movil': 20
+            response_as_dict = json.loads(percentages.response[0].decode('utf-8'))
+            response_as_dict['channels'] = sorted(
+                [{'channel': c['channel'], 'value': c['value']} for c in
+                 response_as_dict['channels']],
+                key=lambda x: x['channel']
+            )
+            expected = {
+                'channels': [
+                    {'channel': 'App Movil', 'value': 20},
+                    {'channel': 'Correo Electrónico', 'value': 30},
+                    {'channel': 'Llamada Telefónica', 'value': 50},
+                ]
             }
+
+            assert response_as_dict == expected, f"Diferencias encontradas: {response_as_dict} != {expected}"
     
     def test_get_percentage_by_channel_with_canal_filter(self):
         with app.app_context():
             percentages = board_service.get_percentage_by_channel(canal_id=1)
-            assert 'Llamada Telefónica' in percentages
-            assert sum(percentages.values()) == 50
+            response_as_dict = percentages.get_json()
+            exist_call = any(channel['channel'] == 'Llamada Telefónica' for channel in response_as_dict['channels'])
+            assert exist_call
+            total_value = sum(channel['value'] for channel in response_as_dict['channels'])
+            assert total_value == 50
     
     def test_get_percentage_by_channel_with_estado_filter(self):
         with app.app_context():
@@ -255,8 +277,11 @@ class TestService():
                                   fecha_actualizacion=datetime.now() + timedelta(hours=1), usuario_creador_id=1, usuario_asignado_id=1, persona_id=1, tipo_id=1)
 
             percentages = board_service.get_percentage_by_channel(estado_id=2)
-            assert 'Llamada Telefónica' in percentages
-            assert sum(percentages.values()) == 100 
+            response_as_dict = percentages.get_json()
+            exist_call = any(channel['channel'] == 'Llamada Telefónica' for channel in response_as_dict['channels'])
+            assert exist_call
+            total_value = sum(channel['value'] for channel in response_as_dict['channels'])
+            assert total_value == 100
     
     def test_get_percentage_by_channel_with_date_range(self):
         with app.app_context():
@@ -269,8 +294,9 @@ class TestService():
                                   fecha_actualizacion=datetime.now() + timedelta(hours=3), usuario_creador_id=1, usuario_asignado_id=1, persona_id=1, tipo_id=1)
 
             percentages = board_service.get_percentage_by_channel(fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
-            assert 'Llamada Telefónica' in percentages
-            assert 'Correo Electronico' not in percentages  
+            response_as_dict = percentages.get_json()
+            exist_call = any(channel['channel'] == 'Llamada Telefónica' for channel in response_as_dict['channels'])
+            assert exist_call
 
     def test_get_percentage_by_channel_with_combined_filters(self):
         with app.app_context():
@@ -283,8 +309,11 @@ class TestService():
                                   fecha_actualizacion=datetime.now() + timedelta(hours=3), usuario_creador_id=1, usuario_asignado_id=1, persona_id=1, tipo_id=1)
 
             percentages = board_service.get_percentage_by_channel(canal_id=1, estado_id=1, fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
-            assert 'Llamada Telefónica' in percentages
-            assert sum(percentages.values()) == 72
+            response_as_dict = percentages.get_json()
+            exist_call = any(channel['channel'] == 'Llamada Telefónica' for channel in response_as_dict['channels'])
+            assert exist_call
+            total_value = sum(channel['value'] for channel in response_as_dict['channels'])
+            assert total_value == 72
     
     def test_get_summarized_incidents_all(self):
         with app.test_client() as test_client:
@@ -345,4 +374,123 @@ class TestService():
             assert data['total'] == 1
             assert data['incidentes'][0]['canal'] == 'Llamada Telefónica'
             assert data['incidentes'][0]['estado'] == 'Abierto'
-            
+
+    def test_get_user_ia_by_username_success(self, mocker):
+        mock_response_data = {
+            'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+            }
+        }
+
+        mocker.patch('src.service.incident_service.requests.get',
+                     return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
+
+        user_ia = incident_service.get_user_ia_by_username()
+
+        assert user_ia is not None
+
+    def test_get_user_ia_by_username_fail(self, mocker):
+        mock_response_data = {
+            'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+            }
+        }
+
+        mocker.patch('src.service.incident_service.requests.get',
+                     return_value=mocker.Mock(status_code=400, json=lambda: mock_response_data))
+
+        user_ia = incident_service.get_user_ia_by_username()
+
+        assert user_ia is None
+
+    def test_get_user_by_username_fail(self, mocker):
+        mock_response_data = {
+            'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+            }
+        }
+
+        mocker.patch('src.service.incident_service.requests.get',
+                     return_value=mocker.Mock(status_code=400, json=lambda: mock_response_data))
+
+        user = incident_service.get_user_by_username(fake.word(), fake.user_name())
+
+        assert user is None
+
+    def test_get_user_by_username_success(self, mocker):
+        mock_response_data = {
+            'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+            }
+        }
+
+        mocker.patch('src.service.incident_service.requests.get',
+                     return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
+
+        user = incident_service.get_user_by_username(fake.word(), fake.user_name())
+
+        assert user is not None
+
+    def test_get_user_success(self, mocker):
+        mock_response_data = {
+            'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+            }
+        }
+
+        mocker.patch('src.service.incident_service.requests.get',
+                     return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
+
+        user = incident_service.get_user(fake.word(), fake.random_number())
+
+        assert user is not None
+
+    def test_get_person_success(self, mocker):
+        mock_response_data = {
+            'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+            }
+        }
+
+        mocker.patch('src.service.incident_service.requests.get',
+                     return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
+
+        user = incident_service.get_person(fake.word(), fake.random_number())
+
+        assert user is not None
+
+    def test_get_person_fail(self, mocker):
+        mock_response_data = {
+            'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+            }
+        }
+
+        mocker.patch('src.service.incident_service.requests.get',
+                     return_value=mocker.Mock(status_code=400, json=lambda: mock_response_data))
+
+        user = incident_service.get_person(fake.word(), fake.random_number())
+
+        assert user is None
+
+    def test_get_person_by_id_success(self, mocker):
+        mock_response_data = {
+            'persona': {
+                'apellidos': 'ApellidoAntiguo',
+                'nombres': 'NombreNuevo'
+            }
+        }
+
+        mocker.patch('src.service.incident_service.requests.get',
+                     return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
+
+        user = incident_service.get_person_by_id(fake.random_number(), fake.word())
+
+        assert user is not None
