@@ -60,6 +60,57 @@ jobs:
         working-directory: ./plans
         run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
 
+  test-invoices-microservices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./invoices
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./invoices
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./invoices
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
+
+  test-payments-microservices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./payments
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./payments
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./payments
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
+
+  test-reports-microservices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./reports
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./reports
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./reports
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
+
   test-ia-microservices:
     runs-on: ubuntu-latest
     strategy:
@@ -82,6 +133,8 @@ jobs:
       - test-users-microservices
       - test-incidents-microservices
       - test-plans-microservices
+      - test-reports-microservices
+      - test-ia-microservices
     if: ${{ contains(github.event.head_commit.message, 'release') || contains(github.event.head_commit.message, 'develop') }}
     runs-on: ubuntu-latest
     steps:

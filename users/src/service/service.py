@@ -174,6 +174,13 @@ class UserService():
         person = Person.query.filter_by(tipo_identificacion=identity_type, numero_identificacion=identity_number).first()        
         return person
 
+    def get_company_by_id(self, id):
+        company = Empresa.query.filter(Empresa.id==id).first()
+        if company:
+            return company
+        else:
+            raise ResourceNotFound
+        
     def get_person_by_id(self, id):
         person = Person.query.filter_by(id=id).first()
         if person:
@@ -244,7 +251,8 @@ class UserService():
         return jsonify({
             "message": "Cliente registrado exitosamente.",
             "usuario": new_user['nombre_usuario'],
-            "empresa": nueva_empresa.nombre_empresa
+            "empresa": nueva_empresa.nombre_empresa,
+            "id_company": nueva_empresa.id
         })
 
     def register_agent(self, user):
