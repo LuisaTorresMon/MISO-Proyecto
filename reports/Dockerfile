@@ -10,6 +10,6 @@ COPY . .
 
 ENV FLASK_APP=src/main.py
 
-EXPOSE 3005
+EXPOSE 3006
 
-CMD ["pipenv", "run", "python", "-m", "flask", "run", "--host=0.0.0.0", "--port=3005"]
+CMD ["pipenv", "run", "python", "-m", "flask", "run", "--host=0.0.0.0", "--port=3006"]

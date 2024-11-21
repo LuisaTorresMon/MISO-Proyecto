@@ -40,4 +40,4 @@ def handle_exception(err):
 app.register_blueprint(operations_blueprint,url_prefix='/report')
 
 if __name__ == "__main__":
-    app.run(host='0.0.0.0', port=3005, debug=True)
+    app.run(host='0.0.0.0', port=3006, debug=True)
