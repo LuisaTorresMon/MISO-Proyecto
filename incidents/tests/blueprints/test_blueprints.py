@@ -907,8 +907,8 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
-            fecha_inicio = (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
-            fecha_fin = (datetime.now() - timedelta(days=3)).strftime('%Y-%m-%d')
+            fecha_inicio = (datetime.now() - timedelta(days=6)).strftime('%m/%d/%Y')
+            fecha_fin = (datetime.now() - timedelta(days=3)).strftime('%m/%d/%Y')
             
             response = test_client.get('/incident/summary', query_string={'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
             data = response.get_json()
@@ -922,8 +922,8 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
-            fecha_inicio = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
-            fecha_fin = datetime.now().strftime('%Y-%m-%d')
+            fecha_inicio = (datetime.now() - timedelta(days=10)).strftime('%m/%d/%Y')
+            fecha_fin = datetime.now().strftime('%m/%d/%Y')
             
             response = test_client.get('/incident/summary', query_string={'canal_id': 1, 'estado_id': 1, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
             data = response.get_json()
