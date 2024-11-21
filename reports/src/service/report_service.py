@@ -1,12 +1,15 @@
 from flask import jsonify
 import requests
 from sqlalchemy import func
+
+from ..utils.utils import CommonUtils
 from ..models.model import db, Report, ReportSchema
 from ..errors.errors import ServerSystemException
 from dotenv import load_dotenv
 import random, logging, os
 
 report_schema = ReportSchema()
+common_utils = CommonUtils()
 
 load_dotenv('.env.template')
 
@@ -58,7 +61,7 @@ class ReportService():
             logging.error(f"Error al guardar el reporte en la base de datos: {e}")
             raise ServerSystemException("No se pudo guardar el reporte. Por favor, contacte al administrador.")
 
-    def generate_pdf_report(self, nombre_reporte, incidentes):
+    def generate_pdf_report(self, nombre_reporte, incidentes, lang):
         from weasyprint import HTML
         from jinja2 import Environment, FileSystemLoader, Template
 
@@ -68,7 +71,11 @@ class ReportService():
 
             logo_path = os.path.join(template_dir, 'logo.png')
 
-            template = env.get_template("template_es.html")
+            template = ''
+            if(lang == 'es'): 
+                template = env.get_template("template_es.html")
+            else:
+                template = env.get_template("template_en.html")
 
             output_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../generated_reports'))
             os.makedirs(output_dir, exist_ok=True)
@@ -84,3 +91,20 @@ class ReportService():
         except Exception as e:
             logging.error(f"Error al generar el PDF: {e}")
             raise ServerSystemException("No se pudo generar el PDF del reporte. Por favor, contacte al administrador.")
+    
+    def send_report_pdf_by_email(self, email, name_report, lang, attached_pdf):
+        subject = ''
+        content = ''
+                
+        if(lang == 'es'):
+            subject = f"Envío del reporte {name_report}"
+            content = f"Se realiza el envio automatico del reporte {name_report}, la encontrará adjunta en formato PDF"
+        else:
+            subject = f"Sending the report {name_report}"
+            content = f"The report {name_report} is automatically sent, you will find it attached in PDF format"
+        
+        response = common_utils.send_email(email, subject, content, attached_pdf)
+        
+        print(f"email response {response}")
+        
+        return response

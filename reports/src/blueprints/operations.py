@@ -30,7 +30,8 @@ def save_report():
         fecha_inicio = data.get('fecha_inicio')
         fecha_fin = data.get('fecha_fin')
         nombre_reporte = data.get('nombre_reporte') 
-        tipo_id = data.get('tipo_id')  
+        tipo_id = data.get('tipo_id')
+        lang = data.get('lang')  
 
         validator_report.nombre_reporte = nombre_reporte
         validator_report.validar_campos_requeridos()
@@ -57,7 +58,7 @@ def save_report():
             fecha_fin=fecha_fin
         )
 
-        pdf_file = service_report.generate_pdf_report(nombre_reporte, incidentes)
+        pdf_file = service_report.generate_pdf_report(nombre_reporte, incidentes, lang)
 
         return send_file(
             pdf_file,
