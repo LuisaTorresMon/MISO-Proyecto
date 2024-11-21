@@ -14,12 +14,9 @@ class TestBlueprints:
             return_value=mock_prediction
         )
 
-        # Crear un cliente de pruebas de Flask
         with app.test_client() as client:
-            # Datos de entrada simulados
             input_data = {"subject": "subject", "context": "some test context"}
 
-            # Hacer la solicitud POST
             response = client.post(
                 '/ia/sync',
                 json=input_data  # Enviar datos como JSON
