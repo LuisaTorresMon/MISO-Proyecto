@@ -7,7 +7,7 @@ class Config:
 
     @staticmethod
     def init():
-        app = Flask(__name__) 
+        app = Flask(__name__, template_folder='templates') 
         
         load_dotenv('.env.template')       
       

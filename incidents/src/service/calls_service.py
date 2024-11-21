@@ -46,4 +46,5 @@ class CallsService():
         def get_call_by_id(self, id): 
             call = db.session.query(Llamada).filter_by(id=id).first()
             return calls_schema.dump(call)
-       
+        
+        

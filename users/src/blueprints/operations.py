@@ -1,7 +1,7 @@
 from flask import Flask, jsonify, make_response, request, Blueprint
 from ..service.service import UserService
 from ..validators.validator import UserValidator
-from ..models.model import PersonSchema
+from ..models.model import PersonSchema, EmpresaSchema
 import logging
 from flask_jwt_extended import jwt_required, get_jwt_identity, get_jwt
 
@@ -9,7 +9,7 @@ users_blueprint = Blueprint('users', __name__)
 user_service = UserService()
 user_validator = UserValidator()
 person_schema = PersonSchema()
-
+company_schema = EmpresaSchema()
 
 # Crear usuario
 @users_blueprint.route('/create', methods = ['POST'])
@@ -41,6 +41,12 @@ def find_user_by_id(id):
 def find_user_by_username(username):
     user = user_service.get_user_by_username(username)
     return make_response(user, 200)
+
+@users_blueprint.route('/company/<int:id>', methods = ['GET'])
+@jwt_required()
+def find_company_by_id(id):
+    company = user_service.get_company_by_id(id)
+    return make_response(company_schema.dump(company), 200)
 
 @users_blueprint.route('/person/<int:id>', methods = ['GET'])
 @jwt_required()
@@ -112,3 +118,12 @@ def validate_token():
 @users_blueprint.route('/ping', methods = ['GET'])
 def health():
     return 'pong', 200
+
+@users_blueprint.route('/ia/user', methods = ['GET'])
+def get_ia_user():
+    headers = request.headers
+    logging.debug(headers)
+    ia_user = headers.get('x-ia-user')
+    if not ia_user:
+        result = user_service.get_user_by_username("agente_ia")
+        return make_response(result, 200)

@@ -55,6 +55,7 @@ class Contract(db.Model):
     es_activo = db.Column(db.Boolean)
     plan_id = db.Column(db.Integer)
     empresa_id = db.Column(db.Integer)
+    
 
 class ContractSchema(SQLAlchemyAutoSchema):
     class Meta:

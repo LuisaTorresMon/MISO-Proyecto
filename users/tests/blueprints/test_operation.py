@@ -76,6 +76,26 @@ class TestOperations():
             assert response_query.status_code == 200
             assert data_query.get('tipo_identificacion') == person_data.get('tipo_identificacion') and data_query.get('numero_identificacion') == person_data.get('numero_identificacion')
 
+    def test_find_company_by_id(self):   
+        with app.test_client() as test_client:
+          
+            token = self.generate_token()
+
+            headers = {'Authorization': f"Bearer {token}"}
+
+            client_response = self.create_client(headers)
+            print(client_response.text)
+            print(client_response.get_json())
+               
+            client_data = client_response.get_json()
+            response_query = test_client.get(f"/user/company/{client_data['id_company']}", headers=headers)
+            print(response_query.get_json())
+            data_query = response_query.get_json()
+            
+            assert response_query.status_code == 200
+            assert data_query.get('id') == f"{client_data['id_company']}"
+
+
     def test_find_person_by_id(self):   
         with app.test_client() as test_client:
           
@@ -226,6 +246,29 @@ class TestOperations():
             }
 
             response = test_client.post('/user/person/create',json=person_data, headers=headers)
+            
+            return response
+        
+    def create_client(self, headers):
+        with app.test_client() as test_client:
+
+            password = fake.password()
+            user_type = 'client'
+
+            user_data = {
+                "nombre_empresa": fake.company(),
+                "email": fake.email(),
+                "tipo_identificacion": 1,
+                "numero_identificacion": fake.random_number(digits=10),
+                "sector": fake.company(),
+                "telefono": fake.random_number(digits=10),
+                "pais": fake.country(),
+                "usuario": fake.user_name(),
+                "contrasena": password,
+                "confirmar_contrasena": password
+            }
+
+            response = test_client.post('/user/register/client',json=user_data, headers=headers)
             
             return response
 
