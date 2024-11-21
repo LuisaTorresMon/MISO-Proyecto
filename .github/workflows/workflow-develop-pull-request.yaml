@@ -132,7 +132,7 @@ jobs:
     needs: 
       - test-users-microservices
       - test-incidents-microservices
-      - test-invoice-microservices
+      - test-invoices-microservices
       - test-plans-microservices
       - test-reports-microservices
       - test-ia-microservices
