@@ -141,6 +141,8 @@ jobs:
       - name: Getting branch name for merge
         id: branch-name
         uses: tj-actions/branch-names@v6
+      - name: Mostrar run_number
+        run: echo "El número actual del run es ${{ github.run_number }}"
       - name: Merge with develop from ${{ steps.branch-name.outputs.ref_branch }}
         uses: tukasz/direct-merge-action@master
         with:
