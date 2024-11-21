@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ nombre_reporte }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        h1 { text-align: center; color: #126173; font-weight: bold; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #96D4D4; padding: 8px; text-align: left; }
+        th { background-color: #f4f4f4; }
+        .header {
+            text-align: center; 
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 100px;
+            height: auto;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <img src="file://{{ logo_path }}" alt="Logo">
+    </div>
+    <h1>{{ nombre_reporte }}</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Código</th>
+                <th>Asunto</th>
+                <th>Canal</th>
+                <th>Estado</th>
+                <th>Tipo</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for incidente in incidentes %}
+            <tr>
+                <td>{{ incidente.codigo }}</td>
+                <td>{{ incidente.asunto }}</td>
+                <td>{{ incidente.canal }}</td>
+                <td>{{ incidente.estado }}</td>
+                <td>{{ incidente.tipo }}</td>
+                <td>{{ incidente.fecha_actualizacion }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>

@@ -1,58 +1,150 @@
 import json
 import pytest
 from faker import Faker
+from pytest_mock import MockerFixture, mocker
+from requests import patch
 from src.main import app
-from src.models.models import Incidente, db, Canal, Estado, Tipo 
-from google.auth.credentials import AnonymousCredentials 
+from src.models.model import db
 from datetime import datetime, timedelta
 from io import BytesIO
+from src.service.report_service import ReportService
 
 fake = Faker()       
+
+@pytest.fixture
+def client():
+    with app.test_client() as client:
+        yield client
+
+class TestBlueprints():
+    def test_save_report_success(self, mocker: MockerFixture):
+        with app.test_client() as test_client:
+            mocker.patch('src.service.report_service.ReportService.fetch_incidents', return_value={
+                "incidentes": [
+                    {
+                        "asunto": "incidente_llamada",
+                        "canal": "Llamada Telefónica",
+                        "codigo": "INC01565",
+                        "estado": "Abierto",
+                        "fecha_actualizacion": "11/15/2024",
+                        "fecha_creacion": "11/15/2024",
+                        "id": 5,
+                        "tipo": "Petición"
+                    },
+                    {
+                        "asunto": "internet",
+                        "canal": "Correo Electrónico",
+                        "codigo": "INC01235",
+                        "estado": "Abierto",
+                        "fecha_actualizacion": "11/15/2024",
+                        "fecha_creacion": "11/15/2024",
+                        "id": 7,
+                        "tipo": "Queja/Reclamo"
+                    },
+                ],
+                "total": 8
+            })
+            mocker.patch('src.service.report_service.ReportService.save_report', return_value=None)
+            mocker.patch('src.service.report_service.ReportService.generate_pdf_report', return_value=BytesIO(b'mock_pdf_content'))
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
         
-class TestBlueprints:
-    
-    @pytest.fixture(scope='session', autouse=True)
-    def populate_database(self):
+            response = test_client.post('/report/generate', headers=headers, json={
+                    'canal_id': 1,
+                    'estado_id': 2,
+                    'fecha_inicio': '01/01/2024',
+                    'fecha_fin': '01/31/2024',
+                    'nombre_reporte': 'Reporte Test',
+                    'tipo_id': 3
+                }
+            )
 
-        with app.app_context():
+            assert response.status_code == 200
+            assert response.content_type == 'application/pdf'
+
+    def test_save_report_missing_data(self, mocker: MockerFixture):
+        with app.test_client() as test_client:
+
+            mocker.patch('src.service.report_service.ReportService.fetch_incidents', return_value={
+                "incidentes": [
+                    {
+                        "asunto": "incidente_llamada",
+                        "canal": "Llamada Telefónica",
+                        "codigo": "INC01565",
+                        "estado": "Abierto",
+                        "fecha_actualizacion": "11/15/2024",
+                        "fecha_creacion": "11/15/2024",
+                        "id": 5,
+                        "tipo": "Petición"
+                    },
+                    {
+                        "asunto": "internet",
+                        "canal": "Correo Electrónico",
+                        "codigo": "INC01235",
+                        "estado": "Abierto",
+                        "fecha_actualizacion": "11/15/2024",
+                        "fecha_creacion": "11/15/2024",
+                        "id": 7,
+                        "tipo": "Queja/Reclamo"
+                    },
+                ],
+                "total": 8
+            })
+            mocker.patch('src.service.report_service.ReportService.save_report', return_value=None)
+            mocker.patch('src.service.report_service.ReportService.generate_pdf_report', return_value=BytesIO(b'mock_pdf_content'))
+            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+
+            response = test_client.post('/report/generate', headers=headers, json={} )
+
+            assert response.status_code == 500
+            assert b'{"msg":"Error en el sistema porfavor contacte con el administrador"}\n' in response.data
         
-            canales = [
-                Canal(nombre_canal='Llamada Telefónica', precio=10000.0),
-                Canal(nombre_canal='Correo Electronico', precio=30000.0),
-                Canal(nombre_canal='App Movil', precio=50000.0)
-            ]
-            db.session.bulk_save_objects(canales)
-
-            tipos = [
-                Tipo(tipo='Petición'),
-                Tipo(tipo='Queja/Reclamo'),
-                Tipo(tipo='Sugerencia')
-            ]
-            db.session.bulk_save_objects(tipos)
-
-            estados = [
-                Estado(estado='Abierto'),
-                Estado(estado='Desestimado'),
-                Estado(estado='Escalado'),
-                Estado(estado='Cerrado Satisfactoriamente'),
-                Estado(estado='Cerrado Insatisfactoriamente'),
-                Estado(estado='Reaperturado')
-            ]
-            db.session.bulk_save_objects(estados)
-
-            db.session.commit()
+    def test_health_check(client):
+        with app.test_client() as test_client:
+            response = test_client.get('/report/ping')
+            assert response.status_code == 200
+            assert response.data == b'pong'   
         
-            yield 
-            
-        with app.app_context():
-            db.session.remove()
-            db.drop_all()
+        
+        
+        
+        
+        
+        '''
+        with app.test_client() as test_client:
+            response = test_client.post(
+                '/report/generate',
+                headers={'Authorization': 'Bearer mock_token'},
+                json={
+                    'canal_id': 1,
+                    'estado_id': 2,
+                    'fecha_inicio': '01/01/2024',
+                    'fecha_fin': '01/31/2024',
+                    'nombre_reporte': 'Reporte Test',
+                    'tipo_id': 3
+                }
+            )
 
-        @pytest.fixture 
-        def client(self):
-            with app.test_client() as client:
-                yield client    
-    
+            # Afirmaciones
+            assert response.status_code == 200
+            assert response.content_type == 'application/pdf'
+            assert response.data == b'mock_pdf_content'
+
+            # Validación de llamadas a los mocks
+            report_service.fetch_incidents.assert_called_once()
+            report_service.save_report.assert_called_once()
+            report_service.generate_pdf_report.assert_called_once()
+
+
+
+    '''
+
+
+
+    '''
     def test_campos_sin_nombre_creacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
@@ -378,8 +470,6 @@ class TestBlueprints:
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.create_person', return_value=1)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            mocker.patch('src.service.incident_service.publish_ia_request')
-            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
 
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
@@ -397,7 +487,7 @@ class TestBlueprints:
                     }
             
             print(form_data)
-
+            
             response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
             incident_data = response_service.get_json()
             
@@ -410,8 +500,6 @@ class TestBlueprints:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.cloud.storage.Client')
-            mocker.patch('src.service.incident_service.publish_ia_request')
-            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
 
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
@@ -430,7 +518,7 @@ class TestBlueprints:
                     }
             
             print(form_data)
-
+            
             response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
             incident_data = response_service.get_json()
             
@@ -444,7 +532,7 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
-            mocker.patch('src.service.incident_service.publish_ia_request')
+
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
             file_data = {
@@ -468,7 +556,7 @@ class TestBlueprints:
             form_data.update(file_data)
             
             print(form_data)
-
+            
             response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
             incident_data = response_service.get_json()
             
@@ -480,10 +568,9 @@ class TestBlueprints:
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
-            mocker.patch('src.service.incident_service.publish_ia_request')
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
-            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
 
+            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
+               
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
                     'emailClient': f"{fake.word()}@outlook.com",
@@ -515,7 +602,6 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
-            mocker.patch('src.service.incident_service.publish_ia_request')
 
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
@@ -556,7 +642,6 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
-            mocker.patch('src.service.incident_service.publish_ia_request')
 
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             
@@ -603,8 +688,7 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
-            mocker.patch('src.service.incident_service.publish_ia_request')
-
+            
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
             self.create_incident(test_client, headers)
@@ -624,8 +708,7 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
-            mocker.patch('src.service.incident_service.publish_ia_request')
-
+            
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
             incident_data = self.create_incident(test_client, headers)
@@ -645,8 +728,7 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
-            mocker.patch('src.service.incident_service.publish_ia_request')
-
+            
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
             incident_data = self.create_incident(test_client, headers)
@@ -660,7 +742,6 @@ class TestBlueprints:
     def test_creacion_incidencia_exitosa_y_actualizacion_incidencia_por_id(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
-
             mock_response_data = {
                 'persona': {
                 'apellidos': 'ApellidoAntiguo',
@@ -672,8 +753,7 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
-            mocker.patch('src.service.incident_service.publish_ia_request')
-
+            
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
             incident_data = self.create_incident(test_client, headers)
@@ -693,29 +773,6 @@ class TestBlueprints:
             
             assert response_service.status_code == 201
             
-    def test_creacion_incidencia_exitosa_y_consulta_canal_mes(self, mocker):
-        with app.test_client() as test_client:
-            mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
-            mock_response_data = {
-                'persona': {
-                'apellidos': 'ApellidoAntiguo',
-                'nombres': 'NombreNuevo'
-                }
-            }
-
-            mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=mock_response_data)
-            mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
-            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
-            mocker.patch('google.cloud.storage.Client')
-            
-            headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
-            
-            mes_actual = datetime.now().month
-
-            response_service = test_client.get(F"/incident/channel/2/{mes_actual}", headers=headers)
-            
-            assert response_service.status_code == 200      
-            
     def create_incident(self, test_client, headers):   
                     
         form_data = {'name': fake.name(),
@@ -733,7 +790,7 @@ class TestBlueprints:
                     }
                         
         print(form_data)
-
+            
         response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
         incident_data = response_service.get_json()
             
@@ -745,18 +802,13 @@ class TestBlueprints:
         with app.test_client() as test_client:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
-            mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             
             response = test_client.get('/incident/channels/percentage', headers=headers)
             data = response.get_json()
 
             assert response.status_code == 200
-
-            exist_call = any(channel['channel'] == 'Llamada Telefónica' for channel in data['channels'])
-            exist_email = any(channel['channel'] == 'Correo Electronico' for channel in data['channels'])
-
-            assert exist_call
-            assert exist_email
+            assert 'Llamada Telefónica' in data
+            assert 'Correo Electronico' in data
 
     def test_get_percentage_of_incidents_by_channel_with_canal_filter(self, mocker):
         with app.test_client() as test_client:
@@ -767,11 +819,8 @@ class TestBlueprints:
             data = response.get_json()
 
             assert response.status_code == 200
-
-            exist_call = any(channel['channel'] == 'Llamada Telefónica' for channel in data['channels'])
-            assert exist_call
-            total_value = sum(channel['value'] for channel in data['channels'])
-            assert total_value == 30
+            assert 'Llamada Telefónica' in data
+            assert sum(data.values()) == 30
 
     def test_get_percentage_of_incidents_by_channel_with_estado_filter(self, mocker):
         with app.test_client() as test_client:
@@ -782,10 +831,8 @@ class TestBlueprints:
             data = response.get_json()
 
             assert response.status_code == 200
-            exist_email = any(channel['channel'] == 'Correo Electronico' for channel in data['channels'])
-            assert exist_email
-            total_value = sum(channel['value'] for channel in data['channels'])
-            assert total_value == 100
+            assert 'Correo Electronico' in data
+            assert sum(data.values()) == 100
     
     def test_get_percentage_of_incidents_by_channel_with_date_range(self, mocker):
         with app.test_client() as test_client:
@@ -833,10 +880,8 @@ class TestBlueprints:
             data = response.get_json()
             
             assert response.status_code == 200
-            exist_email = any(channel['channel'] == 'Correo Electrónico' for channel in data['channels'])
-            assert exist_email
-            total_value = sum(channel['value'] for channel in data['channels'])
-            assert total_value == 100
+            assert 'Correo Electrónico' in data
+            assert sum(data.values()) == 100
     
     def test_get_percentage_of_incidents_by_channel_with_combined_filters(self, mocker):
         with app.test_client() as test_client:
@@ -848,19 +893,15 @@ class TestBlueprints:
             
             response = test_client.get('/incident/channels/percentage', query_string={'canal_id': 1, 'estado_id': 1, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
             data = response.get_json()
-            print(data)
+
             assert response.status_code == 200
-            exist_call = any(channel['channel'] == 'Llamada Telefónica' for channel in data['channels'])
-            assert exist_call
-            total_value = sum(channel['value'] for channel in data['channels'])
-            assert total_value == 100
+            assert 'Llamada Telefónica' in data
+            assert sum(data.values()) == 100
 
     def test_get_percentage_of_incidents_by_channel_missing_authorization(self, mocker):
         with app.test_client() as test_client:
             response = test_client.get('/incident/channels/percentage')
             data = response.get_json()
-            
-            print(f"response {response.text}")
 
             assert response.status_code == 500
             assert 'msg' in data
@@ -907,8 +948,8 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
-            fecha_inicio = (datetime.now() - timedelta(days=6)).strftime('%m/%d/%Y')
-            fecha_fin = (datetime.now() - timedelta(days=3)).strftime('%m/%d/%Y')
+            fecha_inicio = (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
+            fecha_fin = (datetime.now() - timedelta(days=3)).strftime('%Y-%m-%d')
             
             response = test_client.get('/incident/summary', query_string={'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
             data = response.get_json()
@@ -922,8 +963,8 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
-            fecha_inicio = (datetime.now() - timedelta(days=10)).strftime('%m/%d/%Y')
-            fecha_fin = datetime.now().strftime('%m/%d/%Y')
+            fecha_inicio = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
+            fecha_fin = datetime.now().strftime('%Y-%m-%d')
             
             response = test_client.get('/incident/summary', query_string={'canal_id': 1, 'estado_id': 1, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
             data = response.get_json()
@@ -941,3 +982,5 @@ class TestBlueprints:
             assert response.status_code == 500
             assert 'msg' in data
             assert 'Error a la hora de conultar el detalle de la incidencia' in data['msg']
+
+    '''

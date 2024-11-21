@@ -62,7 +62,7 @@ class BoardService():
 
         return jsonify(channels=key_value_array)
     
-    def get_summarized_incidents(self, canal_id=None, estado_id=None, fecha_inicio=None, fecha_fin=None):        
+    def get_summarized_incidents(self, canal_id=None, estado_id=None, fecha_inicio=None, fecha_fin=None, tipo_id=None):        
         query = db.session.query(
             Incidente.id,
             Incidente.codigo,
@@ -86,6 +86,8 @@ class BoardService():
             query = query.filter(Incidente.canal_id == canal_id)
         if estado_id:
             query = query.filter(Incidente.estado_id == estado_id)
+        if tipo_id:
+            query = query.filter(Incidente.tipo_id == tipo_id)
         if fecha_inicio and fecha_fin:
             query = query.filter(func.date(Incidente.fecha_creacion).between(fecha_inicio, fecha_fin))
         elif fecha_inicio:
