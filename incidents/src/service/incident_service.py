@@ -2,12 +2,11 @@ from ..models.models import Incidente, IncidenteSchema, EvidenciaHistorico, Evid
 from .calls_service import CallsService
 from ..utils.utils import CommonUtils
 from ..errors.errors import ServerSystemException
+from ..subscribe.send_to_topic import publish_ia_request
 from datetime import datetime
 from tinytag import TinyTag
 from dotenv import load_dotenv
-import random, logging, os
-import requests
-import copy
+import random, logging, os, requests, calendar
 
 incident_schema = IncidenteSchema()
 calls_service = CallsService()
@@ -19,7 +18,7 @@ evidence_schema = EvidenciaSchema()
 load_dotenv('.env.template')
 USER_URL = os.environ.get('USER_PATH')
 
-class IncidentService():
+class IncidentService:
     
         def create_incident(self, 
                          name_person, 
@@ -71,11 +70,15 @@ class IncidentService():
             
             if channel_incident == 'Llamada Telefónica':
                 calls_service.save_call_incidence(incident, user_id, person_id)
-                
+
             if uploaded_files:
                self.save_upload_files(uploaded_files, incident, user_id)
+
+            incidence = incident_schema.dump(incident)
+
+            publish_ia_request(incidence, detail_incident)
            
-            return incident_schema.dump(incident)
+            return incidence
 
         def update_incident(self, status,
                             observations,
@@ -112,6 +115,13 @@ class IncidentService():
                 self.save_upload_files(uploaded_files, incident, user_creator_id)
 
            return incident_schema.dump(incident)
+
+        def update_incident_from_ia(self,
+                            observations,
+                            incident_id):
+            ia_user = self.get_user_ia_by_username()
+            incident = db.session.query(Incidente).filter(Incidente.id == incident_id).first()
+            self.save_incident_history(incident, observations, ia_user["id"])
 
 
         def save_incident(self, 
@@ -238,7 +248,9 @@ class IncidentService():
                 logging.debug(f"error a la hora de crear el evidence history {err}")
 
         def save_incident_history(self, incident, comments, user_creator_id):
-            
+            logging.debug(f"incident: {incident}")
+            logging.debug(f"user_creator_id: {user_creator_id}")
+            logging.debug(f"comments: {comments}")
             incident_history = None
             try: 
                 logging.debug("Iniciando el guardado de la historia de la incidencia")
@@ -392,6 +404,25 @@ class IncidentService():
             else:
                 return None
 
+        def get_user_ia_by_username(self):
+
+            url = f"{USER_URL}/ia/user"
+
+            headers = {
+                "x-user-ia": "token"
+            }
+
+            response = requests.get(url, headers=headers)
+            logging.debug(f"codigo de respuesta {response.text}")
+            print(f"codigo de respuesta {response.status_code}")
+
+            if response.status_code == 200:
+                logging.debug(f"response.json() {response.json()}")
+                return response.json()
+            else:
+                logging.debug(f"Error consultando usuario ia {response.status_code}")
+                return None
+
         def get_canal_by_nombre(self, channel_incident):
             return db.session.query(Canal).filter_by(nombre_canal = channel_incident).first()
     
@@ -401,3 +432,20 @@ class IncidentService():
     
         def get_estado_by_nombre(self, estado_incidencia):
             return db.session.query(Estado).filter_by(estado = estado_incidencia).first() 
+        
+        def get_number_incident_by_channel_and_month(self, channel_id, month): 
+            
+            first_day = datetime(datetime.now().year, month, 1)
+            last_day = datetime(datetime.now().year, month, calendar.monthrange(datetime.now().year, month)[1], 23, 59, 00)      
+       
+            logging.debug(first_day)
+            logging.debug(last_day)
+       
+            channel = db.session.query(Canal).filter(Canal.id == channel_id).first()
+            incidents_count = db.session.query(Incidente).filter(
+               Incidente.fecha_creacion.between(first_day, last_day),
+               Incidente.canal_id == channel_id
+            ).count()
+              
+            return {"incident_count": incidents_count, "total_price": (incidents_count * channel.precio), "channel_price": channel.precio}
+       

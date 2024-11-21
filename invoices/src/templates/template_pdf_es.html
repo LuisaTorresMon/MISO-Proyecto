@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Factura</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .header {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+        .header img {
+            max-width: 150px;
+        }
+        .header h2 {
+            font-size: 24px;
+            margin: 10px 0;
+        }
+        .header p {
+            margin: 5px 0;
+        }
+        .customer-info, .invoice-info {
+            width: 48%;
+            display: inline-block;
+            vertical-align: top;
+            margin-bottom: 20px;
+        }
+        .customer-info p, .invoice-info p {
+            margin: 5px 0;
+        }
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 10px;
+        }
+        .table th, .table td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: center;
+        }
+        .table th {
+            background-color: #f5f5f5;
+        }
+        .total {
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <img src="file://{{ logo_path }}" alt="Logo">
+    </div>
+
+    <div class="customer-info">
+        <p style="font-size: 12px"><strong>{{ company.nombre_empresa }}</strong></p>
+        <p style="font-size: 12px"><strong>{{ company.numero_identificacion }}</strong></p>
+        <p style="font-size: 12px"><strong>{{ company.email }}</strong></p>
+        <p style="font-size: 12px"><strong>{{ company.telefono }}</strong></p>
+    </div>
+    <div class="invoice-info" style="text-align: right;">
+        <table class="table">
+            <tbody>
+                <tr>
+                    <td><strong>FACTURA ELECTRONICA DE VENTA</strong></td>
+                    <td>{{ invoice.referencia_pago }}</td>
+                </tr>
+                <tr>
+                    <td><strong>FECHA EMSIÓN</strong></td>
+                    <td>{{ emition_date }}</td>
+                </tr>
+                <tr>
+                    <td><strong>FECHA VENCIMIENTO</strong></td>
+                    <td>{{ expiration_date }}</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Descripción</th>
+                <th>Cantidad</th>
+                <th>Valor Unitario</th>
+                <th>Subtotal</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td> 1 </td>
+                <td>Plan Contratado</td>
+                <td> 1 </td>
+                <td>${{ "{:,.2f}".format(invoice.plan_precio_total) }}</td>
+                <td>${{ "{:,.2f}".format(invoice.plan_precio_total) }}</td>
+            </tr>
+            <tr>
+                <td> 2 </td>
+                <td>Incidentes por llamada</td>
+                <td>{{ invoice.numero_incidencia_llamadas }}</td>
+                <td>${{ "{:,.2f}".format(invoice.valor_unitario_incidencia_llamada) }}</td>
+                <td>${{ "{:,.2f}".format(invoice.incidencia_llamadas_precio_total) }}</td>
+            </tr>
+            <tr>
+                <td> 3 </td>
+                <td>Incidentes por correo</td>
+                <td>{{ invoice.numero_incidencia_correo }}</td>
+                <td>${{ "{:,.2f}".format(invoice.valor_unitario_incidencia_correo) }}</td>
+                <td>${{ "{:,.2f}".format(invoice.incidencia_correo_precio_total) }}</td>
+            </tr>
+            <tr>
+                <td> 4 </td>
+                <td>Incidentes por chat</td>
+                <td>{{ invoice.numero_incidencia_movil }}</td>
+                <td>${{ "{:,.2f}".format(invoice.valor_unitario_incidencia_movil) }}</td>
+                <td>${{ "{:,.2f}".format(invoice.incidencia_movil_precio_total) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="total">
+        <p>Total a Pagar: ${{ "{:,.2f}".format(invoice.valor_pagar) }}</p>
+    </div>
+</div>
+
+</body>
+</html>

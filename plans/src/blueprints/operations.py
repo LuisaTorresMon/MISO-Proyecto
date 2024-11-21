@@ -29,3 +29,4 @@ def get(empresa_id):
 @operations_blueprint.route('/ping', methods = ['GET'])
 def health():
     return 'pong', 200
+

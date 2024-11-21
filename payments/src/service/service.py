@@ -1,6 +1,11 @@
 from ..models.models import Payment, PaymentSchema, db
+import logging, requests, os
+from dotenv import load_dotenv
 
 payment_schema = PaymentSchema()
+
+load_dotenv('.env.template')
+INVOICE_PATH = os.environ.get('INVOICE_PATH')
 
 class PaymentService():
     def create_payment(self, invoice):
@@ -17,6 +22,8 @@ class PaymentService():
         
         db.session.add(payment)
         db.session.commit()
+        
+        self.update_invoice_state(self.facturacion_id, "Pagado")
         
         return payment_schema.dump(payment)
     
@@ -38,10 +45,19 @@ class PaymentService():
 
         else:
             self.create_payment(invoice)
-            
-    def get_payments(self):
-      payments = db.session.query(Payment).all()
-            
-      invoices_schema = [payment_schema.dump(payment) for payment in payments]
-      return invoices_schema
+  
+    def update_invoice_state(self, invoice_id, state):
+
+            url = f"{INVOICE_PATH}update/{invoice_id}/{state}"
+            logging.debug(f"url {url}")
+
+            response = requests.patch(url)
+            logging.debug(f"codigo de respuesta {response.text}")
+            print(f"codigo de respuesta {response.status_code}")
+
+            if response.status_code == 200:
+                logging.debug(f"response.json() {response.json()}")
+                return response.json()
+            else:
+                return None
 

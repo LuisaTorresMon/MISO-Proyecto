@@ -1,8 +1,11 @@
 from flask import Flask, request, jsonify
 import requests
+from flask_cors import CORS
 import logging
 
 app = Flask(__name__)
+
+CORS(app, resources={r"/*": {"origins": "*"}}, expose_headers=["Authorization", "Technology"])
 
 MICROSERVICES = {
     'incident': 'http://localhost:3004',
@@ -10,7 +13,8 @@ MICROSERVICES = {
     'payment': 'http://localhost:3001',
     'plan': 'http://localhost:3003',
     'user': 'http://localhost:3000',
-    'report': 'http://localhost:3005'
+    'report': 'http://localhost:3006',
+    'ia': 'http://localhost:3005',
 }
 
 @app.route('/<service>/<path:path>', methods=['GET', 'POST', 'PUT', 'DELETE'])

@@ -60,6 +60,40 @@ jobs:
         working-directory: ./plans
         run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
 
+  test-invoices-microservices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./invoices
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./invoices
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./invoices
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
+
+  test-payments-microservices:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [3.9]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install pipenv
+        working-directory: ./payments
+        run: pip install pipenv
+      - name: Install dependencies
+        working-directory: ./payments
+        run: pipenv install --dev
+      - name: Run unit tests
+        working-directory: ./payments
+        run: pipenv run pytest --cov=src -v -s --cov-fail-under=90
+
   merge-develop:
     needs: 
       - test-users-microservices
