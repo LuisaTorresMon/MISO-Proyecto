@@ -22,7 +22,7 @@ class TestBlueprints:
                 json=input_data  # Enviar datos como JSON
             )
 
-            # Validar la respuesta
+
             assert response.status_code == 200
             response_data = response.get_json()
             assert response_data == {"prediction": mock_prediction}
