@@ -179,3 +179,4 @@ class TestBlueprints():
 
             assert response.status_code == 500
             assert b"Error en el sistema porfavor contacte con el administrador" in response.data       
+
