@@ -82,6 +82,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       USERS_PATH: "http://users:3000"
+      SENGRID_TOKEN: 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
     depends_on:
       reports_db:
         condition: service_healthy

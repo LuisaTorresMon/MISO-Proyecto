@@ -45,3 +45,7 @@ class BadRequestException(ApiError):
 class ErrorService(ApiError):
     code = 500
     description = "Error a la hora de consumir el servicio."
+
+class InvoiceGeneralIntegration(Exception):
+    code = 500
+    description = "Error a la hora de enviar el correo."
