@@ -26,8 +26,8 @@ def handle_exception(err):
 def start_subscription():
     subscribe()
 
+threading.Thread(target=start_subscription).start()
+logging.debug('La descripcion ha comenzado')
+
 if __name__ == '__main__':
-    if os.getenv("ENV") != "test":  # No iniciar en entorno de pruebas
-        threading.Thread(target=start_subscription).start()
-        logging.debug('La descripcion ha comenzado')
     app.run(host='0.0.0.0', port=3005, debug=True)
