@@ -249,7 +249,7 @@ spec:
     spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
-        - name: plans-contenedor
+        - name: invoice-contenedor
           image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/invoice:1.0
           envFrom:
             - secretRef:
@@ -328,7 +328,7 @@ spec:
     spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
-        - name: plans-contenedor
+        - name: payment-contenedor
           image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/payment:1.0
           envFrom:
             - secretRef:
