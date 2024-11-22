@@ -1,6 +1,7 @@
+import os
 from dotenv import load_dotenv
 from os import environ
-from invoices.src.error.errors import InvoiceGeneralIntegration
+from ..errors.errors import InvoiceGeneralIntegration
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail, Attachment, FileContent, FileName, FileType, Disposition
 import logging
@@ -27,6 +28,7 @@ class CommonUtils():
         logging.debug(email_destination)
         logging.debug(subject)
         logging.debug(content)
+        logging.debug(sengrid_token)
         
         sg = SendGridAPIClient(sengrid_token)
         
@@ -39,11 +41,15 @@ class CommonUtils():
         
         if(attached):
             
-            pdf_encoded = base64.b64encode(attached['pdf']).decode('utf-8')
+            with open(attached, 'rb') as pdf_file:
+                pdf_data = pdf_file.read()
+            pdf_encoded = base64.b64encode(pdf_data).decode('utf-8')
+
+            file_name = os.path.basename(attached)
             
             attached_email = Attachment(
                 FileContent(pdf_encoded),
-                FileName(f"{attached['file_name']}.pdf"),
+                FileName(file_name),
                 FileType("application/pdf"),
                 Disposition("attachment")
             )
@@ -57,5 +63,6 @@ class CommonUtils():
     
         except Exception as e:
             logging.debug(e)
-            raise InvoiceGeneralIntegration(500, "Error a la hora de enviar el correo")
+            #raise InvoiceGeneralIntegration(500, "Error a la hora de enviar el correo")
+            raise (500, "Error a la hora de enviar el correo")
         

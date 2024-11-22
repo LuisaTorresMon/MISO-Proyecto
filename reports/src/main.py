@@ -1,3 +1,4 @@
+import logging
 import os
 import time
 from os import environ
@@ -36,6 +37,8 @@ def handle_exception(err):
       "msg": err.description
     }
     return jsonify(response), err.code
+
+logging.basicConfig(level=logging.DEBUG)
 
 app.register_blueprint(operations_blueprint,url_prefix='/report')
 
