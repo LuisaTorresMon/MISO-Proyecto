@@ -6,7 +6,6 @@ from .blueprints.blueprints import ia_blueprint
 from .errors.errors import ApiError
 from .subscribe.subscribe_ia_request import subscribe
 import threading
-import os
 
 app = Config.init()
 
