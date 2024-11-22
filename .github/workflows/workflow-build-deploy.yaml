@@ -52,19 +52,19 @@ jobs:
     - name: build and push the docker image invoice
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
-        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/invoice:${IMAGE_TAG} ./invoice
+        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/invoice:${IMAGE_TAG} ./invoices
         docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/invoice:${IMAGE_TAG}
 
     - name: build and push the docker image payments
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
-        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/payment:${IMAGE_TAG} ./invoice
+        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/payment:${IMAGE_TAG} ./payments
         docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/payment:${IMAGE_TAG}
 
     - name: build and push the docker image ia
       run: |
         gcloud auth configure-docker us-central1-docker.pkg.dev
-        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/ia:${IMAGE_TAG} ./invoice
+        docker build -t us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/ia:${IMAGE_TAG} ./ia
         docker push us-central1-docker.pkg.dev/$GOOGLE_PROJECT/uniandes-misw-proyecto-grado-19/ia:${IMAGE_TAG}
 
     - name: Install gke-gcloud-auth-plugin
