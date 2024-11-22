@@ -28,7 +28,7 @@ services:
       DB_PORT: 5432
       DB_USER: postgres
       DB_PASSWORD: postgres
-      SENGRID_TOKEN: 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
+      SENGRID_TOKEN: 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
     depends_on:
       invoice_db:
         condition: service_healthy
