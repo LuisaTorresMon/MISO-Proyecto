@@ -14,21 +14,41 @@ spec:
             path: /user
             backend:
               service:
-                name: users-service 
+                name: users-service
                 port:
                   number: 80
           - pathType: Prefix
             path: /incident
             backend:
               service:
-                name: incidents-service 
+                name: incidents-service
                 port:
                   number: 80
           - pathType: Prefix
             path: /plan
             backend:
               service:
-                name: plans-service 
+                name: plans-service
                 port:
                   number: 80
-                  
+          - pathType: Prefix
+            path: /invoice
+            backend:
+              service:
+                name: invoice-service
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: /payment
+            backend:
+              service:
+                name: payment-service
+                port:
+                  number: 80
+          - pathType: Prefix
+            path: /ia
+            backend:
+              service:
+                name: ia-service
+                port:
+                  number: 80
