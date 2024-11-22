@@ -63,6 +63,5 @@ class CommonUtils():
     
         except Exception as e:
             logging.debug(e)
-            #raise InvoiceGeneralIntegration(500, "Error a la hora de enviar el correo")
-            raise (500, "Error a la hora de enviar el correo")
+            raise InvoiceGeneralIntegration(500, "Error a la hora de enviar el correo")
         

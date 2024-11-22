@@ -12,7 +12,7 @@ service_report = ReportService()
 operations_blueprint = Blueprint('operations', __name__)
 
 @operations_blueprint.route('/generate', methods = ['POST'])
-def save_email():
+def save_report():
     try:
         headers = request.headers
         token_encabezado = headers.get('Authorization')
@@ -72,7 +72,7 @@ def save_email():
         raise ServerSystemException(f"Error al guardar el reporte: {err}, contacte con el administrador")
     
 @operations_blueprint.route('/sendemail', methods = ['POST'])
-def save_report():
+def save_email():
     try:
         headers = request.headers
         token_encabezado = headers.get('Authorization')
@@ -139,8 +139,7 @@ def save_report():
 
     except Exception as err:
         logging.debug(f"Excepción al guardar el reporte: {err}")
-        #raise ServerSystemException(f"Error al guardar el reporte: {err}, contacte con el administrador")
-        raise (f"Error al guardar el reporte: {err}, contacte con el administrador")    
+        raise ServerSystemException(f"Error al guardar el reporte: {err}, contacte con el administrador")
     
 @operations_blueprint.route('/ping', methods = ['GET'])
 def health():
