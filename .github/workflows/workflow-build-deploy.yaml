@@ -102,4 +102,3 @@ jobs:
       run: |
         kubectl apply -f kubernetes/k8s-base-layer-deployment.yaml
         kubectl apply -f kubernetes/k8s-ingress-deployment.yaml
-
