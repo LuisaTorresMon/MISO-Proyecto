@@ -52,3 +52,10 @@ spec:
                 name: ia-service
                 port:
                   number: 80
+          - pathType: Prefix
+            path: /report
+            backend:
+              service:
+                name: reports-service
+                port:
+                  number: 80
