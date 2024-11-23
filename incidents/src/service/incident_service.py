@@ -3,10 +3,11 @@ from .calls_service import CallsService
 from ..utils.utils import CommonUtils
 from ..errors.errors import ServerSystemException
 from ..subscribe.send_to_topic import publish_ia_request
-from datetime import datetime
+from datetime import datetime, timedelta
 from tinytag import TinyTag
 from dotenv import load_dotenv
 import random, logging, os, requests, calendar
+from sqlalchemy import or_, and_
 
 incident_schema = IncidenteSchema()
 calls_service = CallsService()
@@ -448,4 +449,90 @@ class IncidentService:
             ).count()
               
             return {"incident_count": incidents_count, "total_price": (incidents_count * channel.precio), "channel_price": channel.precio}
-       
+
+        def scale_incidents(self, token, company_id):
+            now = datetime.now()
+            first_date = datetime.now() - timedelta(days=45)
+
+            first_day = datetime(now.year, now.month, now.day)
+            last_day = datetime(first_date.year, first_date.month, first_date.day)
+
+            current_incidents = db.session.query(Incidente).filter(
+                Incidente.fecha_creacion.between(first_day, last_day)
+            ).all()
+
+            current_incidents = [ci for ci in current_incidents if ci.get("estado_id") in [1, 6]]
+
+            agents_data = self.__get_agents_data_by_company_id(token, company_id)
+
+            for agent in agents_data:
+                incidents_count = db.session.query(Incidente).filter(
+                    Incidente.usuario_asignado_id == agent.get("id")
+                ).count()
+
+                if incidents_count < 15:
+                    for i in range(incidents_count - 15):
+                        logging.debug("")
+                        logging.debug("")
+                        logging.debug("Current incident")
+                        logging.debug(current_incidents[i])
+                        logging.debug("")
+                        logging.debug("")
+                        logging.debug("")
+
+
+                logging.debug("")
+                logging.debug("")
+                logging.debug("")
+                logging.debug("")
+                logging.debug("Incidents count")
+                logging.debug(incidents_count)
+                logging.debug("")
+                logging.debug("")
+                logging.debug("")
+                logging.debug("")
+
+
+            #1. Teniendo en cuenta la Fecha de creación y Fecha de actualización de la incidencia.
+                #  Más la y Fecha actual.
+                    # Escalar:
+                        # Las incidencias que tengan más de 45 días desde su cración hasta la fecha actual,
+                            # se reasignen a los 10 agentes que menos incidencias tengan asignadas.
+                            # Cada agente podría tener máximo 15 incidencias en el mes actual.
+
+
+
+
+
+            logging.debug("")
+            logging.debug("")
+            logging.debug("")
+            logging.debug("Current incidents")
+            logging.debug(dir(current_incidents))
+            logging.debug("")
+            logging.debug("")
+            logging.debug("")
+            logging.debug("")
+            logging.debug("")
+            logging.debug(agents_data)
+            logging.debug("")
+            logging.debug("")
+            logging.debug("")
+            logging.debug(token)
+            logging.debug("")
+            logging.debug("")
+            logging.debug("")
+            logging.debug(current_incidents)
+            logging.debug("")
+            logging.debug("")
+            logging.debug("")
+            return {}
+
+        @staticmethod
+        def __get_agents_data_by_company_id(token, company_id):
+            url = f"{USER_URL}/agent/{company_id}"
+            headers = common_utils.obtener_token(token)
+            response = requests.get(url, headers=headers)
+            agents_data = response.json()
+            # agents_data = response.content.decode("utf-8")
+            return agents_data

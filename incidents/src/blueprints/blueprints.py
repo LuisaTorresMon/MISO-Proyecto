@@ -294,4 +294,22 @@ def get_summary_incidents():
     except Exception as err:
         logging.debug(f"excepcion {err}")
         raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
-    
+
+
+@incident_blueprint.route('/scale', methods=['POST'])
+def scale_incidents():
+    try:
+        headers = request.headers
+        token_encabezado = headers.get('Authorization')
+        logging.debug(token_encabezado)
+
+        validator_incident.validate_token_sent(token_encabezado)
+        validator_incident.valid_token(token_encabezado)
+
+        company_id = request.form.get('company_id')
+
+        return incident_service.scale_incidents(token_encabezado, company_id=company_id)
+    except Exception as err:
+        logging.debug(f"excepcion {err}")
+        raise ServerSystemException(
+            f"Error a la hora de escalar las incidencias del sistema, porfavor contacte con su administrador")
