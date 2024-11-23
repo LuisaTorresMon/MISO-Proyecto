@@ -38,9 +38,6 @@ class BoardService():
 
         total_incidents = base_query.scalar() or 1
 
-        #compiled = base_query.statement.compile(dialect=dialect(), compile_kwargs={"literal_binds": True})
-        #logging.debug("Total =========>>>>>>>>> " + str(compiled))
-
         query = db.session.query(
             Canal.nombre_canal.label("canal"),
             func.count(Incidente.id).label("total")
@@ -61,9 +58,6 @@ class BoardService():
     
         results = query.group_by(Canal.nombre_canal).all()
 
-        #compiled = query.statement.compile(dialect=dialect(), compile_kwargs={"literal_binds": True})
-        #logging.debug("Percentages =========>>>>>>>>> " + str(compiled))
-    
         percentages = {
             canal: round((total / total_incidents) * 100) for canal, total in results
         }
