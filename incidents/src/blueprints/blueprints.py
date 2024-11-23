@@ -35,6 +35,7 @@ def create_incidence():
         logging.debug("INCIDENCE WEB")
 
         user_id = request.form.get('user_id')
+        company_id = request.form.get('id_company')
         name_person = request.form.get('name')     
         lastname_person = request.form.get('lastName')     
         email_person = request.form.get('emailClient') 
@@ -48,6 +49,7 @@ def create_incidence():
         logging.debug(f"identity_type_person {identity_type_person}")
         logging.debug(f"identity_number_person {identity_number_person}")
         logging.debug(f"cellphone_person {cellphone_person}")
+        logging.debug(f"cellphone_person {company_id}")
 
         validator_incident.validate_person_data(name_person,
                                             lastname_person, 
@@ -107,6 +109,7 @@ def create_incidence():
                                               uploaded_files,
                                               user_id,
                                               person_id,
+                                              company_id,
                                               token_encabezado,
                                               technology)
 
