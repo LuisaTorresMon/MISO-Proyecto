@@ -230,4 +230,5 @@ networks:
   plan_net:
   incident_net:
   user_net:
+  reports_net:
   ia_net:
