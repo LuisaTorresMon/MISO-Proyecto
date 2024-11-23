@@ -26,8 +26,8 @@ class TestBlueprints():
                         "canal": "Llamada Telefónica",
                         "codigo": "INC01565",
                         "estado": "Abierto",
-                        "fecha_actualizacion": "11/15/2024",
-                        "fecha_creacion": "11/15/2024",
+                        "fecha_actualizacion": "2024-11-15",
+                        "fecha_creacion": "2024-11-15",
                         "id": 5,
                         "tipo": "Petición"
                     },
@@ -36,8 +36,8 @@ class TestBlueprints():
                         "canal": "Correo Electrónico",
                         "codigo": "INC01235",
                         "estado": "Abierto",
-                        "fecha_actualizacion": "11/15/2024",
-                        "fecha_creacion": "11/15/2024",
+                        "fecha_actualizacion": "2024-11-15",
+                        "fecha_creacion": "2024-11-15",
                         "id": 7,
                         "tipo": "Queja/Reclamo"
                     },
@@ -53,8 +53,8 @@ class TestBlueprints():
             response = test_client.post('/report/generate', headers=headers, json={
                     'canal_id': 1,
                     'estado_id': 2,
-                    'fecha_inicio': '01/01/2024',
-                    'fecha_fin': '01/31/2024',
+                    'fecha_inicio': '2024-01-01',
+                    'fecha_fin': '2024-01-31',
                     'nombre_reporte': 'Reporte Test',
                     'tipo_id': 3
                 }
@@ -119,8 +119,8 @@ class TestBlueprints():
                         "canal": "Email",
                         "codigo": "INC1234",
                         "estado": "Abierto",
-                        "fecha_actualizacion": "11/15/2024",
-                        "fecha_creacion": "11/14/2024",
+                        "fecha_actualizacion": "2024-11-15",
+                        "fecha_creacion": "2024-11-14",
                         "id": 1,
                         "tipo": "Petición"
                     }
@@ -135,8 +135,8 @@ class TestBlueprints():
             payload = {
                 'canal_id': 1,
                 'estado_id': 2,
-                'fecha_inicio': '01/01/2024',
-                'fecha_fin': '01/31/2024',
+                'fecha_inicio': '2024-01-01',
+                'fecha_fin': '2024-01-31',
                 'nombre_reporte': 'Reporte Test',
                 'tipo_id': 3,
                 'lang': 'es',
@@ -179,4 +179,3 @@ class TestBlueprints():
 
             assert response.status_code == 500
             assert b"Error en el sistema porfavor contacte con el administrador" in response.data       
-

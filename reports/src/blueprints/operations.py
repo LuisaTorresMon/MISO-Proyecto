@@ -36,8 +36,8 @@ def save_report():
         validator_report.nombre_reporte = nombre_reporte
         validator_report.validar_campos_requeridos()
 
-        fecha_inicio = datetime.strptime(fecha_inicio, '%m/%d/%Y') if fecha_inicio else None
-        fecha_fin = datetime.strptime(fecha_fin, '%m/%d/%Y') if fecha_fin else None
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d') if fecha_inicio else None
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d') if fecha_fin else None
 
         incidentes = service_report.fetch_incidents(
             canal_id=canal_id,
@@ -97,8 +97,8 @@ def save_email():
         validator_report.nombre_reporte = nombre_reporte
         validator_report.validar_campos_requeridos()
 
-        fecha_inicio = datetime.strptime(fecha_inicio, '%m/%d/%Y') if fecha_inicio else None
-        fecha_fin = datetime.strptime(fecha_fin, '%m/%d/%Y') if fecha_fin else None
+        fecha_inicio = datetime.strptime(fecha_inicio, '%Y-%m-%d') if fecha_inicio else None
+        fecha_fin = datetime.strptime(fecha_fin, '%Y-%m-%d') if fecha_fin else None
 
         incidentes = service_report.fetch_incidents(
             canal_id=canal_id,
