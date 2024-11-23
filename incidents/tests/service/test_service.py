@@ -67,6 +67,8 @@ class TestService:
     def test_creacion_incidencia_exitosa_creacion_persona(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.requests.post', return_value=mocker.Mock(status_code=201, json=lambda: {'id': 1}))
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
+
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('src.service.incident_service.publish_ia_request')
             token = "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3"
@@ -81,7 +83,8 @@ class TestService:
             incident_channel = 'Correo Electronico'
             incident_subject = fake.sentence(nb_words=8)
             incident_detail = fake.sentence(nb_words=8)
-            user_id = 1                 
+            user_id = 1    
+            company_id = 1             
 
             incident = incident_service.create_incident(
                 name, 
@@ -97,6 +100,7 @@ class TestService:
                 None,
                 user_id,
                 None,
+                company_id,
                 token,
                 "WEB"
                 )            
@@ -107,6 +111,8 @@ class TestService:
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.requests.put', return_value=mocker.Mock(status_code=201, json=lambda: {'id': 1}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
+
             mocker.patch('google.cloud.storage.Client')
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('src.service.incident_service.publish_ia_request')
@@ -125,6 +131,8 @@ class TestService:
             incident_detail = fake.sentence(nb_words=8)
             user_id = 1 
             person_id = 1
+            company_id = 1
+
             
             files = [ (BytesIO(b"archivo de prueba"), 'test_file.txt') ]                
 
@@ -142,17 +150,19 @@ class TestService:
                 files,
                 user_id,
                 person_id,
+                company_id,
                 token,
                  "WEB"
                 )            
             
             assert incident is not None 
             
-    def test_creacion_incidencia_exitosa_actualizacion_incidencia(self, mocker):
+    def test_creacion_incidencia_exitosa_actualitest_creacion_incidencia_exitosa_actualizacion_incidenciazacion_incidencia(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.requests.put', return_value=mocker.Mock(status_code=201, json=lambda: {'id': 1}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('src.service.incident_service.publish_ia_request')
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
 
             mock_response_data = {
                 'persona': {
@@ -180,6 +190,7 @@ class TestService:
             incident_detail = fake.sentence(nb_words=8)
             user_id = 1 
             person_id = 1
+            company_id = 1
             
             files = [ (BytesIO(b"archivo de prueba"), 'test_file.txt') ]                
 
@@ -197,6 +208,7 @@ class TestService:
                 files,
                 user_id,
                 person_id,
+                company_id,
                 token,
                  "WEB"
                 )    

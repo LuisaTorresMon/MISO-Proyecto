@@ -7,6 +7,8 @@ from datetime import datetime
 from tinytag import TinyTag
 from dotenv import load_dotenv
 import random, logging, os, requests, calendar
+from sqlalchemy import func
+
 
 incident_schema = IncidenteSchema()
 calls_service = CallsService()
@@ -34,6 +36,7 @@ class IncidentService:
                          uploaded_files,
                          user_id,
                          person_id,
+                         company_id,
                          token,
                          technology):
             
@@ -46,25 +49,20 @@ class IncidentService:
                 "cellphone": cellphone_person
             }
             
-            user_asigned_id = user_id
-
             if not person_id:
                 person_id = self.create_person(token, person)
             else:
                 if technology != "MOBILE":
                     self.update_person(token, person)
-                    
-            if technology == "MOBILE":
-                user = self.get_user_by_username(token, 'agente_automatico')
-                user_asigned_id = user['id']
                 
             incident = self.save_incident(incident_type,
                               channel_incident,
                               subject_incident,
                               detail_incident,
                               user_id,
-                              user_asigned_id,
-                              person_id)
+                              company_id,
+                              person_id,
+                              token)
            
             self.save_incident_history(incident, f" Se ha creado la incidencia {incident.codigo} con éxito", user_id)
             
@@ -130,8 +128,9 @@ class IncidentService:
                          subject_incident,
                          detail_incident,
                          user_id,
-                         user_asigned_id,
-                         person_id):
+                         company_id,
+                         person_id,
+                         token):
             
               logging.debug("Iniciando el guardado de la incidencia")
 
@@ -142,6 +141,8 @@ class IncidentService:
               incident_code = self.generate_incident_code()
               logging.debug(f"incident {incident_code}")
               
+              agent_assigned = self.get_agent_with_less_incidents(token,company_id)
+              
               incident = Incidente(
                   codigo = incident_code,
                   descripcion = detail_incident,
@@ -150,7 +151,7 @@ class IncidentService:
                   tipo_id = tipo.id,
                   estado_id =  estado.id,
                   usuario_creador_id = user_id,
-                  usuario_asignado_id = user_asigned_id,
+                  usuario_asignado_id = agent_assigned,
                   persona_id = person_id
               )
               
@@ -159,6 +160,65 @@ class IncidentService:
                             
               return incident
           
+        def get_agent_with_less_incidents(self, token, company_id):
+            print(f"get_agent_with_less_incidents ")
+
+            user_without_incident = []
+            
+            agents = self.get_agents_by_company(token, company_id)
+            print(f"agents {agents}")
+
+            agents_ids = [agent['id'] for agent in agents]
+       
+            print(f"agents_ids {agents_ids}")
+       
+            incidents_with_user = db.session.query(Incidente.usuario_asignado_id).filter(Incidente.usuario_asignado_id.in_(agents_ids)).distinct().all()
+            incidents_with_user_ids = [incident.usuario_asignado_id for incident in incidents_with_user]
+            
+            print(f"incidents_with_user_ids {incidents_with_user_ids}")
+
+            if incidents_with_user_ids:
+                user_without_incident = [user_id for user_id in agents_ids if user_id not in incidents_with_user_ids]
+
+            if len(user_without_incident) <= 0:
+                agents_less_incidents = (
+                        db.session.query(
+                                Incidente.usuario_asignado_id,
+                                func.count(Incidente.id).label('incidentes_count')
+                        )
+                        .filter(Incidente.usuario_asignado_id.in_(agents_ids))  
+                        .group_by(Incidente.usuario_asignado_id)
+                        .order_by(func.count(Incidente.id))
+                        .all()
+                        )
+                
+                agent = agents_less_incidents[0]
+                print(f"end {agent.usuario_asignado_id}")
+                return agent.usuario_asignado_id
+            else:
+                print(f"end {user_without_incident[0]}")
+
+                return user_without_incident[0]
+          
+        def get_agents_by_company(self, token, company_id):
+            
+            url = f"{USER_URL}/agent/{company_id}"
+
+            headers = common_utils.obtener_token(token)
+
+            response = requests.get(url, headers=headers)
+            logging.debug(f"codigo de respuesta {response.text}")
+            print(f"codigo de respuesta {response.status_code}")
+
+            if response.status_code == 200:
+                
+                logging.debug(f"response.json() {response.json()}")
+                agents = response.json()
+                return agents
+            else:
+                raise ServerSystemException
+              
+        
         def create_person(self, token, person):
             
             url = f"{USER_URL}/person/create"

@@ -377,6 +377,7 @@ class TestBlueprints:
     def test_creacion_incidencia_exitosa_creacion_persona(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.create_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('src.service.incident_service.publish_ia_request')
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
@@ -385,7 +386,7 @@ class TestBlueprints:
             
             form_data = {'name': fake.name(),
                     'lastName': fake.name(),
-                    'emailClient': f"{fake.word()}@outlook.com",
+                    'emailClient': "test@outlook.com",
                     'identityType': fake.name(),
                     'cellPhone': fake.random_number(digits=10),
                     'identityNumber': fake.random_number(digits=10),
@@ -393,6 +394,7 @@ class TestBlueprints:
                     'incidentChannel': 'Correo Electronico',
                     'incidentSubject': fake.sentence(nb_words=8),
                     'incidentDetail': fake.sentence(nb_words=8),
+                    'company_id': 1,            
                     'user_id': 1                 
                     }
             
@@ -400,7 +402,7 @@ class TestBlueprints:
 
             response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
             incident_data = response_service.get_json()
-            
+            print(response_service.text)
             print(incident_data)
 
             assert response_service.status_code == 201        
@@ -408,6 +410,8 @@ class TestBlueprints:
     def test_creacion_incidencia_exitosa_con_archivos(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
+
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.cloud.storage.Client')
             mocker.patch('src.service.incident_service.publish_ia_request')
@@ -426,7 +430,8 @@ class TestBlueprints:
                     'incidentSubject': fake.sentence(nb_words=8),
                     'incidentDetail': fake.sentence(nb_words=8),
                     'user_id': 1,
-                    'person_id': 1              
+                    'person_id': 1,
+                    'company_id': 1,            
                     }
             
             print(form_data)
@@ -442,6 +447,8 @@ class TestBlueprints:
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
+
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
             mocker.patch('src.service.incident_service.publish_ia_request')
@@ -462,7 +469,8 @@ class TestBlueprints:
                     'incidentSubject': fake.sentence(nb_words=8),
                     'incidentDetail': fake.sentence(nb_words=8),
                     'user_id': 1,
-                    'person_id': 1              
+                    'person_id': 1,
+                    'company_id': 1,            
                     }
             
             form_data.update(file_data)
@@ -472,6 +480,7 @@ class TestBlueprints:
             response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
             incident_data = response_service.get_json()
             
+            print(response_service.text)
             print(incident_data)
 
             assert response_service.status_code == 201
@@ -480,6 +489,8 @@ class TestBlueprints:
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
+
             mocker.patch('src.service.incident_service.publish_ia_request')
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
@@ -495,7 +506,8 @@ class TestBlueprints:
                     'incidentSubject': fake.sentence(nb_words=8),
                     'incidentDetail': fake.sentence(nb_words=8),
                     'user_id': 1,
-                    'person_id': 1              
+                    'person_id': 1,
+                    'company_id': 1
                     }
                         
             print(form_data)
@@ -512,6 +524,8 @@ class TestBlueprints:
     def test_creacion_incidencia_exitosa_y_consulta_llamada_por_persona(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+           
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
@@ -534,7 +548,8 @@ class TestBlueprints:
                     'incidentSubject': fake.sentence(nb_words=8),
                     'incidentDetail': fake.sentence(nb_words=8),
                     'user_id': 1,
-                    'person_id': 1              
+                    'person_id': 1,
+                    'company_id': 1
                     }
             
             form_data.update(file_data)
@@ -553,6 +568,8 @@ class TestBlueprints:
     def test_creacion_incidencia_exitosa_y_consulta_llamada_por_persona(self, mocker):
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
+
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
             mocker.patch('google.cloud.storage.Client')
@@ -575,7 +592,8 @@ class TestBlueprints:
                     'incidentSubject': fake.sentence(nb_words=8),
                     'incidentDetail': fake.sentence(nb_words=8),
                     'user_id': 1,
-                    'person_id': 1              
+                    'person_id': 1,
+                    'company_id': 1
                     }
             
             form_data.update(file_data)
@@ -599,6 +617,7 @@ class TestBlueprints:
         with app.test_client() as test_client:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.service.incident_service.IncidentService.get_person', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
 
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
@@ -620,6 +639,7 @@ class TestBlueprints:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.service.incident_service.IncidentService.get_person', return_value=1)
             mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
 
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
@@ -641,6 +661,7 @@ class TestBlueprints:
             mocker.patch('src.service.incident_service.IncidentService.update_person', return_value=1)
             mocker.patch('src.service.incident_service.IncidentService.get_person', return_value=1)
             mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=1)
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
 
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
@@ -667,7 +688,7 @@ class TestBlueprints:
                 'nombres': 'NombreNuevo'
                 }
             }
-
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
             mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=mock_response_data)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
@@ -702,7 +723,7 @@ class TestBlueprints:
                 'nombres': 'NombreNuevo'
                 }
             }
-
+            mocker.patch('src.service.incident_service.IncidentService.get_agents_by_company', return_value=[{'id': 1}, {'id': 2}, {'id': 3}])
             mocker.patch('src.service.incident_service.IncidentService.get_user', return_value=mock_response_data)
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: mock_response_data))
             mocker.patch('google.auth.default', return_value=(mocker.Mock(spec=AnonymousCredentials), 'project-id'))
@@ -729,7 +750,8 @@ class TestBlueprints:
                     'incidentSubject': fake.sentence(nb_words=8),
                     'incidentDetail': fake.sentence(nb_words=8),
                     'user_id': 1,
-                    'person_id': 1              
+                    'person_id': 1,
+                    'company_id': 1
                     }
                         
         print(form_data)
