@@ -2,6 +2,7 @@ from flask import Flask
 from ..models.models import db, cargar_datos_iniciales
 from dotenv import load_dotenv
 from os import environ
+import logging
 
 class Config:
 

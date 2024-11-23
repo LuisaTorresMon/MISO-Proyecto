@@ -864,7 +864,8 @@ class TestBlueprints:
 
             assert response.status_code == 500
             assert 'msg' in data
-            assert data['msg'] == 'Error a la hora de conultar el detalle de la incidencia No se ha enviado el token, porfavor contacte con su administrador'
+            print(f"Expected: {data['msg']}")
+            assert data['msg'] == 'Error obteniendo el porcentaje de incidencias por canal: No se ha enviado el token, porfavor contacte con su administrador'
 
     def test_get_summary_incidents_no_filters(self, mocker):
         with app.test_client() as test_client:
@@ -907,8 +908,8 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
-            fecha_inicio = (datetime.now() - timedelta(days=6)).strftime('%m/%d/%Y')
-            fecha_fin = (datetime.now() - timedelta(days=3)).strftime('%m/%d/%Y')
+            fecha_inicio = (datetime.now() - timedelta(days=6)).strftime('%Y-%m-%d')
+            fecha_fin = (datetime.now() - timedelta(days=3)).strftime('%Y-%m-%d')
             
             response = test_client.get('/incident/summary', query_string={'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
             data = response.get_json()
@@ -922,8 +923,8 @@ class TestBlueprints:
             mocker.patch('src.validations.validations.requests.post', return_value=mocker.Mock(status_code=200, json=lambda: {'respuesta': 'Token valido'}))
             headers = {'Authorization': "Bearer 0bbcb410-4263-49fd-a553-62e98eabd7e3", "Technology": "WEB"}
 
-            fecha_inicio = (datetime.now() - timedelta(days=10)).strftime('%m/%d/%Y')
-            fecha_fin = datetime.now().strftime('%m/%d/%Y')
+            fecha_inicio = (datetime.now() - timedelta(days=10)).strftime('%Y-%m-%d')
+            fecha_fin = datetime.now().strftime('%Y-%m-%d')
             
             response = test_client.get('/incident/summary', query_string={'canal_id': 1, 'estado_id': 1, 'fecha_inicio': fecha_inicio, 'fecha_fin': fecha_fin}, headers=headers)
             data = response.get_json()
@@ -940,4 +941,4 @@ class TestBlueprints:
 
             assert response.status_code == 500
             assert 'msg' in data
-            assert 'Error a la hora de conultar el detalle de la incidencia' in data['msg']
+            assert 'Error obteniendo el resumen de las incidencias No se ha enviado el token, porfavor contacte con su administrador' in data['msg']

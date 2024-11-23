@@ -33,8 +33,8 @@ class TestService():
                     "canal": "Llamada Telefónica",
                     "codigo": "INC01565",
                     "estado": "Abierto",
-                    "fecha_actualizacion": "11/15/2024",
-                    "fecha_creacion": "11/15/2024",
+                    "fecha_actualizacion": "2024-11-15",
+                    "fecha_creacion": "2024-11-15",
                     "id": 5,
                     "tipo": "Petición"
                 },
@@ -43,8 +43,8 @@ class TestService():
                     "canal": "Correo Electrónico",
                     "codigo": "INC01235",
                     "estado": "Abierto",
-                    "fecha_actualizacion": "11/15/2024",
-                    "fecha_creacion": "11/15/2024",
+                    "fecha_actualizacion": "2024-11-15",
+                    "fecha_creacion": "2024-11-15",
                     "id": 7,
                     "tipo": "Queja/Reclamo"
                 },
@@ -67,8 +67,8 @@ class TestService():
                 "canal_id": 1,
                 "estado_id": 2,
                 "tipo_id": 3,
-                "fecha_inicio": "11/15/2024",
-                "fecha_fin": "11/16/2024"
+                "fecha_inicio": "2024-11-15",
+                "fecha_fin": "2024-11-16"
             },
             headers={"Authorization": token}
         )
