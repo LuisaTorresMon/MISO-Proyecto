@@ -108,6 +108,25 @@ services:
       - app_net
       - ia_net
 
+  reports:
+    build: ./reports/
+    ports:
+      - "3006:3006"
+    environment:
+      DB_NAME: monitor_reports
+      DB_HOST: reports_db
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      USERS_PATH: "http://users:3000"
+      SENGRID_TOKEN: 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
+    depends_on:
+      reports_db:
+        condition: service_healthy
+    networks:
+      - app_net
+      - reports_net
+
   user_db:
     image: postgres
     environment:
@@ -188,6 +207,22 @@ services:
     networks:
       - incident_net
 
+  reports_db:
+    image: postgres
+    environment:
+      POSTGRES_DB: monitor_reports
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - 5435:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 2s
+      timeout: 5s
+      retries: 5
+    networks:
+      - reports_net
+
 networks:
   invoice_net:
   payment_net:
@@ -195,4 +230,5 @@ networks:
   plan_net:
   incident_net:
   user_net:
+  reports_net:
   ia_net:
