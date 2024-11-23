@@ -100,9 +100,6 @@ class BoardService():
             query = query.filter(func.date(Incidente.fecha_creacion) <= fecha_fin)
         
         incidentes = query.all()
-
-        #compiled = query.statement.compile(dialect=dialect(), compile_kwargs={"literal_binds": True})
-        #logging.debug("Summary =========>>>>>>>>> " + str(compiled))
         
         resultado = [
             {
