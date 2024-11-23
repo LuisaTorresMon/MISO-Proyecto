@@ -193,8 +193,11 @@ class IncidentService:
                         )
                 
                 agent = agents_less_incidents[0]
+                print(f"end {agent.usuario_asignado_id}")
                 return agent.usuario_asignado_id
             else:
+                print(f"end {user_without_incident[0]}")
+
                 return user_without_incident[0]
           
         def get_agents_by_company(self, token, company_id):

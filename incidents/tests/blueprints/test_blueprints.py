@@ -480,6 +480,7 @@ class TestBlueprints:
             response_service = test_client.post('/incident/create',data=form_data, headers=headers, content_type='multipart/form-data')
             incident_data = response_service.get_json()
             
+            print(response_service.text)
             print(incident_data)
 
             assert response_service.status_code == 201
@@ -885,7 +886,8 @@ class TestBlueprints:
 
             assert response.status_code == 500
             assert 'msg' in data
-            assert data['msg'] == 'Error a la hora de conultar el detalle de la incidencia No se ha enviado el token, porfavor contacte con su administrador'
+            print(f"Expected: {data['msg']}")
+            assert data['msg'] == 'Error obteniendo el porcentaje de incidencias por canal: No se ha enviado el token, porfavor contacte con su administrador'
 
     def test_get_summary_incidents_no_filters(self, mocker):
         with app.test_client() as test_client:
@@ -961,4 +963,4 @@ class TestBlueprints:
 
             assert response.status_code == 500
             assert 'msg' in data
-            assert 'Error a la hora de conultar el detalle de la incidencia' in data['msg']
+            assert 'Error obteniendo el resumen de las incidencias No se ha enviado el token, porfavor contacte con su administrador' in data['msg']

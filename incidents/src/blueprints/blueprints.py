@@ -192,7 +192,7 @@ def find_history_by_incident(id_incident):
         return incident_service.find_history_by_incident(token_encabezado, id_incident)
     except Exception as err:
         logging.debug(err)
-        raise ServerSystemException(f"Error a la hora de conultar las incidencias {err}, porfavor contacte con su administrador")
+        raise ServerSystemException(f"Error a la hora de consultar las incidencias {err}, porfavor contacte con su administrador")
    
     
 @incident_blueprint.route('/get/<int:id>', methods=['GET'])
@@ -267,7 +267,7 @@ def get_percentage_of_incidents_by_channel():
         )
     except Exception as err:
         logging.debug(f"excepcion {err}")
-        raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
+        raise ServerSystemException(f"Error obteniendo el porcentaje de incidencias por canal: {err}, porfavor contacte con su administrador")
     
     
 @incident_blueprint.route('/summary', methods=['GET'])
@@ -296,5 +296,5 @@ def get_summary_incidents():
         )
     except Exception as err:
         logging.debug(f"excepcion {err}")
-        raise ServerSystemException(f"Error a la hora de conultar el detalle de la incidencia {err}, porfavor contacte con su administrador")
+        raise ServerSystemException(f"Error obteniendo el resumen de las incidencias {err}, porfavor contacte con su administrador")
     

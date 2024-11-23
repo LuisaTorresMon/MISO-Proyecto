@@ -13,6 +13,7 @@ MICROSERVICES = {
     'payment': 'http://localhost:3001',
     'plan': 'http://localhost:3003',
     'user': 'http://localhost:3000',
+    'report': 'http://localhost:3006',
     'ia': 'http://localhost:3005',
 }
 
