@@ -10,7 +10,7 @@ RUN pip install pipenv && pipenv install --ignore-pipfile
 
 COPY . .
 
-# ENV GOOGLE_APPLICATION_CREDENTIALS="/app/experimentos-435400-c1fc2fa28b49.json"
+# ENV GOOGLE_APPLICATION_CREDENTIALS="/app/experimentos-435400-c1fc2fa28b49.json" 
 
 ENV FLASK_APP=src/main.py
 
