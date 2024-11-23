@@ -124,6 +124,21 @@ def cargar_datos_iniciales():
     automated_person = db.session.query(Person).filter_by(numero_identificacion="0000000001").first()
     ia_person = db.session.query(Person).filter_by(numero_identificacion="0000000002").first()
     person = db.session.query(Person).filter_by(numero_identificacion="1030661927").first()
+    nueva_empresa = db.session.query(Empresa).filter_by(numero_identificacion="00000000").first()
+    
+    if not nueva_empresa:
+        nueva_empresa = Empresa(
+                nombre_empresa="Compañía de Prueba S.A.",
+                email="contacto@compania.com",
+                tipo_identificacion=1,  
+                numero_identificacion="00000000",
+                sector="Tecnología",
+                telefono="+123456789",
+                pais="Costa Rica"
+        )
+          
+        db.session.add(nueva_empresa)
+        db.session.commit()
 
     if not person:
             person = Person(
@@ -190,8 +205,8 @@ def cargar_datos_iniciales():
         hashed_password = bcrypt.hashpw(password.encode("utf-8"), salt)
 
         users = [
-            User(id_empresa=None, id_tipousuario = 1, id_persona=person.id, nombre_usuario="sa", contrasena=hashed_password.decode("utf-8")),  
-            User(id_empresa=None, id_tipousuario = 2, id_persona=automated_person.id, nombre_usuario="test_agent", contrasena=hashed_password.decode("utf-8")),
+            User(id_empresa=nueva_empresa.id, id_tipousuario = 1, id_persona=person.id, nombre_usuario="sa", contrasena=hashed_password.decode("utf-8")),  
+            User(id_empresa=nueva_empresa.id, id_tipousuario = 2, id_persona=automated_person.id, nombre_usuario="test_agent", contrasena=hashed_password.decode("utf-8")),
         ]
 
         db.session.bulk_save_objects(users)

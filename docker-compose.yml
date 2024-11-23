@@ -100,7 +100,7 @@ services:
       DB_USER: postgres
       DB_PASSWORD: postgres
       USERS_PATH: "http://users:3000"
-      OPENAI_API_KEY: ${OPENAI_API_KEY}
+      OPENAI_API_KEY: ""
     depends_on:
       incident_db:
         condition: service_healthy
