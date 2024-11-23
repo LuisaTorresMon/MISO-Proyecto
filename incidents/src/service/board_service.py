@@ -113,3 +113,4 @@ class BoardService():
         
         return jsonify(incidentes=resultado, total=len(resultado))
     
+    
