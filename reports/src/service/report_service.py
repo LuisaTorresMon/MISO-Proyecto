@@ -25,8 +25,8 @@ class ReportService():
                 "canal_id": canal_id,
                 "estado_id": estado_id,
                 "tipo_id": tipo_id,
-                "fecha_inicio": fecha_inicio.strftime('%m/%d/%Y') if fecha_inicio else None,
-                "fecha_fin": fecha_fin.strftime('%m/%d/%Y') if fecha_fin else None
+                "fecha_inicio": fecha_inicio.strftime('%Y-%m-%d') if fecha_inicio else None,
+                "fecha_fin": fecha_fin.strftime('%Y-%m-%d') if fecha_fin else None
             }
             response = requests.get(url, params=params, headers=headers)
             response.raise_for_status()
