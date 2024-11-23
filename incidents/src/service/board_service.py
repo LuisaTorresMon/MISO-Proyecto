@@ -26,7 +26,7 @@ class BoardService():
         elif fecha_inicio:
             base_query = base_query.filter(Incidente.fecha_creacion >= fecha_inicio)
         elif fecha_fin:
-            base_query = base_query.filter(Incidente.fecha_actualizacion <= fecha_fin)
+            base_query = base_query.filter(Incidente.fecha_creacion <= fecha_fin)
 
         total_incidents = base_query.scalar() or 1
 
@@ -50,7 +50,7 @@ class BoardService():
         elif fecha_inicio:
             query = query.filter(func.date(Incidente.fecha_creacion) >= fecha_inicio)
         elif fecha_fin:
-            query = query.filter(func.date(Incidente.fecha_actualizacion) <= fecha_fin)
+            query = query.filter(func.date(Incidente.fecha_creacion) <= fecha_fin)
     
         results = query.group_by(Canal.nombre_canal).all()
     
@@ -93,7 +93,7 @@ class BoardService():
         elif fecha_inicio:
             query = query.filter(func.date(Incidente.fecha_creacion) >= fecha_inicio)
         elif fecha_fin:
-            query = query.filter(func.date(Incidente.fecha_actualizacion) <= fecha_fin)
+            query = query.filter(func.date(Incidente.fecha_creacion) <= fecha_fin)
         
         incidentes = query.all()
         
@@ -103,7 +103,7 @@ class BoardService():
                 "codigo": incidente.codigo,
                 "asunto": incidente.asunto,
                 "fecha_creacion": incidente.fecha_creacion.strftime('%m/%d/%Y') if incidente.fecha_creacion else None,
-                "fecha_actualizacion": incidente.fecha_actualizacion.strftime('%m/%d/%Y') if incidente.fecha_actualizacion else None,
+                "fecha_actualizacion": incidente.fecha_creacion.strftime('%m/%d/%Y') if incidente.fecha_creacion else None,
                 "canal": incidente.nombre_canal,
                 "estado": incidente.estado,
                 "tipo": incidente.tipo
