@@ -5,7 +5,7 @@ metadata:
   labels:
     name: gateway-ingress
   annotations:
-    kubernetes.io/ingress.global-static-ip-name: "abcall-ip-ingress"
+    kubernetes.io/ingress.global-static-ip-name: "gateway-ingress-2"
 spec:
   rules:
     - http:
