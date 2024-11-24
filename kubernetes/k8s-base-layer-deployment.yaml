@@ -14,7 +14,7 @@ spec:
     spec:
       containers:
         - name: users-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/users:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/users:39
           envFrom:
             - secretRef:
                 name: db-secrets
@@ -93,7 +93,7 @@ spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: incidents-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/incidents:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/incidents:39
           envFrom:
             - secretRef:
                 name: db-secrets
@@ -172,7 +172,7 @@ spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: plans-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/plans:39
           envFrom:
             - secretRef:
                 name: db-secrets
@@ -250,7 +250,7 @@ spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: invoice-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/invoice:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/invoice:39
           envFrom:
             - secretRef:
                 name: db-secrets
@@ -329,7 +329,7 @@ spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: payment-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/payment:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/payment:39
           envFrom:
             - secretRef:
                 name: db-secrets
@@ -407,7 +407,7 @@ spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: ia-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/ia:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/ia:39
           envFrom:
             - secretRef:
                 name: db-secrets
@@ -486,7 +486,7 @@ spec:
       serviceAccountName: k8s-proyecto-final-serviceaccount
       containers:
         - name: reports-contenedor
-          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/reports:1.0
+          image: us-central1-docker.pkg.dev/experimentos-435400/uniandes-misw-proyecto-grado-19/reports:39
           envFrom:
             - secretRef:
                 name: db-secrets
