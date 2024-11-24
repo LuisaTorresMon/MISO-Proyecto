@@ -26,7 +26,7 @@ class UserService():
         self.username = user.get('username')
         self.password = user.get('password').encode('utf-8')
 
-        if self.id_persona is None and self.id_empresa is None and self.id_tipousuario is None:
+        if self.id_persona is None and self.id_tipousuario is None:
             raise BadRequestException
 
         else:
@@ -34,13 +34,6 @@ class UserService():
                 if str(self.id_persona).strip() != "":
                     try:
                         int( self.id_persona)
-                    except ValueError:
-                        raise BadRequestException
-
-            if self.id_empresa is not None:
-                if str(self.id_empresa).strip() != "":
-                    try:
-                        int( self.id_empresa)
                     except ValueError:
                         raise BadRequestException
                 
