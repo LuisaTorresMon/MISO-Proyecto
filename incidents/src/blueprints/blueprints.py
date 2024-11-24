@@ -29,13 +29,15 @@ def create_incidence():
     validator_incident.valid_token(token_encabezado)
     
     technology = headers.get('Technology')
-    person_id = request.form.get('person_id') 
+    person_id = request.form.get('person_id')
+    company_id = request.form.get('id_company')
+
+    logging.debug(f"id_company {company_id}")
 
     if technology == 'WEB':
         logging.debug("INCIDENCE WEB")
 
         user_id = request.form.get('user_id')
-        company_id = request.form.get('id_company')
         name_person = request.form.get('name')     
         lastname_person = request.form.get('lastName')     
         email_person = request.form.get('emailClient') 

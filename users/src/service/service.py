@@ -21,12 +21,12 @@ class UserService():
 
     def create_user(self, user):
         self.id_persona = user.get('id_person')
-        self.id_empresa = user.get('id_company')
+        self.id_empresa = Empresa.query.first().id
         self.id_tipousuario = user.get('id_typeuser')
         self.username = user.get('username')
         self.password = user.get('password').encode('utf-8')
 
-        if self.id_persona is None and self.id_empresa is None and self.id_tipousuario is None:
+        if self.id_persona is None and self.id_tipousuario is None:
             raise BadRequestException
 
         else:
@@ -34,13 +34,6 @@ class UserService():
                 if str(self.id_persona).strip() != "":
                     try:
                         int( self.id_persona)
-                    except ValueError:
-                        raise BadRequestException
-
-            if self.id_empresa is not None:
-                if str(self.id_empresa).strip() != "":
-                    try:
-                        int( self.id_empresa)
                     except ValueError:
                         raise BadRequestException
                 
@@ -314,11 +307,11 @@ class UserService():
         numero_identificacion = user.get('numero_identificacion')
         telefono = user.get('telefono')
         correo_electronico = user.get('correo_electronico')
-        id_empresa = user.get('id_empresa')
+        id_empresa = Empresa.query.first().id
 
         logging.debug(id_empresa)
 
-        nuevo_agente = Person(
+        nuevo_usuario = Person(
             nombres =nombres,
             apellidos = apellidos,
             tipo_identificacion = tipo_identificacion,
@@ -327,20 +320,20 @@ class UserService():
             correo_electronico = correo_electronico
         )
 
-        db.session.add(nuevo_agente)
+        db.session.add(nuevo_usuario)
         db.session.commit()
 
         user_data = {
             "username": nombre_usuario,
             "password": contrasena,
             "id_typeuser": id_user_type,
-            "id_person": nuevo_agente.id
+            "id_person": nuevo_usuario.id
         }
         new_user = self.create_user(user_data)
 
         return jsonify({
             "message": "Usuario registrado exitosamente.",
             "usuario": new_user['nombre_usuario'],
-            "empresa": nuevo_agente.nombres
+            "empresa": nuevo_usuario.nombres
         })
     

@@ -4,7 +4,7 @@ import json
 from faker import Faker
 from datetime import datetime
 from src.main import app
-from src.models.model import db, Product, ProductPerson
+from src.models.model import db, Product, ProductPerson, Empresa
 from src.service.service import UserService
 from src.errors.errors import IncorrectUserOrPasswordException, UserAlreadyExistException, BadRequestException, ResourceNotFound
 
@@ -99,20 +99,6 @@ class TestServices():
         }
 
         # Verificar que lanza BadRequestException al no poder convertir id_persona a entero
-        with pytest.raises(BadRequestException):
-            user_service.create_user(mock_data)
-
-    def test_create_user_invalid_id_empresa_raises_exception(self, mocker):
-        # Datos simulados con un `id_empresa` no convertible a entero
-        mock_data = {
-            'id_person': None,
-            'id_company': 'invalid_company',
-            'id_typeuser': '2',
-            'username': 'testuser',
-            'password': 'password123'
-        }
-
-        # Verificar que lanza BadRequestException al no poder convertir id_empresa a entero
         with pytest.raises(BadRequestException):
             user_service.create_user(mock_data)
 
@@ -246,7 +232,7 @@ class TestServices():
         with app.test_client() as test_client:
             user_data = {
                 'id_person': '4',
-                'id_company': None,
+                'id_company': Empresa.query.first().id,
                 'id_typeuser': '1',
                 'username': 'testuser',
                 'password': self.generate_credentials('password123')
