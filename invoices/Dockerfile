@@ -8,7 +8,7 @@ COPY Pipfile* ./
 
 RUN pip install pipenv && pipenv install --ignore-pipfile
 
-COPY . .
+COPY . . 
 
 # ENV GOOGLE_APPLICATION_CREDENTIALS="/app/experimentos-435400-a8c250104b8f.json" 
 
