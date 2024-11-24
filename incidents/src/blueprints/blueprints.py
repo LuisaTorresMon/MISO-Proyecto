@@ -32,6 +32,8 @@ def create_incidence():
     person_id = request.form.get('person_id')
     company_id = request.form.get('id_company')
 
+    logging.debug(f"id_company {company_id}")
+
     if technology == 'WEB':
         logging.debug("INCIDENCE WEB")
 
