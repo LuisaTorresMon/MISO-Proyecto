@@ -21,7 +21,7 @@ class UserService():
 
     def create_user(self, user):
         self.id_persona = user.get('id_person')
-        self.id_empresa = user.get('id_company')
+        self.id_empresa = Empresa.query.first().id
         self.id_tipousuario = user.get('id_typeuser')
         self.username = user.get('username')
         self.password = user.get('password').encode('utf-8')
