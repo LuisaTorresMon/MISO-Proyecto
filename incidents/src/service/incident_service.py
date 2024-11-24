@@ -161,25 +161,24 @@ class IncidentService:
               return incident
           
         def get_agent_with_less_incidents(self, token, company_id):
-            print(f"get_agent_with_less_incidents ")
 
             user_without_incident = []
             
             agents = self.get_agents_by_company(token, company_id)
-            print(f"agents {agents}")
-
+            logging.debug(f"agents {agents}")
             agents_ids = [agent['id'] for agent in agents]
        
-            print(f"agents_ids {agents_ids}")
-       
+            logging.debug(f"agents_ids {agents_ids}")
+
             incidents_with_user = db.session.query(Incidente.usuario_asignado_id).filter(Incidente.usuario_asignado_id.in_(agents_ids)).distinct().all()
             incidents_with_user_ids = [incident.usuario_asignado_id for incident in incidents_with_user]
             
-            print(f"incidents_with_user_ids {incidents_with_user_ids}")
+            logging.debug(f"incidents_with_user_ids {incidents_with_user_ids}")
 
             if incidents_with_user_ids:
                 user_without_incident = [user_id for user_id in agents_ids if user_id not in incidents_with_user_ids]
-
+            else:
+                user_without_incident = agents_ids
             if len(user_without_incident) <= 0:
                 agents_less_incidents = (
                         db.session.query(
